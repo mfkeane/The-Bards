@@ -1,0 +1,13 @@
+import numpry
+
+board = numpry.zeros(8,8)
+
+for i in range(8):
+    board[i] = input() 
+game_type = input
+
+if input is Moves:
+    # do this...
+    
+elif input is Massacre:
+    # do this...
