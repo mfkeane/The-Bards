@@ -1,6 +1,6 @@
-import numpry
+import numpy
 
-board = numpry.zeros(8,8)
+board = numpy.zeros(8,8)
 
 for i in range(8):
     board[i] = input() 
