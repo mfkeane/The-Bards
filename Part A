@@ -1,7 +1,5 @@
-import numpy
-
 # initialise board matrix
-board = numpy.zeros(8,8)
+board = [[0 for col in range(8)] for row in range(8)]
 
 # Load board and game_type
 for i in range(8):
