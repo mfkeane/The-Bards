@@ -4,10 +4,17 @@ board = numpry.zeros(8,8)
 
 for i in range(8):
     board[i] = input() 
-game_type = input
+game_type = input()
 
 if input is Moves:
     # do this...
+    for x in range(8):
+        for y range(8):
+            if board[x][y] is 'O':
+                #Check avaliable spaces
+                
+            elif board[x][y] is '@':
+                #Check avaliable spaces
     
 elif input is Massacre:
     # do this...
