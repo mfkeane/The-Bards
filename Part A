@@ -1,11 +1,15 @@
 import numpy
 
+# initialise board matrix
 board = numpy.zeros(8,8)
 
+# Load board and game_type
 for i in range(8):
-    board[i] = input() 
+    board[i] = input().split()
 game_type = input()
 
+
+# Check game_type
 if input is Moves:
     # do this...
     for x in range(8):
