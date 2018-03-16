@@ -1,38 +1,42 @@
-# initialise board matrix
-board = [[0 for col in range(8)] for row in range(8)]
+def main():
 
-# Load board and game_type
-for i in range(8):
-    board[i] = input().split()
-game_type = input()
+    # initialise board matrix
+    board = [[0 for col in range(8)] for row in range(8)]
+
+    # Load board and game_type
+    for i in range(8):
+        board[i] = input().split()
+    game_type = input()
 
 
-# Check game_type
-#------------------------MOVES------------------------
-if input is Moves:
+    # Check game_type
+    #------------------------MOVES------------------------
+    if input is Moves:
 
-    # Initialise moves variables
-    moves_O = 0
-    moves_at = 0
+        # Initialise moves variables
+        moves_O = 0
+        moves_at = 0
     
-    # For each square on board:
-    #       - check if it's a piece
-    #       - if so, count avaliable moves 
+        # For each square on board:
+        #       - check if it's a piece
+        #       - if so, count avaliable moves 
      
-    for x in range(8):
-        for y range(8):
-            if board[x][y] is 'O':
-                #Check avaliable spaces
-                moves_O += CheckMoves(board,x,y)
+        for x in range(8):
+            for y in range(8):
+                if board[x][y] is 'O':
+                    #Check avaliable spaces
+                    moves_O += CheckMoves(board,x,y)
                 
-            elif board[x][y] is '@':
-                #Check avaliable spaces
-                moves_at += CheckMoves(board,x,y)
+                elif board[x][y] is '@':
+                    #Check avaliable spaces
+                    moves_at += CheckMoves(board,x,y)
+
+        print(moves_O +'\n' + moves_at)
     
     
-#---------------------MASSACRE----------------------
-elif input is Massacre:
-    # do this...
+    #---------------------MASSACRE----------------------
+    elif input is Massacre:
+        # do this...
 
 
 #------------------HELPER FUNCTIONS-----------------
@@ -50,13 +54,14 @@ def CheckMoves(board, x, y):
     if board[x][y-1] is '-':
         moves+=1
         
-    if (x+2 is in range(8)) and (board[x+1][y] is 'O' or '@') and (board[x+2][y] is '-'):
+    if (x+2 in range(8)) and (board[x+1][y] is 'O' or '@') and (board[x+2][y] is '-'):
         moves+=1
-    if (x-2 is in range(8)) and (board[x-1][y] is 'O' or '@') and (board[x-2][y] is '-'):
+    if (x-2 in range(8)) and (board[x-1][y] is 'O' or '@') and (board[x-2][y] is '-'):
         moves+=1
-    if (y+2 is in range(8)) and (board[x][y+1] is 'O' or '@') and (board[x][y+2] is '-'):
+    if (y+2 in range(8)) and (board[x][y+1] is 'O' or '@') and (board[x][y+2] is '-'):
         moves+=1
-    if (y-2 is in range(8)) and (board[x][y-1] is 'O' or '@') and (board[x][y-2] is '-'):
+    if (y-2 in range(8)) and (board[x][y-1] is 'O' or '@') and (board[x][y-2] is '-'):
         moves+=1
         
     return moves
+
