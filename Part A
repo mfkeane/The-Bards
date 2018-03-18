@@ -31,11 +31,11 @@ def main():
      
         for x in range(8):
             for y in range(8):
-                if board[x][y] is 'O':
+                if board[x][y] is white:
                     #Check avaliable spaces
                     moves_O += CheckMoves(board,x,y)
                 
-                elif board[x][y] is '@':
+                elif board[x][y] is black:
                     #Check avaliable spaces
                     moves_at += CheckMoves(board,x,y)
 
@@ -57,7 +57,7 @@ def main():
 
                elif board[x][y] is black:
                    targets.append((x,y))
-                   find_goal_pos(targets(x,y))
+                   goals = find_goal_pos(goals,x,y)
                    num_black += 1
 
       for i in range(num_white):
@@ -95,7 +95,7 @@ def CheckMoves(board, x, y):
     
 # Check if piece already partially surrounded and mark goal positions for white
 
-def find_goal_pos(x,y):
+def find_goal_pos(goals,x,y):
 
     # If no white pieces surround black, all surrounding tiles are valid goals
 
@@ -117,6 +117,8 @@ def find_goal_pos(x,y):
         goals.append((x,y-1))
     if (board[x][y-1] is white):
         goals.append((x,y+1))
+    
+    return goals
 
 def in_goal_pos(x,y):
 
