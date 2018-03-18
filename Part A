@@ -1,3 +1,4 @@
+
 def main():
 
     #Define symbols
@@ -10,6 +11,7 @@ def main():
     attackers = []
     targets = []
     goals = []
+    flanks = []
     
     # Load board and game_type
     for i in range(8):
@@ -57,14 +59,21 @@ def main():
 
                elif board[x][y] is black:
                    targets.append((x,y))
-                   goals = find_goal_pos(goals,x,y)
                    num_black += 1
 
-      for i in range(num_white):
-          if attackers[i] is in_goal_pos(attackers[i]):
-              i += 1
-          else
-              it_depth_search(attackers[i])
+       for i in targets:
+           x = i[0]
+           y = i[1]
+           returns = find_goal_pos(goals, flanks,x,y)
+           goals = returns[0]
+           flanks = returns[1]
+           
+           
+      #for i in range(num_white):
+       #   if attackers[i] is in_goal_pos(attackers[i]):
+       #       i += 1
+        #  else
+           #   it_depth_search(attackers[i])
 
 
 #------------------HELPER FUNCTIONS-----------------
@@ -95,7 +104,7 @@ def CheckMoves(board, x, y):
     
 # Check if piece already partially surrounded and mark goal positions for white
 
-def find_goal_pos(goals,x,y):
+def find_goal_pos(goals,flanks,x,y):
 
     # If no white pieces surround black, all surrounding tiles are valid goals
 
@@ -111,14 +120,18 @@ def find_goal_pos(goals,x,y):
 
     if (board[x+1][y] is white):
         goals.append((x-1,y))
+        flanks.append(attackers.pop(attackers.index((x+1,y))))
     if (board[x-1][y] is white):
         goals.append((x+1,y))
+        flanks.append(attackers.pop(attackers.index((x-1,y))))
     if (board[x][y+1] is white):
         goals.append((x,y-1))
+        flanks.append(attackers.pop(attackers.index((x,y+1))))
     if (board[x][y-1] is white):
         goals.append((x,y+1))
+        flanks.append(attackers.pop(attackers.index((x,y-1))))
     
-    return goals
+    return [goals,flanks]
 
 def in_goal_pos(x,y):
 
