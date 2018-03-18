@@ -1,11 +1,19 @@
 def main():
 
+    #Define symbols
+    empty = '-'
+    white = 'O'
+    black = '@'
+    
     # initialise board matrix
     board = [[0 for col in range(8)] for row in range(8)]
-
+    attackers = []
+    targets = []
+    goals = []
+    
     # Load board and game_type
     for i in range(8):
-        board[i] = input().split()
+        board[i] = input().replace(" ", "")
     game_type = input()
 
 
@@ -36,7 +44,27 @@ def main():
     
     #---------------------MASSACRE----------------------
     elif input is Massacre:
-        # do this...
+       # Store locations of Black and White pieces
+
+       num_white = 0
+       num_black = 0
+
+       for x in range(8):
+           for y range(8):
+               if board[x][y] is white:
+                   attackers.append((x,y))
+                   num_white += 1
+
+               elif board[x][y] is black:
+                   targets.append((x,y))
+                   find_goal_pos(targets(x,y))
+                   num_black += 1
+
+      for i in range(num_white):
+          if attackers[i] is in_goal_pos(attackers[i]):
+              i += 1
+          else
+              it_depth_search(attackers[i])
 
 
 #------------------HELPER FUNCTIONS-----------------
