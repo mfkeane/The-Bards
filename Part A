@@ -92,4 +92,45 @@ def CheckMoves(board, x, y):
         moves+=1
         
     return moves
+    
+# Check if piece already partially surrounded and mark goal positions for white
+
+def find_goal_pos(x,y):
+
+    # If no white pieces surround black, all surrounding tiles are valid goals
+
+    if (board[x+1][y] is empty and board[x-1][y] is empty
+    and board[x][y+1] is empty and board[x][y-1] is empty):
+
+        goals.append((x+1,y))
+        goals.append((x-1,y))
+        goals.append((x,y+1))
+        goals.append((x,y-1))
+
+    # If piece already surrounded by one white piece, adjacent square is goal
+
+    if (board[x+1][y] is white):
+        goals.append((x-1,y))
+    if (board[x-1][y] is white):
+        goals.append((x+1,y))
+    if (board[x][y+1] is white):
+        goals.append((x,y-1))
+    if (board[x][y-1] is white):
+        goals.append((x,y+1))
+
+def in_goal_pos(x,y):
+
+    # Check that the white piece is in a goal pos
+
+    if (board[x+1][y] is black or board[x-1][y] is black
+    or board[x][y+1] is black or board[x][y-1] is black):
+        return 1
+    else
+        return 0
+
+def check_taken(x,y):
+
+
+def check_win(board):
+
 
