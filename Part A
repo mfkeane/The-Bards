@@ -1,3 +1,8 @@
+class Dijkstra():
+    def dijkstra(): #or it_depth_search():
+        #initialise and search
+        # can probably just copy and paste here, with citation
+
 
 def main():
 
@@ -70,7 +75,7 @@ def main():
            
            
       #for i in range(num_white):
-       #   if attackers[i] is in_goal_pos(attackers[i]):
+       #   if in_goal_pos(attackers[i]):
        #       i += 1
         #  else
            #   it_depth_search(attackers[i])
@@ -139,9 +144,9 @@ def in_goal_pos(x,y):
 
     if (board[x+1][y] is black or board[x-1][y] is black
     or board[x][y+1] is black or board[x][y-1] is black):
-        return 1
+        return True
     else
-        return 0
+        return False
 
 def check_taken(x,y):
 
