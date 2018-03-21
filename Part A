@@ -116,13 +116,43 @@ def main():
            returns = find_goal_pos(goals, flanks,x,y)
            goals = returns[0]
            flanks = returns[1]
+                      
+      for i in range(len(attackers)):
+          # if attacker is not being helpful, put it somewhere better
+          if not in_goal_pos(attackers[i]):
+              it_depth_search(attackers[i])
            
+              #put all path data to move_list
            
-      #for i in range(num_white):
-       #   if in_goal_pos(attackers[i]):
-       #       i += 1
-        #  else
-           #   it_depth_search(attackers[i])
+              # Remove current goal from goal list
+              goals.remove(attackers[i])
+           
+              #move O to O_goal_list
+              flanks.append(attackers.pop(attackers[i]))
+           
+              # -----Check if target is dead-----
+              # find opposite flank
+              (x,y) = attackers[i]
+              (x_tar, y_tar) = curr_target
+              flanker = (x+(x_tar-x), y+(y_tar-y))
+           
+              # if opposite flank is also in flanking list
+              if flanker in flanks:
+                  # target dead
+               
+                  # remove all associated goal's from list (except already removed one)
+                  for coord in find_goal_pos([],[],x_tar, y_tar)[0]:
+                      if coord is not attackers[i]:
+                          goals.remove(coord)
+                       
+                  # remove current target from target list as it's dead
+                  targets.remove(curr_target)
+               
+                  # move associated flankers from flanker list to attackers if coords no longer in goal list
+                  if (x,y) not in goals:
+                      attackers.append(flanks.pop(attackers[i]))
+                  if flanker not in goals:
+                      attackers.append(flanks.pop(flanker))
 
 
 #------------------HELPER FUNCTIONS-----------------
