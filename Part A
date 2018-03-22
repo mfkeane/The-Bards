@@ -103,7 +103,6 @@ class WatchYourBack:
 
     def massacre(board):
         
-        moves[]
         # Store locations of Black and White pieces
         for x in range(8):
            for y range(8):
