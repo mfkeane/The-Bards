@@ -1,76 +1,29 @@
-#-----------START OF SOURCED CODE------------
-# The following code is sourced from:
-# Lynn Root (screen name: econchick) (30/01/2013) Python implementation of Dijkstra's Algorithm (Version 1.0) [source code]. https://gist.github.com/econchick/4666413
-class Graph:
-  def __init__(self):
-    self.nodes = set()
-    self.edges = defaultdict(list)
-    self.distances = {}
-
-  def add_node(self, value):
-    self.nodes.add(value)
-
-  def add_edge(self, from_node, to_node, distance):
-    self.edges[from_node].append(to_node)
-    self.edges[to_node].append(from_node)
-    self.distances[(from_node, to_node)] = distance
-
-
-def dijsktra(graph, initial):
-  visited = {initial: 0}
-  path = {}
-
-  nodes = set(graph.nodes)
-
-  while nodes: 
-    min_node = None
-    for node in nodes:
-      if node in visited:
-        if min_node is None:
-          min_node = node
-        elif visited[node] < visited[min_node]:
-          min_node = node
-
-    if min_node is None:
-      break
-
-    nodes.remove(min_node)
-    current_weight = visited[min_node]
-
-    for edge in graph.edges[min_node]:
-      weight = current_weight + graph.distance[(min_node, edge)]
-      if edge not in visited or weight < visited[edge]:
-        visited[edge] = weight
-        path[edge] = min_node
-
-  return visited, path
-        
- #------------END OF SOURCED CODE-------------
  
  #------------------HELPER FUNCTIONS-----------------
 
 # Function to check the avaliable moves surrounding a piece
 
+
 def CheckMoves(board, x, y):
     moves = 0
-    if board[x+1][y] is '-':
+    if (x+1 in range(8)) and board[x+1][y] is '-':
         moves+=1
-    if board[x-1][y] is '-':
+    if (x-1 in range(8)) and board[x-1][y] is '-':
         moves+=1
-    if board[x][y+1] is '-':
+    if (y+1 in range(8)) and board[x][y+1] is '-':
         moves+=1
-    if board[x][y-1] is '-':
+    if (y-1 in range(8)) and board[x][y-1] is '-':
         moves+=1
-        
-    if (x+2 in range(8)) and (board[x+1][y] is 'O' or '@') and (board[x+2][y] is '-'):
+
+    if (x+2 in range(8)) and ((board[x+1][y] is 'O') or (board[x+1][y] is '@'))$
         moves+=1
-    if (x-2 in range(8)) and (board[x-1][y] is 'O' or '@') and (board[x-2][y] is '-'):
+    if (x-2 in range(8)) and ((board[x-1][y] is 'O') or (board[x-1][y] is '@'))$
         moves+=1
-    if (y+2 in range(8)) and (board[x][y+1] is 'O' or '@') and (board[x][y+2] is '-'):
+    if (y+2 in range(8)) and ((board[x][y+1] is 'O') or (board[x][y+1] is '@'))$
         moves+=1
-    if (y-2 in range(8)) and (board[x][y-1] is 'O' or '@') and (board[x][y-2] is '-'):
+    if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
         moves+=1
-        
+
     return moves
     
 # Check if piece already partially surrounded and mark goal positions for white
@@ -122,31 +75,6 @@ def check_win(board):
 
 # --------------------MAIN----------------------
 
-
-
-def CheckMoves(board, x, y):
-    moves = 0
-    if (x+1 in range(8)) and board[x+1][y] is '-':
-        moves+=1
-    if (x-1 in range(8)) and board[x-1][y] is '-':
-        moves+=1
-    if (y+1 in range(8)) and board[x][y+1] is '-':
-        moves+=1
-    if (y-1 in range(8)) and board[x][y-1] is '-':
-        moves+=1
-
-    if (x+2 in range(8)) and ((board[x+1][y] is 'O') or (board[x+1][y] is '@'))$
-        moves+=1
-    if (x-2 in range(8)) and ((board[x-1][y] is 'O') or (board[x-1][y] is '@'))$
-        moves+=1
-    if (y+2 in range(8)) and ((board[x][y+1] is 'O') or (board[x][y+1] is '@'))$
-        moves+=1
-    if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
-        moves+=1
-
-    return moves
-
-
 #Define symbols
 empty = '-'
 white = 'O'
@@ -167,26 +95,7 @@ game_type = input()
 print(game_type)
 
 # Check game_type
-#------------------------MOVES------------------------
-if game_type == "Moves":
 
-    # Initialise moves variables
-    moves_O = 0
-    moves_at = 0
-
-    # For each square on board:
-    #       - check if it's a piece
-    #       - if so, count avaliable moves
-
-
-# Load board and game_type
-for i in range(8):
-    line = input()
-    board[i] = line.replace(" ","")
-game_type = input()
-print(game_type)
-
-# Check game_type
 #------------------------MOVES------------------------
 if game_type == "Moves":
 
