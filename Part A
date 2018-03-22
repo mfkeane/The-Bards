@@ -6,7 +6,7 @@ black = '@'
 class WatchYourBack:
     
     # Function to check the avaliable moves surrounding a piece
-    def CheckMoves(board, x, y):
+    def check_moves(board, x, y):
         moves = 0
         if (x+1 in range(8)) and board[x+1][y] is '-':
             moves+=1
@@ -25,6 +25,29 @@ class WatchYourBack:
             moves+=1
         if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
             moves+=1
+
+        return moves
+     
+    # Appends avaliable moves to a list
+    def append_moves(board, x, y):
+        moves = []
+        if (x+1 in range(8)) and board[x+1][y] is '-':
+            moves.append((x+1,y))
+        if (x-1 in range(8)) and board[x-1][y] is '-':
+            moves.append((x-1,y))
+        if (y+1 in range(8)) and board[x][y+1] is '-':
+            moves.append((x,y+1))
+        if (y-1 in range(8)) and board[x][y-1] is '-':
+            moves.append((x,y-1))
+
+        if (x+2 in range(8)) and ((board[x+1][y] is 'O') or (board[x+1][y] is '@'))$
+            moves.append((x+2,y))
+        if (x-2 in range(8)) and ((board[x-1][y] is 'O') or (board[x-1][y] is '@'))$
+            moves.append((x-2,y))
+        if (y+2 in range(8)) and ((board[x][y+1] is 'O') or (board[x][y+1] is '@'))$
+            moves.append((x,y+2))
+        if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
+            moves.append((x,y-2))
 
         return moves
     
@@ -68,11 +91,37 @@ class WatchYourBack:
             return True
         else
             return False
-
+    def find_closest_goal(piece,goals):
+        closest = goals[0]
+        dist = 16
+        for place in goals:
+            if (abs((piece[0]-place[0])+(piece[1]-place[1])))<dist:
+                dist = abs((piece[0]-place[0])+(piece[1]-place[1])))
+                closest = place
+        return closest
+        
+    
+    
     def check_taken(x,y):
 
 
     def check_win(board):
+    
+    # not sure if works yet
+    # Searching algorithm function: Depth Limited Search
+    def depth_limited_search(board, curr_pos, goal, path, depth):
+        if curr_pos == goal:
+            return path
+        if depth <= 0:
+            return None
+        else:
+            children = append_moves(board, curr_pos[0], curr_pos[1])
+            for coord in children:
+                search = path
+                search.append(coord)
+                result = depth_limited_search(board, path[-1], goal, search, depth-1)
+                if result is not None:
+                    return result
 
 #------------------------MOVES------------------------
 
@@ -89,11 +138,12 @@ class WatchYourBack:
             for y in range(8):
                 if board[x][y] is white:
                     #Check avaliable spaces
-                    moves_O += CheckMoves(board,x,y)
+                    moves_O += check_moves(board,x,y)
 
                 elif board[x][y] is black:
                     #Check avaliable spaces
-                    moves_at += CheckMoves(board,x,y)
+                    moves_at += 
+                    (board,x,y)
 
 
         print(str(moves_O) + "\n" + str(moves_at))
@@ -103,6 +153,8 @@ class WatchYourBack:
 
     def massacre(board):
         
+         moves = []
+         
         # Store locations of Black and White pieces
         for x in range(8):
            for y range(8):
@@ -119,7 +171,7 @@ class WatchYourBack:
             goals = returns[0]
             flanks = returns[1]
            
-        for j in range(len(targets)):
+   '''     for j in range(len(targets)):
             curr_target_x = targets[j][0]
             curr_target_y = targets[j][1]
             closest_white_x = attackers[0][0]
@@ -132,44 +184,46 @@ class WatchYourBack:
             abs(curr_target_y - closest_white_y)))
 
                 closest_white_x = attackers[k][0]
-                closest_white_y = attackers[k][1]
-                      
-        for i in range(len(attackers)):
-        # if attacker is not being helpful, put it somewhere better
-            if not in_goal_pos(attackers[i]):
-                it_depth_search(attackers[i])
-          
-                #put all path data to move_list
+                closest_white_y = attackers[k][1]   
+                '''
+                
+        # While all black pieces are not dead     
+        while len(targets)>0              
+            for i in range(len(attackers)):
+            # if attacker is not being helpful, put it somewhere better
+                if not in_goal_pos(attackers[i]):
+                    goal = find_closest_goal(attackers[i], goals)
+                    moves.append(depth_limited_search(board, attackers[i], goal, path, depth))
            
-                # Remove current goal from goal list
-                goals.remove(attackers[i])
+                    # Remove current goal from goal list
+                    goals.remove(attackers[i])
            
-                #move O to O_goal_list
-                flanks.append(attackers.pop(attackers[i]))
+                    #move O to O_goal_list
+                    flanks.append(attackers.pop(attackers[i]))
            
-                # -----Check if target is dead-----
-                # find opposite flank
-                (x,y) = attackers[i]
-                (x_tar, y_tar) = curr_target
-                flanker = (x+(x_tar-x), y+(y_tar-y))
+                    # -----Check if target is dead-----
+                    # find opposite flank
+                    (x,y) = attackers[i]
+                    (x_tar, y_tar) = curr_target
+                    flanker = (x+(x_tar-x), y+(y_tar-y))
            
-                # if opposite flank is also in flanking list
-                if flanker in flanks:
-                    # target dead
+                    # if opposite flank is also in flanking list
+                    if flanker in flanks:
+                        # target dead
              
-                    # remove all associated goal's from list (except already removed one)
-                    for coord in find_goal_pos([],[],x_tar, y_tar)[0]:
-                        if coord is not attackers[i]:
-                            goals.remove(coord)
+                        # remove all associated goal's from list (except already removed one)
+                        for coord in find_goal_pos([],[],x_tar, y_tar)[0]:
+                            if coord is not attackers[i]:
+                                goals.remove(coord)
                        
-                    # remove current target from target list as it's dead
-                    targets.remove(curr_target)
+                        # remove current target from target list as it's dead
+                        targets.remove(curr_target)
                
-                    # move associated flankers from flanker list to attackers if coords no longer in goal list
-                    if (x,y) not in goals:
-                        attackers.append(flanks.pop(attackers[i]))
-                    if flanker not in goals:
-                        attackers.append(flanks.pop(flanker))
+                        # move associated flankers from flanker list to attackers if coords no longer in goal list
+                        if (x,y) not in goals:
+                            attackers.append(flanks.pop(attackers[i]))
+                        if flanker not in goals:
+                            attackers.append(flanks.pop(flanker))
 
             for i in range(len(moves)-1):
                 print(moves[i] + " -> " moves[i+1])
