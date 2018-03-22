@@ -126,18 +126,14 @@ if game_type == "Moves":
 elif input is Massacre:
     # Store locations of Black and White pieces
     
-    num_white = 0
-    num_black = 0
 
     for x in range(8):
        for y range(8):
            if board[x][y] is white:
                attackers.append((x,y))
-               num_white += 1
 
            elif board[x][y] is black:
                targets.append((x,y))
-               num_black += 1
 
     for i in targets:
         x = i[0]
