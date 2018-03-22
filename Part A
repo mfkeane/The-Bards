@@ -1,84 +1,184 @@
- 
- #------------------HELPER FUNCTIONS-----------------
-
-# Function to check the avaliable moves surrounding a piece
-
-
-def CheckMoves(board, x, y):
-    moves = 0
-    if (x+1 in range(8)) and board[x+1][y] is '-':
-        moves+=1
-    if (x-1 in range(8)) and board[x-1][y] is '-':
-        moves+=1
-    if (y+1 in range(8)) and board[x][y+1] is '-':
-        moves+=1
-    if (y-1 in range(8)) and board[x][y-1] is '-':
-        moves+=1
-
-    if (x+2 in range(8)) and ((board[x+1][y] is 'O') or (board[x+1][y] is '@'))$
-        moves+=1
-    if (x-2 in range(8)) and ((board[x-1][y] is 'O') or (board[x-1][y] is '@'))$
-        moves+=1
-    if (y+2 in range(8)) and ((board[x][y+1] is 'O') or (board[x][y+1] is '@'))$
-        moves+=1
-    if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
-        moves+=1
-
-    return moves
-    
-# Check if piece already partially surrounded and mark goal positions for white
-
-def find_goal_pos(goals,flanks,x,y):
-
-    # If no white pieces surround black, all surrounding tiles are valid goals
-
-    if (board[x+1][y] is empty and board[x-1][y] is empty
-    and board[x][y+1] is empty and board[x][y-1] is empty):
-
-        goals.append((x+1,y))
-        goals.append((x-1,y))
-        goals.append((x,y+1))
-        goals.append((x,y-1))
-
-    # If piece already surrounded by one white piece, adjacent square is goal
-
-    if (board[x+1][y] is white):
-        goals.append((x-1,y))
-        flanks.append(attackers.pop(attackers.index((x+1,y))))
-    if (board[x-1][y] is white):
-        goals.append((x+1,y))
-        flanks.append(attackers.pop(attackers.index((x-1,y))))
-    if (board[x][y+1] is white):
-        goals.append((x,y-1))
-        flanks.append(attackers.pop(attackers.index((x,y+1))))
-    if (board[x][y-1] is white):
-        goals.append((x,y+1))
-        flanks.append(attackers.pop(attackers.index((x,y-1))))
-    
-    return [goals,flanks]
-
-def in_goal_pos(x,y):
-
-    # Check that the white piece is in a goal pos
-
-    if (board[x+1][y] is black or board[x-1][y] is black
-    or board[x][y+1] is black or board[x][y-1] is black):
-        return True
-    else
-        return False
-
-def check_taken(x,y):
-
-
-def check_win(board):
-
-
-# --------------------MAIN----------------------
-
-#Define symbols
+#Constants
 empty = '-'
 white = 'O'
 black = '@'
+
+class WatchYourBack:
+    
+    # Function to check the avaliable moves surrounding a piece
+    def CheckMoves(board, x, y):
+        moves = 0
+        if (x+1 in range(8)) and board[x+1][y] is '-':
+            moves+=1
+        if (x-1 in range(8)) and board[x-1][y] is '-':
+            moves+=1
+        if (y+1 in range(8)) and board[x][y+1] is '-':
+            moves+=1
+        if (y-1 in range(8)) and board[x][y-1] is '-':
+            moves+=1
+
+        if (x+2 in range(8)) and ((board[x+1][y] is 'O') or (board[x+1][y] is '@'))$
+            moves+=1
+        if (x-2 in range(8)) and ((board[x-1][y] is 'O') or (board[x-1][y] is '@'))$
+            moves+=1
+        if (y+2 in range(8)) and ((board[x][y+1] is 'O') or (board[x][y+1] is '@'))$
+            moves+=1
+        if (y-2 in range(8)) and ((board[x][y-1] is 'O') or (board[x][y-1] is '@'))$
+            moves+=1
+
+        return moves
+    
+    # Check if piece already partially surrounded and mark goal positions for white
+    def find_goal_pos(goals,flanks,x,y):
+
+        # If no white pieces surround black, all surrounding tiles are valid goals
+
+        if (board[x+1][y] is empty and board[x-1][y] is empty
+        and board[x][y+1] is empty and board[x][y-1] is empty):
+
+            goals.append((x+1,y))
+            goals.append((x-1,y))
+            goals.append((x,y+1))
+            goals.append((x,y-1))
+
+        # If piece already surrounded by one white piece, adjacent square is goal
+
+        if (board[x+1][y] is white):
+            goals.append((x-1,y))
+            flanks.append(attackers.pop(attackers.index((x+1,y))))
+        if (board[x-1][y] is white):
+            goals.append((x+1,y))
+            flanks.append(attackers.pop(attackers.index((x-1,y))))
+        if (board[x][y+1] is white):
+            goals.append((x,y-1))
+            flanks.append(attackers.pop(attackers.index((x,y+1))))
+        if (board[x][y-1] is white):
+            goals.append((x,y+1))
+            flanks.append(attackers.pop(attackers.index((x,y-1))))
+    
+        return [goals,flanks]
+
+    # Check if piece 
+    def in_goal_pos(x,y):
+
+        # Check that the white piece is in a goal pos
+
+        if (board[x+1][y] is black or board[x-1][y] is black
+        or board[x][y+1] is black or board[x][y-1] is black):
+            return True
+        else
+            return False
+
+    def check_taken(x,y):
+
+
+    def check_win(board):
+
+#------------------------MOVES------------------------
+
+    def moves(board):
+        # Initialise moves variables
+        moves_O = 0
+        moves_at = 0
+
+        # For each square on board:
+        #       - check if it's a piece
+        #       - if so, count avaliable moves
+
+        for x in range(8):
+            for y in range(8):
+                if board[x][y] is white:
+                    #Check avaliable spaces
+                    moves_O += CheckMoves(board,x,y)
+
+                elif board[x][y] is black:
+                    #Check avaliable spaces
+                    moves_at += CheckMoves(board,x,y)
+
+
+        print(str(moves_O) + "\n" + str(moves_at))
+        return [moves_O, moves_at]
+
+#---------------------MASSACRE----------------------
+
+    def massacre(board):
+        
+        moves[]
+        # Store locations of Black and White pieces
+        for x in range(8):
+           for y range(8):
+               if board[x][y] is white:
+                   attackers.append((x,y))
+
+               elif board[x][y] is black:
+                   targets.append((x,y))
+
+        for i in targets:
+            x = i[0]
+            y = i[1]
+            returns = find_goal_pos(goals, flanks,x,y)
+            goals = returns[0]
+            flanks = returns[1]
+           
+        for j in range(len(targets)):
+            curr_target_x = targets[j][0]
+            curr_target_y = targets[j][1]
+            closest_white_x = attackers[0][0]
+            closest_white_y = attackers[0][1]
+       
+        for k in range(len(attackers)):
+            if((abs(curr_target_x-attackers[k][0]) <
+            abs(curr_target_x-closest_white_x)) &
+            (abs(curr_target_y - attackers[k][1]) <
+            abs(curr_target_y - closest_white_y)))
+
+                closest_white_x = attackers[k][0]
+                closest_white_y = attackers[k][1]
+                      
+        for i in range(len(attackers)):
+        # if attacker is not being helpful, put it somewhere better
+            if not in_goal_pos(attackers[i]):
+                it_depth_search(attackers[i])
+          
+                #put all path data to move_list
+           
+                # Remove current goal from goal list
+                goals.remove(attackers[i])
+           
+                #move O to O_goal_list
+                flanks.append(attackers.pop(attackers[i]))
+           
+                # -----Check if target is dead-----
+                # find opposite flank
+                (x,y) = attackers[i]
+                (x_tar, y_tar) = curr_target
+                flanker = (x+(x_tar-x), y+(y_tar-y))
+           
+                # if opposite flank is also in flanking list
+                if flanker in flanks:
+                    # target dead
+             
+                    # remove all associated goal's from list (except already removed one)
+                    for coord in find_goal_pos([],[],x_tar, y_tar)[0]:
+                        if coord is not attackers[i]:
+                            goals.remove(coord)
+                       
+                    # remove current target from target list as it's dead
+                    targets.remove(curr_target)
+               
+                    # move associated flankers from flanker list to attackers if coords no longer in goal list
+                    if (x,y) not in goals:
+                        attackers.append(flanks.pop(attackers[i]))
+                    if flanker not in goals:
+                        attackers.append(flanks.pop(flanker))
+
+            for i in range(len(moves)-1):
+                print(moves[i] + " -> " moves[i+1])
+
+            return moves
+
+
+# --------------------MAIN----------------------
 
 # initialise board matrix
 board = [[0 for col in range(8)] for row in range(8)]
@@ -96,102 +196,8 @@ print(game_type)
 
 # Check game_type
 
-#------------------------MOVES------------------------
 if game_type == "Moves":
-
-    # Initialise moves variables
-    moves_O = 0
-    moves_at = 0
-
-    # For each square on board:
-    #       - check if it's a piece
-    #       - if so, count avaliable moves
-
-    for x in range(8):
-        for y in range(8):
-            if board[x][y] is white:
-                #Check avaliable spaces
-                moves_O += CheckMoves(board,x,y)
-                print("white" + str(x) + "," + str(y) + "," + str(moves_O))
-
-            elif board[x][y] is black:
-                #Check avaliable spaces
-                moves_at += CheckMoves(board,x,y)
-                print("black" + str(x) + "," + str(y) + "," + str(moves_O))
-
-
-    print(str(moves_O) + "\n" + str(moves_at))
-    
-#---------------------MASSACRE----------------------
+    moves(board)
 elif input is Massacre:
-    # Store locations of Black and White pieces
+    moves(board)
     
-
-    for x in range(8):
-       for y range(8):
-           if board[x][y] is white:
-               attackers.append((x,y))
-
-           elif board[x][y] is black:
-               targets.append((x,y))
-
-    for i in targets:
-        x = i[0]
-        y = i[1]
-        returns = find_goal_pos(goals, flanks,x,y)
-        goals = returns[0]
-        flanks = returns[1]
-           
-    for j in range(len(targets)):
-        curr_target_x = targets[j][0]
-        curr_target_y = targets[j][1]
-        closest_white_x = attackers[0][0]
-        closest_white_y = attackers[0][1]
-       
-    for k in range(len(attackers)):
-        if((abs(curr_target_x-attackers[k][0]) <
-        abs(curr_target_x-closest_white_x)) &
-        (abs(curr_target_y - attackers[k][1]) <
-        abs(curr_target_y - closest_white_y)))
-
-            closest_white_x = attackers[k][0]
-            closest_white_y = attackers[k][1]
-                      
-    for i in range(len(attackers)):
-    # if attacker is not being helpful, put it somewhere better
-        if not in_goal_pos(attackers[i]):
-            it_depth_search(attackers[i])
-          
-            #put all path data to move_list
-           
-            # Remove current goal from goal list
-            goals.remove(attackers[i])
-           
-            #move O to O_goal_list
-            flanks.append(attackers.pop(attackers[i]))
-           
-            # -----Check if target is dead-----
-            # find opposite flank
-            (x,y) = attackers[i]
-            (x_tar, y_tar) = curr_target
-            flanker = (x+(x_tar-x), y+(y_tar-y))
-           
-            # if opposite flank is also in flanking list
-            if flanker in flanks:
-                # target dead
-             
-                # remove all associated goal's from list (except already removed one)
-                for coord in find_goal_pos([],[],x_tar, y_tar)[0]:
-                    if coord is not attackers[i]:
-                        goals.remove(coord)
-                       
-                # remove current target from target list as it's dead
-                targets.remove(curr_target)
-               
-                # move associated flankers from flanker list to attackers if coords no longer in goal list
-                if (x,y) not in goals:
-                    attackers.append(flanks.pop(attackers[i]))
-                if flanker not in goals:
-                    attackers.append(flanks.pop(flanker))
-
-
