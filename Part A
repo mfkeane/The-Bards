@@ -130,8 +130,10 @@ class WatchYourBack:
                 search.append(coord)
                 result = depth_limited_search(board, path[-1], goal, search,
                 depth-1) """Path -1???"""
-                #if result is not None:
-            return result """Potentially returns nothing???"""
+            if result is not None:
+                return result """Potentially returns nothing???
+                                 If result is none, the current recurision will end and 
+                                 it should jump back up to the last recursion"""
 
 #------------------------MOVES------------------------
 
@@ -206,16 +208,16 @@ class WatchYourBack:
                     # -----Check if target is dead-----
                     # find opposite flank
                     (x,y) = attacker
-                    if (x+1 in range(8)) and board[x+1][y] is black):
+                    if (x+2 in range(8)) and board[x+1][y] is black):
                         curr_target = (x+1,y)
                         flanker = (x+2,y)
-                    if (x-1 in range(8)) and board[x-1][y] is black):
+                    if (x-2 in range(8)) and board[x-1][y] is black):
                         curr_target = (x-1,y)
                         flanker = (x-2,y)
-                    if (y+1 in range(8)) and board[x][y+1] is black):
+                    if (y+2 in range(8)) and board[x][y+1] is black):
                         curr_target = (x,y+1)
                         flanker = (x,y+2)
-                    if (y-1 in range(8)) and board[x][y-1] is black):
+                    if (y-2 in range(8)) and board[x][y-1] is black):
                         curr_target = (x, y-1)
                         flanker = (x, y-2)
 
