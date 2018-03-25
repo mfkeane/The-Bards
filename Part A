@@ -8,26 +8,26 @@ class WatchYourBack:
     # Function to check the avaliable moves surrounding a piece
     def check_moves(board, x, y):
         moves = 0
-        if (x+1 in range(8)) and board[x+1][y] is '-':
+        if (x+1 in range(8)) and (board[x+1][y] is '-'):
             moves+=1
-        if (x-1 in range(8)) and board[x-1][y] is '-':
+        if (x-1 in range(8)) and (board[x-1][y] is '-'):
             moves+=1
-        if (y+1 in range(8)) and board[x][y+1] is '-':
+        if (y+1 in range(8)) and (board[x][y+1] is '-'):
             moves+=1
-        if (y-1 in range(8)) and board[x][y-1] is '-':
+        if (y-1 in range(8)) and (board[x][y-1] is '-'):
             moves+=1
 
         if (x+2 in range(8)) and ((board[x+1][y] is 'O')
-        or (board[x+1][y] is '@'))$
+        or (board[x+1][y] is '@')):
             moves+=1
         if (x-2 in range(8)) and ((board[x-1][y] is 'O')
-        or (board[x-1][y] is '@'))$
+        or (board[x-1][y] is '@')):
             moves+=1
         if (y+2 in range(8)) and ((board[x][y+1] is 'O')
-        or (board[x][y+1] is '@'))$
+        or (board[x][y+1] is '@')):
             moves+=1
         if (y-2 in range(8)) and ((board[x][y-1] is 'O')
-        or (board[x][y-1] is '@'))$
+        or (board[x][y-1] is '@')):
             moves+=1
 
         return moves
@@ -45,16 +45,16 @@ class WatchYourBack:
             moves.append((x,y-1))
 
         if (x+2 in range(8)) and ((board[x+1][y] is 'O')
-        or (board[x+1][y] is '@'))$
+        or (board[x+1][y] is '@')):
             moves.append((x+2,y))
         if (x-2 in range(8)) and ((board[x-1][y] is 'O')
-        or (board[x-1][y] is '@'))$
+        or (board[x-1][y] is '@')):
             moves.append((x-2,y))
         if (y+2 in range(8)) and ((board[x][y+1] is 'O')
-        or (board[x][y+1] is '@'))$
+        or (board[x][y+1] is '@')):
             moves.append((x,y+2))
         if (y-2 in range(8)) and ((board[x][y-1] is 'O')
-        or (board[x][y-1] is '@'))$
+        or (board[x][y-1] is '@')):
             moves.append((x,y-2))
 
         return moves
@@ -99,7 +99,7 @@ class WatchYourBack:
         if (board[x+1][y] is black or board[x-1][y] is black
         or board[x][y+1] is black or board[x][y-1] is black):
             return True
-        else
+        else:
             return False
 
     def find_closest_goal(piece,goals):
@@ -107,14 +107,10 @@ class WatchYourBack:
         dist = 16
         for place in goals:
             if (abs((piece[0]-place[0])+(piece[1]-place[1])))<dist:
-                dist = abs((piece[0]-place[0])+(piece[1]-place[1])))
+                dist = abs((piece[0]-place[0])+(piece[1]-place[1]))
                 closest = place
         return closest
 
-"""    def check_taken(x,y):
-
-
-    def check_win(board):"""
 
     # not sure if works yet
     # Searching algorithm function: Depth Limited Search
@@ -126,14 +122,14 @@ class WatchYourBack:
         else:
             children = append_moves(board, curr_pos[0], curr_pos[1])
             for coord in children:
-                search = path """Necessary???"""
+                search = path #Necessary???
                 search.append(coord)
                 result = depth_limited_search(board, path[-1], goal, search,
-                depth-1) """Path -1???"""
+                depth-1) #Path -1???
             if result is not None:
-                return result """Potentially returns nothing???
-                                 If result is none, the current recurision will end and 
-                                 it should jump back up to the last recursion"""
+                return result #Potentially returns nothing???
+                              # If result is none, the current recurision will end and 
+                              #  it should jump back up to the last recursion
 
 #------------------------MOVES------------------------
 
@@ -154,7 +150,7 @@ class WatchYourBack:
 
                 elif board[x][y] is black:
                     #Check avaliable spaces
-                    moves_at +=
+                    moves_at += 1
                     (board,x,y)
 
 
@@ -165,11 +161,11 @@ class WatchYourBack:
 
     def massacre(board):
 
-         moves = []
+        moves = []
 
         # Store locations of Black and White pieces
         for x in range(8):
-           for y range(8):
+           for y in range(8):
                if board[x][y] is white:
                    attackers.append((x,y))
 
@@ -208,23 +204,23 @@ class WatchYourBack:
                     # -----Check if target is dead-----
                     # find opposite flank
                     (x,y) = attacker
-                    if (x+2 in range(8)) and board[x+1][y] is black):
+                    if (x+2 in range(8)) and (board[x+1][y] is black):
                         curr_target = (x+1,y)
                         flanker = (x+2,y)
-                    if (x-2 in range(8)) and board[x-1][y] is black):
+                    if (x-2 in range(8)) and (board[x-1][y] is black):
                         curr_target = (x-1,y)
                         flanker = (x-2,y)
-                    if (y+2 in range(8)) and board[x][y+1] is black):
+                    if (y+2 in range(8)) and (board[x][y+1] is black):
                         curr_target = (x,y+1)
                         flanker = (x,y+2)
-                    if (y-2 in range(8)) and board[x][y-1] is black):
+                    if (y-2 in range(8)) and (board[x][y-1] is black):
                         curr_target = (x, y-1)
                         flanker = (x, y-2)
 
                     (flank_x, flank_y) = flanker
                     """#(x,y) = attacker
                     #(x_tar, y_tar) = curr_target
-                    flanker = (x+(x_tar-x), y+(y_tar-y)) """"
+                    flanker = (x+(x_tar-x), y+(y_tar-y)) """
 
                     # if opposite flank is also in flanking list
                     if flanker in flanks:
@@ -241,20 +237,20 @@ class WatchYourBack:
 
                         # move associated flankers from flanker list to
                         #   attackers if coords no longer in goal list
-                        if (x,y) not in goals and board[x][y-1] is not black
+                        if ((x,y) not in goals and board[x][y-1] is not black
                         and board[x][y+1] is not black
                         and board[x-1][y] is not black
                         and board[x+1][y] is not black):
                             attackers.append(flanks.pop(attacker))
-                        if flanker not in goals
+                        if (flanker not in goals
                         and board[flank_x][flank_y-1] is not black
                         and board[flank_x][flank_y+1] is not black
                         and board[flank_x-1][flank_y] is not black
-                        and board[flank_x+1][flank_y] is not black:
+                        and board[flank_x+1][flank_y] is not black):
                             attackers.append(flanks.pop(flanker))
 
             for i in range(len(moves)-1):
-                print(moves[i] + " -> " moves[i+1])
+                print(moves[i] + " -> " + moves[i+1])
 
             return moves
 
