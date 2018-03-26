@@ -2,6 +2,7 @@
 empty = '-'
 white = 'O'
 black = '@'
+corner = 'X'
 
 class WatchYourBack:
 
@@ -100,6 +101,17 @@ class WatchYourBack:
 
         return [goals,flanks]
 
+    def remove_goal_pos(goals,x,y):
+      
+        if (x+1,y) in goals:
+            goals.remove((x+1,y))
+        if (x-1,y) in goals:
+            goals.remove((x-1,y))
+        if (x,y+1) in goals:
+            goals.remove((x,y+1))
+        if (x,y-1) in goals:
+            goals.remove((x,y-1))
+
     def in_goal_pos(x,y):
 
         # Check that the white piece is in a goal pos
@@ -121,7 +133,7 @@ class WatchYourBack:
 
 
    
-    def it_deepening(board, path, attacker, goals, max_depth=16):
+    def it_deepening(board, path, attacker, goals, max_depth=10):
         for depth in range(1, max_depth):
         
             result = WatchYourBack.depth_limited_search(board, attacker, goals,
@@ -189,6 +201,7 @@ class WatchYourBack:
         moves = []
         goals = []
         flanks = []
+        END = object()
         
         # Store locations of Black and White pieces
         for x in range(8):
@@ -211,18 +224,32 @@ class WatchYourBack:
             #for i in range(len(attackers)):
             # if attacker is not being helpful, put it somewhere better
                 if not WatchYourBack.in_goal_pos(attacker[0], attacker[1]):
-                    moves.extend(WatchYourBack.it_deepening(board, [], 
-                    attacker, goals))
+                    path = WatchYourBack.it_deepening(board, [], 
+                    attacker, goals)
+                    
+                    # if no path found, try next attacker
+                    if path == None:
+                        continue
+                    moves.extend(path)
+                    moves.append(END)
+                    
+                    s = list(board[attacker[0]])
+                    s[attacker[1]] = empty
+                    board[attacker[0]] = "".join(s)
+                    
+                    s = list(board[moves[-2][0]])
+                    s[moves[-2][1]] = white
+                    board[moves[-2][0]] = "".join(s)
                     
                     # Remove current goal from goal list
                     for  goal in goals:
-                        if len(moves)>0:
-                            if goal == moves[-1]:
+                        if len(moves)>1:
+                            if goal == moves[-2]:
                                 goals.remove(goal)
 
                     #move O to O_goal_list
-                    if len(moves)>0:
-                        flanks.append(moves[-1])
+                    if len(moves)>1:
+                        flanks.append(moves[-2])
                         attackers.pop(attackers.index(attacker))
                   
                     """for j in range(len(goals)):
@@ -233,8 +260,8 @@ class WatchYourBack:
                     # find opposite flank
                     x = -3
                     y = -3
-                    if len(moves)>0:
-                        (x,y) = moves[-1]
+                    if len(moves)>1:
+                        (x,y) = moves[-2]
                     flanker = []
                     curr_target = []
                     if (x+2 in range(8)) and (board[x+1][y] is black):
@@ -257,35 +284,55 @@ class WatchYourBack:
 
                     # if opposite flank is also in flanking list
                     for f in flanker:
-                        if flanker in flanks:
+                        if (f in flanks) or (board[f[0]][f[1]] is corner):
                             # target dead
+                            (flank_x, flank_y) = f
                             
-                            # remove all associated goal's from list
-                            #   (except already removed one)
-                            for coord in flanks:
-                                if coord not in attackers:
-                                    goals.remove(coord)
-
                             # remove current target from target list as it's dead
-                            targets.remove(curr_target[flanker.index(f)])
+                            target_to_remove = curr_target[flanker.index(f)]
+                            targets.remove(target_to_remove)
+                            s = list(board[target_to_remove[0]])
+                            s[target_to_remove[1]] = empty
+                            board[target_to_remove[0]] = "".join(s)
+                            
+                            if len(targets)==0:
+                                break
+                            
+                            WatchYourBack.remove_goal_pos(goals,curr_target[
+                            flanker.index(f)][0],curr_target[
+                            flanker.index(f)][1])
 
                             # move associated flankers from flanker list to
                             #   attackers if coords no longer in goal list
                             if ((x,y) not in goals 
-                            and board[x][y-1] is not black
-                            and board[x][y+1] is not black
-                            and board[x-1][y] is not black
-                            and board[x+1][y] is not black):
-                                attackers.append(flanks.pop(attacker))
-                            if (flanker not in goals
-                            and board[flank_x][flank_y-1] is not black
-                            and board[flank_x][flank_y+1] is not black
-                            and board[flank_x-1][flank_y] is not black
-                            and board[flank_x+1][flank_y] is not black):
-                                attackers.append(flanks.pop(flanker))
+                            and (y-1 in range(8)
+                            and board[x][y-1] is not black)
+                            and (y+1 in range(8)
+                            and board[x][y+1] is not black)
+                            and (x-1 in range(8)
+                            and board[x-1][y] is not black)
+                            and (x+1 in range(8)
+                            and board[x+1][y] is not black)):
+                                attackers.append(flanks.pop(
+                                    flanks.index((x,y))))
+                               
+                                
+                            if (f not in goals
+                            and (board[f[0]][f[1]] is not corner)
+                            and (flank_y-1 in range(8)
+                            and board[flank_x][flank_y-1] is not black)
+                            and (flank_y+1 in range(8)
+                            and board[flank_x][flank_y+1] is not black)
+                            and (flank_x-1 in range(8)
+                            and board[flank_x-1][flank_y] is not black)
+                            and (flank_x+1 in range(8)
+                            and board[flank_x+1][flank_y] is not black)):
+                                attackers.append(flanks.pop(flanks.index(f)))
+                                
 
         for i in range(len(moves)-1):
-            print(str(moves[i]) + " -> " + str(moves[i+1]))
+            if moves[i] != END and moves[i+1] != END:
+                print(str(moves[i]) + " -> " + str(moves[i+1]))
 
         return moves
 
