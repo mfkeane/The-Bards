@@ -120,14 +120,17 @@ class WatchYourBack:
         return closest
 
 
-    # not sure if works yet
+   
     def it_deepening(board, path, attacker, goals, max_depth=16):
         for depth in range(1, max_depth):
-            print(depth)
+        
             result = WatchYourBack.depth_limited_search(board, attacker, goals,
              depth)
-            if result == max_depth:
+         
+            if result != None:
                 return result
+            else:
+              continue
     
     # Searching algorithm function: Depth Limited Search
     def depth_limited_search(board, start, goals, depth):
@@ -137,7 +140,6 @@ class WatchYourBack:
         
         while visited:
             current = visited.pop()
-            print(path)
             if current in goals:
                 path.append(current)
                 return path
@@ -184,7 +186,7 @@ class WatchYourBack:
 
     def massacre(board): #put in corner squares
 
-        moves = [(-1,-1)]
+        moves = []
         goals = []
         flanks = []
         
@@ -196,26 +198,22 @@ class WatchYourBack:
 
                elif board[x][y] is black:
                    targets.append((x,y))
-        print("stored")
         for i in targets:
             x = i[0]
             y = i[1]
             returns = WatchYourBack.find_goal_pos(goals, flanks,x,y)
             goals = returns[0]
-            print(goals)
             flanks = returns[1]
             
-        print("Found goals")
         # While all black pieces are not dead
         while len(targets)>0:
             for attacker in attackers:
             #for i in range(len(attackers)):
             # if attacker is not being helpful, put it somewhere better
                 if not WatchYourBack.in_goal_pos(attacker[0], attacker[1]):
-                    moves.append(WatchYourBack.it_deepening(board, [], 
+                    moves.extend(WatchYourBack.it_deepening(board, [], 
                     attacker, goals))
                     
-                    print("path done")
                     # Remove current goal from goal list
                     for  goal in goals:
                         if len(moves)>0:
@@ -226,7 +224,7 @@ class WatchYourBack:
                     if len(moves)>0:
                         flanks.append(moves[-1])
                         attackers.pop(attackers.index(attacker))
-                    print("O moved")
+                  
                     """for j in range(len(goals)):
                         if attackers[i] in goals:
                             goals.remove(attackers[i])"""
@@ -236,22 +234,21 @@ class WatchYourBack:
                     x = -3
                     y = -3
                     if len(moves)>0:
-                        x = moves[-1]
-                        y = moves[-1]
+                        (x,y) = moves[-1]
                     flanker = []
                     curr_target = []
                     if (x+2 in range(8)) and (board[x+1][y] is black):
-                        curr_target.append(x+1,y)
-                        flanker.append(x+2,y)
+                        curr_target.append((x+1,y))
+                        flanker.append((x+2,y))
                     if (x-2 in range(8)) and (board[x-1][y] is black):
-                        curr_target.append(x-1,y)
-                        flanker.append(x-2,y)
+                        curr_target.append((x-1,y))
+                        flanker.append((x-2,y))
                     if (y+2 in range(8)) and (board[x][y+1] is black):
-                        curr_target.append(x,y+1)
-                        flanker.append(x,y+2)
+                        curr_target.append((x,y+1))
+                        flanker.append((x,y+2))
                     if (y-2 in range(8)) and (board[x][y-1] is black):
-                        curr_target.append(x, y-1)
-                        flanker.append(x, y-2)
+                        curr_target.append((x, y-1))
+                        flanker.append((x, y-2))
 
                     #(flank_x, flank_y) = flanker
                     """#(x,y) = attacker
@@ -262,7 +259,7 @@ class WatchYourBack:
                     for f in flanker:
                         if flanker in flanks:
                             # target dead
-                            print("target dead")
+                            
                             # remove all associated goal's from list
                             #   (except already removed one)
                             for coord in flanks:
@@ -287,10 +284,10 @@ class WatchYourBack:
                             and board[flank_x+1][flank_y] is not black):
                                 attackers.append(flanks.pop(flanker))
 
-            for i in range(len(moves)-1):
-                print(moves[i] + " -> " + moves[i+1])
+        for i in range(len(moves)-1):
+            print(str(moves[i]) + " -> " + str(moves[i+1]))
 
-            return moves
+        return moves
 
 
 # --------------------MAIN----------------------
@@ -307,12 +304,10 @@ for i in range(8):
     line = input()
     board[i] = line.replace(" ","")
 game_type = input()
-print(game_type)
 
 # Check game_type
 
 if game_type == "Moves":
     WatchYourBack.moves(board)
 elif game_type == "Massacre":
-    print("input defined")
     WatchYourBack.massacre(board)
