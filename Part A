@@ -33,29 +33,37 @@ class WatchYourBack:
         return moves
 
     # Appends avaliable moves to a list
-    def append_moves(board, x, y):
+    def append_moves(board, x, y, path):
         moves = []
         if (x+1 in range(8)) and board[x+1][y] is '-':
-            moves.append((x+1,y))
+            if (x+1,y) not in path:
+                moves.append((x+1,y))
         if (x-1 in range(8)) and board[x-1][y] is '-':
-            moves.append((x-1,y))
+            if (x-1,y) not in path:
+                moves.append((x-1,y))
         if (y+1 in range(8)) and board[x][y+1] is '-':
-            moves.append((x,y+1))
+            if (x,y+1) not in path:
+                moves.append((x,y+1))
         if (y-1 in range(8)) and board[x][y-1] is '-':
-            moves.append((x,y-1))
+            if (x,y-1) not in path:
+                moves.append((x,y-1))
 
         if (x+2 in range(8)) and ((board[x+1][y] is 'O')
-        or (board[x+1][y] is '@')):
-            moves.append((x+2,y))
+        or (board[x+1][y] is '@')) and board[x+2][y] is '-':
+            if (x+2,y) not in path:
+                moves.append((x+2,y))
         if (x-2 in range(8)) and ((board[x-1][y] is 'O')
-        or (board[x-1][y] is '@')):
-            moves.append((x-2,y))
+        or (board[x-1][y] is '@')) and board[x-2][y] is '-':
+            if (x-2,y) not in path:
+                moves.append((x-2,y))
         if (y+2 in range(8)) and ((board[x][y+1] is 'O')
-        or (board[x][y+1] is '@')):
-            moves.append((x,y+2))
+        or (board[x][y+1] is '@')) and board[x][y+2] is '-':
+            if (x,y+2) not in path:
+                moves.append((x,y+2))
         if (y-2 in range(8)) and ((board[x][y-1] is 'O')
-        or (board[x][y-1] is '@')):
-            moves.append((x,y-2))
+        or (board[x][y-1] is '@')) and board[x][y-2] is '-':
+            if (x,y-2) not in path:
+                moves.append((x,y-2))
 
         return moves
 
@@ -113,24 +121,39 @@ class WatchYourBack:
 
 
     # not sure if works yet
+    def it_deepening(board, path, attacker, goals, max_depth=16):
+        for depth in range(1, max_depth):
+            print(depth)
+            result = WatchYourBack.depth_limited_search(board, attacker, goals,
+             depth)
+            if result == max_depth:
+                return result
+    
     # Searching algorithm function: Depth Limited Search
-    def depth_limited_search(board, curr_pos, goal, path, depth):
-        if curr_pos == goal:
-            return path
-        if depth <= 0:
-            return None
-        else:
-            children = WatchYourBack.append_moves(board, curr_pos[0], curr_pos[1])
-            for coord in children:
-                search = path #Necessary???
-                search.append(coord)
-                result = WatchYourBack.depth_limited_search(board, path[-1],
-                 goal, search, depth-1) #Path -1??? Last one in path
-            if result is not None:
-                return result #Potentially returns nothing???
-                              # If result is none, the current recurision will end and 
-                              #  it should jump back up to the last recursion
-
+    def depth_limited_search(board, start, goals, depth):
+        SENTINEL = object()
+        path = []
+        visited = [start]
+        
+        while visited:
+            current = visited.pop()
+            print(path)
+            if current in goals:
+                path.append(current)
+                return path
+                
+            elif current == SENTINEL:
+                depth += 1
+                if len(path)>0:
+                    path.pop()
+                
+            elif depth != 0:
+                depth -= 1
+                path.append(current)
+                visited.append(SENTINEL)
+                visited.extend(WatchYourBack.append_moves(board, current[0], 
+                current[1], path))
+        
 #------------------------MOVES------------------------
 
     def moves(board):
@@ -179,7 +202,9 @@ class WatchYourBack:
             y = i[1]
             returns = WatchYourBack.find_goal_pos(goals, flanks,x,y)
             goals = returns[0]
+            print(goals)
             flanks = returns[1]
+            
         print("Found goals")
         # While all black pieces are not dead
         while len(targets)>0:
@@ -187,22 +212,21 @@ class WatchYourBack:
             #for i in range(len(attackers)):
             # if attacker is not being helpful, put it somewhere better
                 if not WatchYourBack.in_goal_pos(attacker[0], attacker[1]):
-                    closest_goal = WatchYourBack.find_closest_goal(attacker, 
-                    goals)
-                    if closest_goal == None:
-                        closest_goal = goals[0]
-                    print("Found closest goal")
-                    moves.append(WatchYourBack.depth_limited_search(board, 
-                    attacker, closest_goal, [], 16))
-                    print("DLS")
+                    moves.append(WatchYourBack.it_deepening(board, [], 
+                    attacker, goals))
+                    
+                    print("path done")
                     # Remove current goal from goal list
-                    for goal in goals:
-                        if goal == attacker:
-                            goals.remove(goal)
+                    for  goal in goals:
+                        if len(moves)>0:
+                            if goal == moves[-1]:
+                                goals.remove(goal)
 
                     #move O to O_goal_list
-                    flanks.append(attackers.pop(attacker))
-
+                    if len(moves)>0:
+                        flanks.append(moves[-1])
+                        attackers.pop(attackers.index(attacker))
+                    print("O moved")
                     """for j in range(len(goals)):
                         if attackers[i] in goals:
                             goals.remove(attackers[i])"""
@@ -210,20 +234,22 @@ class WatchYourBack:
                     # -----Check if target is dead-----
                     # find opposite flank
                     (x,y) = attacker
+                    flanker = []
+                    curr_target = []
                     if (x+2 in range(8)) and (board[x+1][y] is black):
-                        curr_target = (x+1,y)
-                        flanker = (x+2,y)
+                        curr_target.append(x+1,y)
+                        flanker.append(x+2,y)
                     if (x-2 in range(8)) and (board[x-1][y] is black):
-                        curr_target = (x-1,y)
-                        flanker = (x-2,y)
+                        curr_target.append(x-1,y)
+                        flanker.append(x-2,y)
                     if (y+2 in range(8)) and (board[x][y+1] is black):
-                        curr_target = (x,y+1)
-                        flanker = (x,y+2)
+                        curr_target.append(x,y+1)
+                        flanker.append(x,y+2)
                     if (y-2 in range(8)) and (board[x][y-1] is black):
-                        curr_target = (x, y-1)
-                        flanker = (x, y-2)
+                        curr_target.append(x, y-1)
+                        flanker.append(x, y-2)
 
-                    (flank_x, flank_y) = flanker
+                    #(flank_x, flank_y) = flanker
                     """#(x,y) = attacker
                     #(x_tar, y_tar) = curr_target
                     flanker = (x+(x_tar-x), y+(y_tar-y)) """
@@ -231,12 +257,11 @@ class WatchYourBack:
                     # if opposite flank is also in flanking list
                     if flanker in flanks:
                         # target dead
-
+                        print("target dead")
                         # remove all associated goal's from list
                         #   (except already removed one)
-                        for coord in WatchYourBack.find_goal_pos([],[],x_tar,
-                         y_tar)[0]:
-                            if coord is not attacker:
+                        for coord in flanks:
+                            if coord not in attackers:
                                 goals.remove(coord)
 
                         # remove current target from target list as it's dead
