@@ -182,9 +182,9 @@ class WatchYourBack:
 
 #---------------------MASSACRE----------------------
 
-    def massacre(board):
+    def massacre(board): #put in corner squares
 
-        moves = []
+        moves = [(-1,-1)]
         goals = []
         flanks = []
         
@@ -233,7 +233,11 @@ class WatchYourBack:
 
                     # -----Check if target is dead-----
                     # find opposite flank
-                    (x,y) = attacker
+                    x = -3
+                    y = -3
+                    if len(moves)>0:
+                        x = moves[-1]
+                        y = moves[-1]
                     flanker = []
                     curr_target = []
                     if (x+2 in range(8)) and (board[x+1][y] is black):
@@ -255,31 +259,33 @@ class WatchYourBack:
                     flanker = (x+(x_tar-x), y+(y_tar-y)) """
 
                     # if opposite flank is also in flanking list
-                    if flanker in flanks:
-                        # target dead
-                        print("target dead")
-                        # remove all associated goal's from list
-                        #   (except already removed one)
-                        for coord in flanks:
-                            if coord not in attackers:
-                                goals.remove(coord)
+                    for f in flanker:
+                        if flanker in flanks:
+                            # target dead
+                            print("target dead")
+                            # remove all associated goal's from list
+                            #   (except already removed one)
+                            for coord in flanks:
+                                if coord not in attackers:
+                                    goals.remove(coord)
 
-                        # remove current target from target list as it's dead
-                        targets.remove(curr_target)
+                            # remove current target from target list as it's dead
+                            targets.remove(curr_target[flanker.index(f)])
 
-                        # move associated flankers from flanker list to
-                        #   attackers if coords no longer in goal list
-                        if ((x,y) not in goals and board[x][y-1] is not black
-                        and board[x][y+1] is not black
-                        and board[x-1][y] is not black
-                        and board[x+1][y] is not black):
-                            attackers.append(flanks.pop(attacker))
-                        if (flanker not in goals
-                        and board[flank_x][flank_y-1] is not black
-                        and board[flank_x][flank_y+1] is not black
-                        and board[flank_x-1][flank_y] is not black
-                        and board[flank_x+1][flank_y] is not black):
-                            attackers.append(flanks.pop(flanker))
+                            # move associated flankers from flanker list to
+                            #   attackers if coords no longer in goal list
+                            if ((x,y) not in goals 
+                            and board[x][y-1] is not black
+                            and board[x][y+1] is not black
+                            and board[x-1][y] is not black
+                            and board[x+1][y] is not black):
+                                attackers.append(flanks.pop(attacker))
+                            if (flanker not in goals
+                            and board[flank_x][flank_y-1] is not black
+                            and board[flank_x][flank_y+1] is not black
+                            and board[flank_x-1][flank_y] is not black
+                            and board[flank_x+1][flank_y] is not black):
+                                attackers.append(flanks.pop(flanker))
 
             for i in range(len(moves)-1):
                 print(moves[i] + " -> " + moves[i+1])
