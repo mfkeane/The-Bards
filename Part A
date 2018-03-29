@@ -215,14 +215,14 @@ class WatchYourBack:
 
 # -------------------SEARCH FUNCTIONS------------------
 
-#*****************************************************************************
+#***
 #    The following is based upon and modified from code posted online at: 
 #    Title: Implementing Depth Limited Path Finding with Stack
 #    Author: Screennames "Brian" and "RootTwo"
 #    Date: 12 Feb 2016, 21:03
 #   Availability: https://stackoverflow.com/questions/35261256/implementing
 #                 -depth-limited-path-finding-with-stack
-#*****************************************************************************
+#***
 
     # Iterative Deepening Search to find paths
     def it_deepening(board, path, attacker, goals, max_depth=16):
@@ -267,9 +267,9 @@ class WatchYourBack:
                                                           current[1], path))
 
  
-#*****************************************************************************
+#***
 #    END OF MODIFIED CODE
-#*****************************************************************************
+#***
 
 # ------------------------MOVES------------------------
 
