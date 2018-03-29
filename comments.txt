@@ -1,9 +1,14 @@
 Calculating Available Moves
   Time complexity: nested for loop O(n^2), check moves fn is O(1). Therefore total is O(n^2)
-  Space complexity: O(1) Only storing x, y, moves_0 and moves_@, all just numbers.
+  Space complexity: O(1) Only storing x, y, moves_0 and moves_@, all just single numbers. This will not change as the board increases or 
+                    decreases in size
 
 Eliminating Enemy Pieces
-Using iterative deepening depth limited search. 
-The branching factor for the search tree is 3.
-Max search depth: 16, one corner of board to the other
-Doesn’t return shortest possible sequence of moves
+  Using iterative deepening depth limited search. 
+  The branching factor for the search tree is 3, as the piece can only move horizontally or vertically, but is not allowed to move onto an 
+    already visited square.
+  Max search depth: 16, one corner of board to the other. If lowered, it is possible that the algorithm will find a piece that is closer 
+    to a goal and be more efficient, but it is also possible that it will find no possible moves, say if the piece and the goal were at 
+    opposite corners of the board. 
+  It doesn’t return shortest possible sequence of moves altogether, but it will find the shortest path to a given goal from a certain 
+    piece.
