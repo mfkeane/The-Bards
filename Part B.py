@@ -1,4 +1,11 @@
 class Player:
+    
+    # Constants
+    EMPTY = '-'
+    WHITE = 'O'
+    BLACK = '@'
+    CORNER = 'X'
+    
     def _init_(self, colour):
     
         dimension = 8
@@ -49,6 +56,11 @@ class Player:
             
             # pick somewhere to place piece in y_range and not on X
             #   and add to my_pos and board
+            
+            # Update the board
+            s = list(board[y])
+            s[x] = EMPTY
+            board[y] = "".join(s)
             
         else:
             # Moving Phase
