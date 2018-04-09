@@ -1,7 +1,7 @@
 class Player:
     def _init_(self, colour):
     
-    
+        dimension = 8
         board = ["X------X",
                  "--------",
                  "--------",
@@ -25,6 +25,23 @@ class Player:
         
     
     def action(self, turns):
+        
+        # Handling board shrinking
+        if turns == 128:
+            board = ["X----X",
+                     "------",
+                     "------",
+                     "------",
+                     "------",
+                     "X----X"]
+            dimension = 6
+            
+         elif turns == 192:
+            board = ["X--X",
+                     "----",
+                     "----",
+                     "X--X"]
+            dimension = 4
         
         if turns <=24:
             # Placing Phase
