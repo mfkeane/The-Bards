@@ -1,5 +1,7 @@
 class Player:
     
+    from collections import defaultdict
+    
     # Constants
     EMPTY = '-'
     WHITE = 'O'
@@ -256,9 +258,24 @@ class Player:
             # Will return a nested tuple
             
             # Run moves, returns array of nested tuples (current pos, end pos)
+            moves_list = moves(...)
+            
+            if len(moves_list) < 1:
+                # No avaliable moves
+                return None
+            
             # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
-            #      for every move, run search len function on every goal, keep track of shortest distance
-            #      then add index of move as key and shortest dist as value in dictionary
+            eval_dict = defaultdict()
+            # For every move, run search len function on every goal, keep track of shortest distance
+            for i in len(moves_list):
+                val = calc_shortest_dist(moves_list[i][1])
+                # Then add index of move as key and shortest dist as value in dictionary
+                eval_dict[i] = val
+            
+            for key, value in sorted(eval_dict.iteritems(), key=lambda (k,v): (v,k)): # not really sure how sorted works, loop not necessary but I'm unsure how to do it otherwise
+                action = moves_list[key]
+                break
+            
             #      sort dictionary, use key (index of moves) to find and return that move
             
         return action
