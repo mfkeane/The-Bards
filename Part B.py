@@ -255,6 +255,12 @@ class Player:
             # Moving Phase
             # Will return a nested tuple
             
+            # Run moves, returns array of nested tuples (current pos, end pos)
+            # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
+            #      for every move, run search len function on every goal, keep track of shortest distance
+            #      then add index of move as key and shortest dist as value in dictionary
+            #      sort dictionary, use key (index of moves) to find and return that move
+            
         return action
             
        
