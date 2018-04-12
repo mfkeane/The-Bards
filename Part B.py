@@ -40,32 +40,32 @@ class Player:
         # If no Player pieces surround Opponent,
         #   all surrounding tiles are valid goals
 
-        if (x+1 in range(8)) and (board[x+1][y] is EMPTY):
+        if (x+1 in range(8)) and (board[y][x+1] is EMPTY):
             goals.append((x+1, y))
-        if (x-1 in range(8)) and (board[x-1][y] is EMPTY):
+        if (x-1 in range(8)) and (board[y][x-1] is EMPTY):
             goals.append((x-1, y))
-        if (y+1 in range(8)) and (board[x][y+1] is EMPTY):
+        if (y+1 in range(8)) and (board[y+1][x] is EMPTY):
             goals.append((x, y+1))
-        if (y-1 in range(8)) and (board[x][y-1] is EMPTY):
+        if (y-1 in range(8)) and (board[y-1][x] is EMPTY):
             goals.append((x, y-1))
 
         # If piece already surrounded by one Player piece,
         #   or is next to a CORNER, opposite square is goal
 
-        if ((x+1 in range(8)) and (x-1 in range(8)) and ((board[x+1][y] is
-           my_colour) or board[x+1][y] is CORNER)):
+        if ((x+1 in range(8)) and (x-1 in range(8)) and ((board[y][x+1] is
+           my_colour) or board[y][x+1] is CORNER)):
             goals.append((x-1, y))
-            if board[x+1][y] is my_colour and (x+1,y) in attackers:
+            if board[y][x+1] is my_colour and (x+1,y) in attackers:
                 flanks.append(attackers.pop(attackers.index((x+1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
             if (x,y-1) in goals:
                 goals.remove((x,y-1))
 
-        if ((x-1 in range(8)) and (x+1 in range(8)) and ((board[x-1][y] is
-           my_colour) or board[x-1][y] is CORNER)):
+        if ((x-1 in range(8)) and (x+1 in range(8)) and ((board[y][x-1] is
+           my_colour) or board[y][x-1] is CORNER)):
             goals.append((x+1, y))
-            if board[x-1][y] is my_colour and (x-1,y) in attackers:
+            if board[y][x-1] is my_colour and (x-1,y) in attackers:
                 flanks.append(attackers.pop(attackers.index((x-1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
@@ -73,9 +73,9 @@ class Player:
                 goals.remove((x,y-1))
 
         if ((y+1 in range(8)) and (y-1 in range(8)) and ((board[x][y+1] is
-           my_colour) or board[x][y+1] is CORNER)):
+           my_colour) or board[y+1][x] is CORNER)):
             goals.append((x, y-1))
-            if board[x][y+1] is my_colour and (x,y+1) in attackers:
+            if board[y+1][x] is my_colour and (x,y+1) in attackers:
                 flanks.append(attackers.pop(attackers.index((x, y+1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -83,9 +83,9 @@ class Player:
                 goals.remove((x-1,y))
 
         if ((y-1 in range(8)) and (y+1 in range(8)) and ((board[x][y-1] is
-           my_colour) or board[x][y-1] is CORNER)):
+           my_colour) or board[y-1][x] is CORNER)):
             goals.append((x, y+1))
-            if board[x][y-1] is my_colour and (x,y-1) in attackers:
+            if board[y-1][x] is my_colour and (x,y-1) in attackers:
                 flanks.append(attackers.pop(attackers.index((x, y-1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -93,29 +93,29 @@ class Player:
                 goals.remove((x-1,y))
 
         # if Opponent on edge of board
-        if ((x+1 not in range(8)) and ((y+1 in range(8) and board[x][y+1] is
-           EMPTY) and ((y-1 in range(8)) and board[x][y-1] is EMPTY))):
+        if ((x+1 not in range(8)) and ((y+1 in range(8) and board[y+1][x] is
+           EMPTY) and ((y-1 in range(8)) and board[y-1][x] is EMPTY))):
             goals.append((x,y+1))
             goals.append((x,y-1))
             if (x-1,y) in goals:
                 goals.remove((x-1,y))
 
-        if ((x-1 not in range(8)) and ((y+1 in range(8) and board[x][y+1] is
-           EMPTY) and ((y-1 in range(8)) and board[x][y-1] is EMPTY))):
+        if ((x-1 not in range(8)) and ((y+1 in range(8) and board[y+1][x] is
+           EMPTY) and ((y-1 in range(8)) and board[y-1][x] is EMPTY))):
             goals.append((x,y+1))
             goals.append((x,y-1))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
 
-        if ((y+1 not in range(8)) and ((x+1 in range(8) and board[x+1][y] is
-           EMPTY) and ((x-1 in range(8)) and board[x-1][y] is EMPTY))):
+        if ((y+1 not in range(8)) and ((x+1 in range(8) and board[y][x+1] is
+           EMPTY) and ((x-1 in range(8)) and board[y][x-1] is EMPTY))):
             goals.append((x+1,y))
             goals.append((x-1,y))
             if (x,y-1) in goals:
                 goals.remove((x,y-1))
 
-        if ((y-1 not in range(8)) and ((x+1 in range(8) and board[x+1][y] is
-           EMPTY) and ((x-1 in range(8)) and board[x-1][y] is EMPTY))):
+        if ((y-1 not in range(8)) and ((x+1 in range(8) and board[y][x+1] is
+           EMPTY) and ((x-1 in range(8)) and board[y][x-1] is EMPTY))):
             goals.append((x+1,y))
             goals.append((x-1,y))
             if (x,y+1) in goals:
@@ -132,20 +132,20 @@ class Player:
         x = goal[0]
         y = goal[1]
 
-        if (x in range(1,7) and (board[x+1][y] is opp_colour
-            and board[x-1][y] is opp_colour) and
-           ((x+2 in range(8) and board[x+2][y] is not my_colour) or (x+2 not in
+        if (x in range(1,7) and (board[y][x+1] is opp_colour
+            and board[y][x-1] is opp_colour) and
+           ((x+2 in range(8) and board[y][x+2] is not my_colour) or (x+2 not in
            range(8))) and
-           ((x-2 in range(8) and board[x-2][y] is not my_colour) or (x+2 not in
+           ((x-2 in range(8) and board[y][x-2] is not my_colour) or (x+2 not in
            range(8)))):
 
             remove_goal_pos(goals, x, y)
 
-        if (y in range(1,7) and (board[y+1][y] is opp_colour
+        if (y in range(1,7) and (board[y+1][x] is opp_colour
            and board[y-1][y] is opp_colour) and
-           ((y+2 in range(8) and board[y+2][y] is not my_colour) or (y+2 not in
+           ((y+2 in range(8) and board[y+2][x] is not my_colour) or (y+2 not in
            range(8))) and
-           ((y-2 in range(8) and board[y-2][y] is not my_colour) or (y+2 not in
+           ((y-2 in range(8) and board[y-2][x] is not my_colour) or (y+2 not in
            range(8)))):
 
             remove_goal_pos(goals, x, y)
@@ -170,33 +170,33 @@ class Player:
         def check_moves(self, x, y):
             moves = 0
             # Check square to right
-            if (x+1 in range(8)) and (board[x+1][y] is EMPTY):
+            if (x+1 in range(8)) and (board[y][x+1] is EMPTY):
                 moves += 1
             # Check square to left
-            if (x-1 in range(8)) and (board[x-1][y] is EMPTY):
+            if (x-1 in range(8)) and (board[y][x-1] is EMPTY):
                 moves += 1
             # Check square below
-            if (y+1 in range(8)) and (board[x][y+1] is EMPTY):
+            if (y+1 in range(8)) and (board[y+1][x] is EMPTY):
                 moves += 1
             # Check square above
-            if (y-1 in range(8)) and (board[x][y-1] is EMPTY):
+            if (y-1 in range(8)) and (board[y-1][x] is EMPTY):
                 moves += 1
 
             # Check if piece can jump to right
-            if (x+2 in range(8)) and ((board[x+1][y] is my_colour) or
-               (board[x+1][y] is opp_colour)) and (board[x+2][y] is EMPTY):
+            if (x+2 in range(8)) and ((board[y][x+1] is my_colour) or
+               (board[y][x+1] is opp_colour)) and (board[y][x+2] is EMPTY):
                 moves += 1
             # Check if piece can jump to left
-            if (x-2 in range(8)) and ((board[x-1][y] is my_colour) or
-               (board[x-1][y] is opp_colour)) and (board[x-2][y] is EMPTY):
+            if (x-2 in range(8)) and ((board[y][x-1] is my_colour) or
+               (board[y][x-1] is opp_colour)) and (board[y][x-2] is EMPTY):
                 moves += 1
             # Check if piece can jump down
-            if (y+2 in range(8)) and ((board[x][y+1] is my_colour) or
-               (board[x][y+1] is opp_colour)) and (board[x][y+2] is EMPTY):
+            if (y+2 in range(8)) and ((board[y+1][x] is my_colour) or
+               (board[y+1][x] is opp_colour)) and (board[y+2][x] is EMPTY):
                 moves += 1
             # Check if piece can jump up
-            if (y-2 in range(8)) and ((board[x][y-1] is my_colour) or
-               (board[x][y-1] is opp_colour)) and (board[x][y-2] is EMPTY):
+            if (y-2 in range(8)) and ((board[y-1][x] is my_colour) or
+               (board[y-1][x] is opp_colour)) and (board[y-2][x] is EMPTY):
                 moves += 1
 
             return moves
