@@ -170,36 +170,36 @@ class Player:
     
       # Function to check the avaliable moves surrounding a piece
         def check_moves(self, x, y):
-            moves = 0
+            moves = []
             # Check square to right
             if (x+1 in range(8)) and (board[y][x+1] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x+1,y));
             # Check square to left
             if (x-1 in range(8)) and (board[y][x-1] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x-1,y));
             # Check square below
             if (y+1 in range(8)) and (board[y+1][x] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x,y+1));
             # Check square above
             if (y-1 in range(8)) and (board[y-1][x] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x,y-1));
 
             # Check if piece can jump to right
             if (x+2 in range(8)) and ((board[y][x+1] is my_colour) or
                (board[y][x+1] is opp_colour)) and (board[y][x+2] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x+2,y));
             # Check if piece can jump to left
             if (x-2 in range(8)) and ((board[y][x-1] is my_colour) or
                (board[y][x-1] is opp_colour)) and (board[y][x-2] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x-2,y));
             # Check if piece can jump down
             if (y+2 in range(8)) and ((board[y+1][x] is my_colour) or
                (board[y+1][x] is opp_colour)) and (board[y+2][x] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x,y+2));
             # Check if piece can jump up
             if (y-2 in range(8)) and ((board[y-1][x] is my_colour) or
                (board[y-1][x] is opp_colour)) and (board[y-2][x] is EMPTY):
-                moves += 1
+                moves.append((x,y),(x,y-2));
 
             return moves
     
@@ -216,11 +216,71 @@ class Player:
             for y in range(8):
                 if board[y][x] is my_colour:
                     # Check avaliable spaces
-                    my_moves += Player.check_moves(self, x, y)
+                    my_moves = my_moves + Player.check_moves(self, x, y)
 
         print(str(my_moves) + "\n"))
-        return [my_moves]
+        return my_moves
     
+    # -------------------SEARCH FUNCTIONS------------------
+
+#***
+#    The following is based upon and modified from code posted online at:
+#    Title: Implementing Depth Limited Path Finding with Stack
+#    Author: Screennames "Brian" and "RootTwo"
+#    Date: 12 Feb 2016, 21:03
+#   Availability: https://stackoverflow.com/questions/35261256/implementing
+#                 -depth-limited-path-finding-with-stack
+#***
+
+    # Iterative Deepening Search to find paths
+    def it_deepening(self, path, attacker, goals, max_depth=16):
+        for depth in range(1, max_depth):
+
+            result = WatchYourBack.depth_limited_search(board, attacker, goals
+                                                        ,depth)
+
+            if result is not None:
+                return result
+            else:
+                continue
+
+    # Searching algorithm function: Depth Limited Search
+    def depth_limited_search(self, start, goals, depth):
+        SENTINEL = object()
+        path = []
+        visited = [start]
+
+        while visited:
+
+            current = visited.pop()
+            # once goal state reached, return the path to it
+            if current in goals and current!=start:
+                path.append(current)
+                return path
+
+            # if the depth is reached without reaching goal, increase depth
+            #   & start again
+            elif current == SENTINEL:
+                depth += 1
+                if len(path) > 0:
+                    path.pop()
+
+            # if goal isn't reached but depth hasn't been reached, keep
+            #   searching through available moves
+            elif depth != 0:
+                depth -= 1
+                path.append(current)
+                visited.append(SENTINEL)
+                visited.extend(WatchYourBack.append_moves(board, current[0],
+                                                          current[1], path))
+
+
+#***
+#    END OF MODIFIED CODE
+#***
+
+    def calc_shortest_dist(self, attacker, goals):
+        return len(it_deepening(self, [], attacker, goals))
 
     def action(self, turns):
         
@@ -258,7 +318,7 @@ class Player:
             # Will return a nested tuple
             
             # Run moves, returns array of nested tuples (current pos, end pos)
-            moves_list = moves(...)
+            moves_list = moves(self)
             
             if len(moves_list) < 1:
                 # No avaliable moves
@@ -268,7 +328,7 @@ class Player:
             eval_dict = defaultdict()
             # For every move, run search len function on every goal, keep track of shortest distance
             for i in len(moves_list):
-                val = calc_shortest_dist(moves_list[i][1])
+                val = calc_shortest_dist(self, moves_list[i][1], goals)
                 # Then add index of move as key and shortest dist as value in dictionary
                 eval_dict[i] = val
             
