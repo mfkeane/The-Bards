@@ -236,7 +236,7 @@ class Player:
     def it_deepening(self, path, attacker, goals, max_depth=16):
         for depth in range(1, max_depth):
 
-            result = WatchYourBack.depth_limited_search(board, attacker, goals
+            result = Player.depth_limited_search(board, attacker, goals
                                                         ,depth)
 
             if result is not None:
@@ -271,7 +271,7 @@ class Player:
                 depth -= 1
                 path.append(current)
                 visited.append(SENTINEL)
-                visited.extend(WatchYourBack.append_moves(board, current[0],
+                visited.extend(Player.append_moves(board, current[0],
                                                           current[1], path))
 
 
