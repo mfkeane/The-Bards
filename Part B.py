@@ -34,6 +34,7 @@ class Player:
             y_start = range(2,8)
             my_colour = BLACK
             opp_colour = WHITE
+          
               
             # Check if piece already partially surrounded
     #   and mark goal positions for Player
@@ -312,6 +313,7 @@ class Player:
             s = list(board[y])
             s[x] = EMPTY
             board[y] = "".join(s)
+            my_pos = (x,y)
             
         else:
             # Moving Phase
