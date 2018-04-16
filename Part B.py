@@ -344,6 +344,8 @@ class Player:
         
     def update(self, action):
          #update opp_pos and board
+            
+            #have list of white & black pos, update opponent pos, update board and find new goal pos
     
         
     
