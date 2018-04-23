@@ -6,6 +6,7 @@ fix search
 class Player:
     
     from collections import defaultdict
+    import random
     
     # Constants
     EMPTY = '-'
@@ -318,6 +319,9 @@ class Player:
             dimension = 4"""
         
         if turns <=24:
+            if turns == 1:
+                first_piece_x = random.randint(min_index, max_index)
+                first_piece_y = random.randint(min_index, max_index)
             # Placing Phase
             # Will return a single tuple
             
