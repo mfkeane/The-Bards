@@ -1,6 +1,6 @@
 fill lists with player and opponent positions
 implement update 
-board shrinking
+board shrinking - move corners
 fix search
 
 class Player:
@@ -13,9 +13,16 @@ class Player:
     BLACK = '@'
     CORNER = 'X'
     
-    def _init_(self, colour):
+  def update_corners(self, min_index, max_index)
+    return [(min_index, min_index),(min_index, max_index),(max_index, min_index),(max_index, max_index)]
     
-        dimension = 8
+    def _init_(self, colour):
+        
+        min_index = 0
+        max_index = 7
+        corners = update_corners(min_index, max_index)
+    
+        #dimension = 8
         board = ["X------X",
                  "--------",
                  "--------",
@@ -39,7 +46,6 @@ class Player:
             y_start = range(2,8)
             my_colour = BLACK
             opp_colour = WHITE
-          
               
             # Check if piece already partially surrounded
     #   and mark goal positions for Player
@@ -292,20 +298,24 @@ class Player:
         
         # Handling board shrinking
         if turns == 128:
-            board = ["X----X",
+            min_index = 1
+            max_index = 6
+            corners = update_corners(min_index, max_index)
+            """board = ["X----X",
                      "------",
                      "------",
                      "------",
                      "------",
                      "X----X"]
-            dimension = 6
+            dimension = 6"""
             
          elif turns == 192:
-            board = ["X--X",
+            corners = update_corners(min_index, max_index)
+            """board = ["X--X",
                      "----",
                      "----",
                      "X--X"]
-            dimension = 4
+            dimension = 4"""
         
         if turns <=24:
             # Placing Phase
