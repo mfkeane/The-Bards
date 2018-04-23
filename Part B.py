@@ -1,3 +1,8 @@
+fill lists with player and opponent positions
+implement update 
+board shrinking
+fix search
+
 class Player:
     
     from collections import defaultdict
