@@ -323,12 +323,13 @@ class Player:
         
         if turns <=24:
             #if turns == 1:
-            first_piece_x = random.randint(min_index, max_index)
-            first_piece_y = random.randint(min_index, max_index)
+            #If player is white, change min and max index 
+            x = random.randint(min_index, max_index)
+            y = random.randint(min_index, max_index) #y_start
             
             # MY SECTION, FIX
             for i in range(0, pieces_in_play):
-                #if (check if next to opp piece
+                #if (check if next to opp piece) check surrounds fn (killable fn)?
                     #set goal as square opposite 
             pieces_in_play = pieces_in_play + 1
             # Placing Phase
