@@ -298,6 +298,9 @@ class Player:
     def action(self, turns):
         
         # Handling board shrinking
+        
+        pieces_in_play = 0
+        
         if turns == 128:
             min_index = 1
             max_index = 6
@@ -319,9 +322,15 @@ class Player:
             dimension = 4"""
         
         if turns <=24:
-            if turns == 1:
-                first_piece_x = random.randint(min_index, max_index)
-                first_piece_y = random.randint(min_index, max_index)
+            #if turns == 1:
+            first_piece_x = random.randint(min_index, max_index)
+            first_piece_y = random.randint(min_index, max_index)
+            
+            # MY SECTION, FIX
+            for i in range(0, pieces_in_play):
+                #if (check if next to opp piece
+                    #set goal as square opposite 
+            pieces_in_play = pieces_in_play + 1
             # Placing Phase
             # Will return a single tuple
             
