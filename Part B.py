@@ -13,6 +13,8 @@ class Player:
     
     def _init_(self, colour):
         
+        turn = 0
+
         min_index = 0
         max_index = 7
         corners = update_corners(min_index, max_index)
@@ -33,6 +35,9 @@ class Player:
         elif colour == "black":
             y_start = range(2,8)
               
+        attackers = []
+        flanks = []
+
             # Check if piece already partially surrounded
     #   and mark goal positions for Player
     def find_goal_pos(self, goals, flanks, x, y):
@@ -277,11 +282,28 @@ class Player:
 #    END OF MODIFIED CODE
 #***
 
+    def cases(self, case_1, case_2, case_3, case_4):
+         for pos in op_pos:
+        
+#next to each other, next to a wall, +1 from my space, +2 from my space, + 2 from black
+    def case_2(self, ):
+        #+1 from me only space
+    def case_3(self, ):
+        #next to a wall
+
+    def check_cases(self, action):
+          #case one
+          if so:
+	   return true:
+         #case 2
+         #case 3
+
     def calc_shortest_dist(self, attacker, goals):
         return len(it_deepening(self, [], attacker, goals))
 
     def action(self, turns):
-        
+        turn = turns
+
         # Handling board shrinking
         
         pieces_in_play = 0
@@ -297,10 +319,51 @@ class Player:
             corners = update_corners(min_index, max_index)
         
         if turns <=24:
-            #if turns == 1:
+            if turns == 1:
+	#Check not placing next to black
+                x = random.randint(min_index, max_index)
+                y_start_list = list(y_start)
+                y = random.randint(y_start_list[0], y_start_list[-1]) 
+	    return (x,y)
+	
+        if case_1 != false:
+return(x,y)
+        elif case_2 != false:
+return(x,y) 
+        elif case_3 != false:
+return(x,y)
+        elif case_4 != false:
+return(x,y) 
+
+
+           if len(save_pos) != 0:
+                for i in range(len(save_pos)):
+	          if check_surroundings(save_pos[i]):
+                           return save_pos.pop(i)
+
+
             #If player is my_pos, change min and max index 
-            x = random.randint(min_index, max_index)
-            y = random.randint(min_index, max_index) #y_start
+	if len(kill_pos) != 0:
+                for i in range(len(kill_pos)):
+	          if check_surroundings(kill_pos[i]):
+                           return kill_pos.pop(i)
+
+           for pos in opp_pos:
+               result = check_two_away(pos) #check surrounds of position 2 away so not going into a spot where will die
+	   if result != None:
+		return result
+	
+	while
+	    x = random.randint(min_index, max_index)
+                y_start_list = list(y_start)
+                y = random.randint(y_start_list[0], y_start_list[-1]) 
+	    if check_surroundings(x,y) is true:
+return (x,y) #check surrounds, say if in own area, then safe)
+#CHECK EMPTY GUYS PLEASE or choose rand value from empty
+
+#priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
+#place opponent, check if matches any of cases. If it matches, check place for my piece isn’t next to a black that is not in soon (not killable). If next to black not in soon, check if can place a white piece somewhere to make case 4 happen, if not, place randomly but not next to black
+
             
             # MY SECTION, FIX
             for i in range(0, pieces_in_play):
@@ -316,6 +379,8 @@ class Player:
             # Update the board
             my_pos.add((x,y))
 empty_spaces.remove((x,y)) 
+if (x,y) in kill_pos:
+    kill_pos.remove((x,y))
             
         else:
             # Moving Phase
@@ -347,8 +412,28 @@ empty_spaces.remove((x,y))
        
         
     def update(self, action):
-         #update opp_pos and board
-            
+        turn += 1
+
+        #update opp_pos and board
+        if turn <=24:
+	 op_pos.add(action)
+             empty_spaces.remove(action) 
+             if action in kill_pos:
+      kill_pos.remove(action)
+
+if check_cases(self, action):
+     soon.add(action)
+
+         else:
+         #placing
+              op_pos.add(action[1])
+              empty_spaces.remove(action[1]) 
+              empty_spaces.add(action[0])
+               if action[1] in kill_pos:
+        kill_pos.remove(action[1])
+    
+
+
             #have list of my_pos & op_pos pos, update opponent pos, update board and find new goal pos
     
         
