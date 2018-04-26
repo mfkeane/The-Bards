@@ -22,16 +22,11 @@ class Player:
         min_index = 0
         max_index = 7
         corners = update_corners(min_index, max_index)
-    
-        #dimension = 8
-        board = ["X------X",
-                 "--------",
-                 "--------",
-                 "--------",
-                 "--------",
-                 "--------",
-                 "--------",
-                 "X------X"]
+        empty_spaces = []
+        for i in range(max_index+1):
+            for j in range(max_index+1):
+                if (i,j) not in corners:
+                    empty_spaces
     
         my_pos  = []
         opp_pos = []
