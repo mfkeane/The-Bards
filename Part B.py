@@ -1,4 +1,4 @@
-fill lists with player and opponent positions
+ fill lists with player and opponent positions
 implement update 
 board shrinking - move corners
 fix search
@@ -8,12 +8,6 @@ class Player:
     from collections import defaultdict
     import random
     
-    # Constants
-    EMPTY = '-'
-    WHITE = 'O'
-    BLACK = '@'
-    CORNER = 'X'
-    
   def update_corners(self, min_index, max_index)
     return [(min_index, min_index),(min_index, max_index),(max_index, min_index),(max_index, max_index)]
     
@@ -22,11 +16,11 @@ class Player:
         min_index = 0
         max_index = 7
         corners = update_corners(min_index, max_index)
-        empty_spaces = []
+        empty_list_spaces = []
         for i in range(max_index+1):
             for j in range(max_index+1):
                 if (i,j) not in corners:
-                    empty_spaces
+                    empty_list_spaces.add((i,j))
     
         my_pos  = []
         opp_pos = []
@@ -36,12 +30,8 @@ class Player:
         
         if colour == "white":
             y_start = range(0,6)
-            my_colour = WHITE
-            opp_colour = BLACK
         elif colour == "black":
             y_start = range(2,8)
-            my_colour = BLACK
-            opp_colour = WHITE
               
             # Check if piece already partially surrounded
     #   and mark goal positions for Player
@@ -50,52 +40,52 @@ class Player:
         # If no Player pieces surround Opponent,
         #   all surrounding tiles are valid goals
 
-        if (x+1 in range(8)) and (board[y][x+1] is EMPTY):
+        if (x+1 in range(max_index + 1)) and ((x+1,y) in empty_list_spaces):
             goals.append((x+1, y))
-        if (x-1 in range(8)) and (board[y][x-1] is EMPTY):
+        if (x-1 in range(max_index + 1)) and ((x-1,y) in empty_list_spaces):
             goals.append((x-1, y))
-        if (y+1 in range(8)) and (board[y+1][x] is EMPTY):
+        if (y+1 in range(max_index + 1)) and ((x,y+1) in empty_list_spaces):
             goals.append((x, y+1))
-        if (y-1 in range(8)) and (board[y-1][x] is EMPTY):
+        if (y-1 in range(max_index + 1)) and ((x,y-1) in empty_list_spaces):
             goals.append((x, y-1))
 
         # If piece already surrounded by one Player piece,
-        #   or is next to a CORNER, opposite square is goal
+        #   or is next to a corner, opposite square is goal
 
-        if ((x+1 in range(8)) and (x-1 in range(8)) and ((board[y][x+1] is
-           my_colour) or board[y][x+1] is CORNER)):
+        if ((x+1 in range(max_index + 1)) and (x-1 in range(max_index + 1)) and (((x+1,y) in
+           my_pos) or (x+1,y) in corners)):
             goals.append((x-1, y))
-            if board[y][x+1] is my_colour and (x+1,y) in attackers:
+            if (x+1,y) in my_pos and (x+1,y) in attackers:
                 flanks.append(attackers.pop(attackers.index((x+1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
             if (x,y-1) in goals:
                 goals.remove((x,y-1))
 
-        if ((x-1 in range(8)) and (x+1 in range(8)) and ((board[y][x-1] is
-           my_colour) or board[y][x-1] is CORNER)):
+        if ((x-1 in range(max_index + 1)) and (x+1 in range(max_index + 1)) and (((x-1,y) in
+           my_pos) or (x-1,y) in corners)):
             goals.append((x+1, y))
-            if board[y][x-1] is my_colour and (x-1,y) in attackers:
+            if (x-1,y) in my_pos and (x-1,y) in attackers:
                 flanks.append(attackers.pop(attackers.index((x-1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
             if (x,y-1) in goals:
                 goals.remove((x,y-1))
 
-        if ((y+1 in range(8)) and (y-1 in range(8)) and ((board[x][y+1] is
-           my_colour) or board[y+1][x] is CORNER)):
+        if ((y+1 in range(max_index + 1)) and (y-1 in range(max_index + 1)) and ((board[x][y+1] is
+           my_pos) or (x,y+1) in corners)):
             goals.append((x, y-1))
-            if board[y+1][x] is my_colour and (x,y+1) in attackers:
+            if (x,y+1) in my_pos and (x,y+1) in attackers:
                 flanks.append(attackers.pop(attackers.index((x, y+1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
             if (x-1,y) in goals:
                 goals.remove((x-1,y))
 
-        if ((y-1 in range(8)) and (y+1 in range(8)) and ((board[x][y-1] is
-           my_colour) or board[y-1][x] is CORNER)):
+        if ((y-1 in range(max_index + 1)) and (y+1 in range(max_index + 1)) and ((board[x][y-1] is
+           my_pos) or (x,y-1) in corners)):
             goals.append((x, y+1))
-            if board[y-1][x] is my_colour and (x,y-1) in attackers:
+            if (x,y-1) in my_pos and (x,y-1) in attackers:
                 flanks.append(attackers.pop(attackers.index((x, y-1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -103,29 +93,29 @@ class Player:
                 goals.remove((x-1,y))
 
         # if Opponent on edge of board
-        if ((x+1 not in range(8)) and ((y+1 in range(8) and board[y+1][x] is
-           EMPTY) and ((y-1 in range(8)) and board[y-1][x] is EMPTY))):
+        if ((x+1 not in range(max_index + 1)) and ((y+1 in range(max_index + 1) and (x,y+1) in
+           empty_list) and ((y-1 in range(max_index + 1)) and (x,y-1) in empty_list_spaces))):
             goals.append((x,y+1))
             goals.append((x,y-1))
             if (x-1,y) in goals:
                 goals.remove((x-1,y))
 
-        if ((x-1 not in range(8)) and ((y+1 in range(8) and board[y+1][x] is
-           EMPTY) and ((y-1 in range(8)) and board[y-1][x] is EMPTY))):
+        if ((x-1 not in range(max_index + 1)) and ((y+1 in range(max_index + 1) and (x,y+1) in
+           empty_list) and ((y-1 in range(max_index + 1)) and (x,y-1) in empty_list_spaces))):
             goals.append((x,y+1))
             goals.append((x,y-1))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
 
-        if ((y+1 not in range(8)) and ((x+1 in range(8) and board[y][x+1] is
-           EMPTY) and ((x-1 in range(8)) and board[y][x-1] is EMPTY))):
+        if ((y+1 not in range(max_index + 1)) and ((x+1 in range(max_index + 1) and (x+1,y) in
+           empty_list) and ((x-1 in range(max_index + 1)) and (x-1,y) in empty_list_spaces))):
             goals.append((x+1,y))
             goals.append((x-1,y))
             if (x,y-1) in goals:
                 goals.remove((x,y-1))
 
-        if ((y-1 not in range(8)) and ((x+1 in range(8) and board[y][x+1] is
-           EMPTY) and ((x-1 in range(8)) and board[y][x-1] is EMPTY))):
+        if ((y-1 not in range(max_index + 1)) and ((x+1 in range(max_index + 1) and (x+1,y) in
+           empty_list) and ((x-1 in range(max_index + 1)) and (x-1,y) in empty_list_spaces))):
             goals.append((x+1,y))
             goals.append((x-1,y))
             if (x,y+1) in goals:
@@ -137,26 +127,26 @@ class Player:
 
         return [goals, flanks]
     
-    # remove any goals that will result in white's death
+    # remove any goals that will result in my_pos's death
     def remove_kamikaze(self, goal):
         x = goal[0]
         y = goal[1]
 
-        if (x in range(1,7) and (board[y][x+1] is opp_colour
-            and board[y][x-1] is opp_colour) and
-           ((x+2 in range(8) and board[y][x+2] is not my_colour) or (x+2 not in
-           range(8))) and
-           ((x-2 in range(8) and board[y][x-2] is not my_colour) or (x+2 not in
-           range(8)))):
+        if (x in range(1,7) and ((x+1,y) in opp_colour
+            and (x-1,y) in opp_colour) and
+           ((x+2 in range(max_index + 1) and (x+2,y) in not my_pos) or (x+2 not in
+           range(max_index + 1))) and
+           ((x-2 in range(max_index + 1) and (x-2,y) in not my_pos) or (x+2 not in
+           range(max_index + 1)))):
 
             remove_goal_pos(goals, x, y)
 
-        if (y in range(1,7) and (board[y+1][x] is opp_colour
+        if (y in range(1,7) and ((x,y+1) in opp_colour
            and board[y-1][y] is opp_colour) and
-           ((y+2 in range(8) and board[y+2][x] is not my_colour) or (y+2 not in
-           range(8))) and
-           ((y-2 in range(8) and board[y-2][x] is not my_colour) or (y+2 not in
-           range(8)))):
+           ((y+2 in range(max_index + 1) and (x,y+2) in not my_pos) or (y+2 not in
+           range(max_index + 1))) and
+           ((y-2 in range(max_index + 1) and (x,y-2) in not my_pos) or (y+2 not in
+           range(max_index + 1)))):
 
             remove_goal_pos(goals, x, y)
             
@@ -176,37 +166,37 @@ class Player:
          targets and (x+1,y-1) not in targets):
             goals.remove((x, y-1))
     
-      # Function to check the avaliable moves surrounding a piece
+      # Function to check the available moves surrounding a piece
         def check_moves(self, x, y):
             moves = []
             # Check square to right
-            if (x+1 in range(8)) and (board[y][x+1] is EMPTY):
+            if (x+1 in range(max_index + 1)) and ((x+1,y) in empty_list_spaces):
                 moves.append((x,y),(x+1,y));
             # Check square to left
-            if (x-1 in range(8)) and (board[y][x-1] is EMPTY):
+            if (x-1 in range(max_index + 1)) and ((x-1,y) in empty_list_spaces):
                 moves.append((x,y),(x-1,y));
             # Check square below
-            if (y+1 in range(8)) and (board[y+1][x] is EMPTY):
+            if (y+1 in range(max_index + 1)) and ((x,y+1) in empty_list_spaces):
                 moves.append((x,y),(x,y+1));
             # Check square above
-            if (y-1 in range(8)) and (board[y-1][x] is EMPTY):
+            if (y-1 in range(max_index + 1)) and ((x,y-1) in empty_list_spaces):
                 moves.append((x,y),(x,y-1));
 
             # Check if piece can jump to right
-            if (x+2 in range(8)) and ((board[y][x+1] is my_colour) or
-               (board[y][x+1] is opp_colour)) and (board[y][x+2] is EMPTY):
+            if (x+2 in range(max_index + 1)) and (((x+1,y) in my_pos) or
+               ((x+1,y) in opp_colour)) and ((x+2,y) in empty_list):
                 moves.append((x,y),(x+2,y));
             # Check if piece can jump to left
-            if (x-2 in range(8)) and ((board[y][x-1] is my_colour) or
-               (board[y][x-1] is opp_colour)) and (board[y][x-2] is EMPTY):
+            if (x-2 in range(max_index + 1)) and (((x-1,y) in my_pos) or
+               ((x-1,y) in opp_colour)) and ((x-2,y) in empty_list):
                 moves.append((x,y),(x-2,y));
             # Check if piece can jump down
-            if (y+2 in range(8)) and ((board[y+1][x] is my_colour) or
-               (board[y+1][x] is opp_colour)) and (board[y+2][x] is EMPTY):
+            if (y+2 in range(max_index + 1)) and (((x,y+1) in my_pos) or
+               ((x,y+1) in opp_colour)) and ((x,y+2) in empty_list):
                 moves.append((x,y),(x,y+2));
             # Check if piece can jump up
-            if (y-2 in range(8)) and ((board[y-1][x] is my_colour) or
-               (board[y-1][x] is opp_colour)) and (board[y-2][x] is EMPTY):
+            if (y-2 in range(max_index + 1)) and (((x,y-1) in my_pos) or
+               ((x,y-1) in opp_colour)) and ((x,y-2) in empty_list):
                 moves.append((x,y),(x,y-2));
 
             return moves
@@ -218,12 +208,12 @@ class Player:
 
         # For each square on board:
         #       - check if it's a piece
-        #       - if so, count avaliable moves
+        #       - if so, count available moves
 
-        for x in range(8):
-            for y in range(8):
-                if board[y][x] is my_colour:
-                    # Check avaliable spaces
+        for x in range(max_index + 1):
+            for y in range(max_index + 1):
+                if board[y][x] is my_pos:
+                    # Check available spaces
                     my_moves = my_moves + Player.check_moves(self, x, y)
 
         print(str(my_moves) + "\n"))
@@ -300,25 +290,15 @@ class Player:
             min_index = 1
             max_index = 6
             corners = update_corners(min_index, max_index)
-            """board = ["X----X",
-                     "------",
-                     "------",
-                     "------",
-                     "------",
-                     "X----X"]
-            dimension = 6"""
             
          elif turns == 192:
+	min_index = 2
+	max_index = 5
             corners = update_corners(min_index, max_index)
-            """board = ["X--X",
-                     "----",
-                     "----",
-                     "X--X"]
-            dimension = 4"""
         
         if turns <=24:
             #if turns == 1:
-            #If player is white, change min and max index 
+            #If player is my_pos, change min and max index 
             x = random.randint(min_index, max_index)
             y = random.randint(min_index, max_index) #y_start
             
@@ -334,10 +314,8 @@ class Player:
             #   and add to my_pos and board
             
             # Update the board
-            s = list(board[y])
-            s[x] = EMPTY
-            board[y] = "".join(s)
-            my_pos = (x,y)
+            my_pos.add((x,y))
+empty_spaces.remove((x,y)) 
             
         else:
             # Moving Phase
@@ -371,9 +349,11 @@ class Player:
     def update(self, action):
          #update opp_pos and board
             
-            #have list of white & black pos, update opponent pos, update board and find new goal pos
+            #have list of my_pos & op_pos pos, update opponent pos, update board and find new goal pos
     
         
     
     
 #principle variation search
+
+
