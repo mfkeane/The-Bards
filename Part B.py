@@ -35,6 +35,9 @@ class Player:
         elif colour == "black":
             y_start = range(2,8)
               
+	save_pos = [] # positions to place pieces to save another immediately
+	kill_pos = [] # positions to place pieces to kill an opponent immediately
+	
         attackers = []
         flanks = []
 
@@ -313,52 +316,53 @@ class Player:
             max_index = 6
             corners = update_corners(min_index, max_index)
             
-         elif turns == 192:
-	min_index = 2
-	max_index = 5
-            corners = update_corners(min_index, max_index)
+        elif turns == 192:
+            min_index = 2
+	    max_index = 5
+     	    corners = update_corners(min_index, max_index)
         
         if turns <=24:
             if turns == 1:
-	#Check not placing next to black
+		#Check not placing next to black
                 x = random.randint(min_index, max_index)
                 y_start_list = list(y_start)
                 y = random.randint(y_start_list[0], y_start_list[-1]) 
-	    return (x,y)
+	    	return (x,y)
 	
-        if case_1 != false:
-return(x,y)
-        elif case_2 != false:
-return(x,y) 
-        elif case_3 != false:
-return(x,y)
-        elif case_4 != false:
-return(x,y) 
+            """if case_1 != false:
+	        return(x,y)
+            elif case_2 != false:
+	        return(x,y) 
+            elif case_3 != false:
+                return(x,y)
+            elif case_4 != false:
+                return(x,y) """
 
-
+	   # First priority is to save our pieces if needed
            if len(save_pos) != 0:
                 for i in range(len(save_pos)):
 	          if check_surroundings(save_pos[i]):
                            return save_pos.pop(i)
 
 
-            #If player is my_pos, change min and max index 
-	if len(kill_pos) != 0:
+           # Second priority is to place pieces in positions that will kill an opponent
+	   #If player is my_pos, change min and max index 
+	   if len(kill_pos) != 0:
                 for i in range(len(kill_pos)):
 	          if check_surroundings(kill_pos[i]):
                            return kill_pos.pop(i)
 
+	   # If no priorising places, place a piece somewhere so that it is not next to an opponent 
+	   # (therefore preventing it from being taken in the next turn)
            for pos in opp_pos:
                result = check_two_away(pos) #check surrounds of position 2 away so not going into a spot where will die
-	   if result != None:
-		return result
+	       if result != None:
+	           return result
 	
-	while
-	    x = random.randint(min_index, max_index)
-                y_start_list = list(y_start)
-                y = random.randint(y_start_list[0], y_start_list[-1]) 
-	    if check_surroundings(x,y) is true:
-return (x,y) #check surrounds, say if in own area, then safe)
+	   for pos in empty_pos:
+	        if pos[1] in y_start:
+	            if check_surroundings(pos[0], pos[1]) is true:
+                        return (x,y) #check surrounds, say if in own area, then safe)
 #CHECK EMPTY GUYS PLEASE or choose rand value from empty
 
 #priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
@@ -378,9 +382,9 @@ return (x,y) #check surrounds, say if in own area, then safe)
             
             # Update the board
             my_pos.add((x,y))
-empty_spaces.remove((x,y)) 
-if (x,y) in kill_pos:
-    kill_pos.remove((x,y))
+	    empty_spaces.remove((x,y)) 
+	    if (x,y) in kill_pos:
+    	        kill_pos.remove((x,y))
             
         else:
             # Moving Phase
@@ -398,6 +402,10 @@ if (x,y) in kill_pos:
             # For every move, run search len function on every goal, keep track of shortest distance
             for i in len(moves_list):
                 val = calc_shortest_dist(self, moves_list[i][1], goals)
+		
+		# if move is a dumb move, add 20 to val
+		if eval_move(self, i) != true: #need to make this function
+			val += 20
                 # Then add index of move as key and shortest dist as value in dictionary
                 eval_dict[i] = val
             
@@ -407,7 +415,7 @@ if (x,y) in kill_pos:
             
             #      sort dictionary, use key (index of moves) to find and return that move
             
-        return action
+            return action
             
        
         
@@ -416,21 +424,22 @@ if (x,y) in kill_pos:
 
         #update opp_pos and board
         if turn <=24:
-	 op_pos.add(action)
-             empty_spaces.remove(action) 
-             if action in kill_pos:
-      kill_pos.remove(action)
+ 	# Placing Phase
+	    op_pos.add(action)
+            empty_spaces.remove(action) 
+            if action in kill_pos:
+                kill_pos.remove(action)
 
-if check_cases(self, action):
-     soon.add(action)
+            if check_cases(self, action):
+                soon.add(action)
 
-         else:
-         #placing
-              op_pos.add(action[1])
-              empty_spaces.remove(action[1]) 
-              empty_spaces.add(action[0])
-               if action[1] in kill_pos:
-        kill_pos.remove(action[1])
+        else:
+        # Moving Phase
+            op_pos.add(action[1])
+            empty_spaces.remove(action[1]) 
+            empty_spaces.add(action[0])
+            if action[1] in kill_pos:
+                kill_pos.remove(action[1])
     
 
 
