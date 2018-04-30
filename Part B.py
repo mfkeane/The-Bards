@@ -41,6 +41,29 @@ class Player:
         attackers = []
         flanks = []
 
+
+    def eval_move(self, pos):
+	x = pos[0]
+	y = pos[1]
+	
+	if ((x+1,y) in opp_pos or (x-1,y) in opp_pos or (x,y+1) 
+	    in opp_pos or (x,y-1) in opp_pos):
+	    # Check if we'll die
+	
+	    if (((x+1,y) in opp_pos and (x-1,y) in opp_pos and ((x+2,y) in my_pos or (x-2,y) in my_pos)) or ((x,y+1) 
+	    	in opp_pos and (x,y-1) in opp_pos and ((x,y+2) in my_pos or (x,y-2) in my_pos))):
+		# In a deadly spot, but we won't die as we're attacking
+	        return True
+	    elif (((x+1,y) in opp_pos and (x-1,y) in opp_pos) or ((x,y+1) 
+	    	in opp_pos and (x,y-1) in opp_pos)):
+		# In a deadly spot and will die
+		return False
+	    
+	    
+		
+	
+	
+	
             # Check if piece already partially surrounded
     #   and mark goal positions for Player
     def find_goal_pos(self, goals, flanks, x, y):
