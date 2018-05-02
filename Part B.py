@@ -1,14 +1,14 @@
- fill lists with player and opponent positions
-implement update 
-board shrinking - move corners
-fix search
+#fill lists with player and opponent positions
+#implement update 
+#board shrinking - move corners
+#fix search
 
 class Player:
     
     from collections import defaultdict
     from random import randint
 
-    
+  # Update Corners by.. well updating corners... Also kills off any pieces outside the new boundaries
   def update_corners(self, min_index, max_index):
       # Update empty and piece positions (including number of dead)
       for i in range(len(empty_list)):
@@ -262,7 +262,7 @@ class Player:
         x = goal[0]
         y = goal[1]
 
-        if (x in range(1,7) and ((x+1,y) in opp_colour
+        if (x in range(min_index+1,max_index-1) and ((x+1,y) in opp_colour
             and (x-1,y) in opp_colour) and
            ((x+2 in range(max_index + 1) and (x+2,y) in not my_pos) or (x+2 not in
            range(max_index + 1))) and
@@ -271,7 +271,7 @@ class Player:
 
             remove_goal_pos(goals, x, y)
 
-        if (y in range(1,7) and ((x,y+1) in opp_colour
+        if (y in range(min_index+1,max_index-1) and ((x,y+1) in opp_colour
            and board[y-1][y] is opp_colour) and
            ((y+2 in range(max_index + 1) and (x,y+2) in not my_pos) or (y+2 not in
            range(max_index + 1))) and
@@ -347,7 +347,7 @@ class Player:
                     # Check available spaces
                     my_moves = my_moves + Player.check_moves(self, x, y)
 
-        print(str(my_moves) + "\n"))
+        #print(str(my_moves) + "\n"))
         return my_moves
     
     # -------------------SEARCH FUNCTIONS------------------
@@ -408,7 +408,8 @@ class Player:
 #    END OF MODIFIED CODE
 #***
 
-    def cases(self, case_1, case_2, case_3, case_4):
+    #don't think we need these with how its now laid out?
+    """def cases(self, case_1, case_2, case_3, case_4):
          for pos in op_pos:
         
 #next to each other, next to a wall, +1 from my space, +2 from my space, + 2 from black
@@ -422,7 +423,7 @@ class Player:
           if so:
 	   return true:
          #case 2
-         #case 3
+         #case 3 """
 
     def calc_shortest_dist(self, attacker, goals):
         return len(it_deepening(self, [], attacker, goals))
@@ -503,17 +504,16 @@ class Player:
 	           return result
 
 	  while(True):
-	       pos = empty_list[randint(0, len(empty_list))
+	       pos = empty_list[randint(0, len(empty_list))]
                    if pos[1] in y_start:
 	            if eval_move(pos) == 0:
                             return (x,y) #check surrounds, say if in own area, then safe)
-#CHECK EMPTY GUYS PLEASE or choose rand value from empty
 
 #priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
 #place opponent, check if matches any of cases. If it matches, check place for my piece isn’t next to a black that is not in soon (not killable). If next to black not in soon, check if can place a white piece somewhere to make case 4 happen, if not, place randomly but not next to black
 
-            
-            # MY SECTION, FIX
+            # do we need this?
+            """# MY SECTION, FIX
             for i in range(0, pieces_in_play):
                 #if (check if next to opp piece) check surrounds fn (killable fn)?
                     #set goal as square opposite 
@@ -528,7 +528,7 @@ class Player:
             my_pos.add((x,y))
 	    empty_spaces.remove((x,y)) 
 	    if (x,y) in kill_pos:
-    	        kill_pos.remove((x,y))
+    	        kill_pos.remove((x,y))"""
             
         else:
             # Moving Phase
@@ -546,6 +546,7 @@ class Player:
             # For every move, run search len function on every goal, keep track of shortest distance
             for i in len(moves_list):
                 val = calc_shortest_dist(self, moves_list[i][1], goals) # do we want to split goals into kill and save?
+	        # NEED TO SORT OUT GOALS, MAYBE GOALS = KILL_POS + SAVE_POS??
 		
 		# if move is a dumb move, add more to val
 		val += eval_move(self, i)
