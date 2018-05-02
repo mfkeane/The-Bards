@@ -6,10 +6,24 @@ fix search
 class Player:
     
     from collections import defaultdict
-    import random
+    from random import randint
+
     
-  def update_corners(self, min_index, max_index)
-    return [(min_index, min_index),(min_index, max_index),(max_index, min_index),(max_index, max_index)]
+  def update_corners(self, min_index, max_index):
+      # Update empty and piece positions (including number of dead)
+      for i in range(len(empty_list)):
+          if (empty_list[i][0] < min_index or empty_list[i][0] > max_index or empty_list[i][1] < min_index or empty_list[i][1] > max_index):
+             empty_list.pop(i)
+      for i in range(len(my_pos)):
+          if (my_pos[i][0] < min_index or my_pos[i][0] > max_index or my_pos[i][1] < min_index or my_pos[i][1] > max_index):
+             my_pos.pop(i)
+             my_dead += 1
+      for i in range(len(opp_pos)):
+          if (opp_pos[i][0] < min_index or opp_pos[i][0] > max_index or opp_pos[i][1] < min_index or opp_pos[i][1] > max_index):
+             opp_pos.pop(i)
+             opp_dead += 1
+
+      return [(min_index, min_index),(min_index, max_index),(max_index, min_index),(max_index, max_index)]
     
     def _init_(self, colour):
         
@@ -17,7 +31,7 @@ class Player:
 
         min_index = 0
         max_index = 7
-        corners = update_corners(min_index, max_index)
+        corners = update_corners(self, min_index, max_index)
         empty_list_spaces = []
         for i in range(max_index+1):
             for j in range(max_index+1):
@@ -41,6 +55,50 @@ class Player:
         attackers = []
         flanks = []
 
+    # Function checks if a piece has been killed and updates records
+    def check_confirmed_kill(self, pos, type):
+        if type == 0:
+        # My turn, check if opp is dead
+            x = pos[0]
+            y = pos[1] 
+if (((x+1,y) in opp_pos) and ((x+2,y) in my_pos)):
+    opp_pos.remove((x+1,y))
+    opp_dead += 1
+    empty_list.add((x+1,y)
+elif (((x-1,y) in opp_pos) and ((x-2,y) in my_pos)):
+    opp_pos.remove((x-1,y))
+    opp_dead += 1
+    empty_list.add((x-1,y)
+elif (((x,y+1) in opp_pos) and ((x,y+2) in my_pos)):
+    opp_pos.remove((x,y+1))
+    opp_dead += 1
+    empty_list.add((x,y+1)
+elif (((x,y-1) in opp_pos) and ((x,y-2) in my_pos)):
+    opp_pos.remove((x,y-1))
+    opp_dead += 1
+    empty_list.add((x,y-1)
+
+        elif type == 1:
+        # Opp turn, check if my piece is dead
+            x = pos[0]
+            y = pos[1] 
+            if (((x+1,y) in my_pos) and ((x+2,y) in opp_pos)):
+    my_pos.remove((x+1,y))
+    my_dead += 1
+    empty_list.add((x+1,y)
+elif (((x-1,y) in my_pos) and ((x-2,y) in opp_pos)):
+    my_pos.remove((x-1,y))
+    my_dead += 1
+    empty_list.add((x-1,y)
+elif (((x,y+1) in my_pos) and ((x,y+2) in opp_pos)):
+    my_pos.remove((x,y+1))
+    my_dead += 1
+    empty_list.add((x,y+1)
+elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
+    my_pos.remove((x,y-1))
+    my_dead += 1
+    empty_list.add((x,y-1)
+
 
     def eval_move(self, pos):
 	x = pos[0]
@@ -48,16 +106,33 @@ class Player:
 	
 	if ((x+1,y) in opp_pos or (x-1,y) in opp_pos or (x,y+1) 
 	    in opp_pos or (x,y-1) in opp_pos):
-	    # Check if we'll die
+	    # Check if we'll die since there’s an opp next to us
 	
 	    if (((x+1,y) in opp_pos and (x-1,y) in opp_pos and ((x+2,y) in my_pos or (x-2,y) in my_pos)) or ((x,y+1) 
 	    	in opp_pos and (x,y-1) in opp_pos and ((x,y+2) in my_pos or (x,y-2) in my_pos))):
 		# In a deadly spot, but we won't die as we're attacking
-	        return True
+                    if (turn <= 24):
+                        # Can cause a loop to form that is not productive in placing phase
+                        return 5
+	        return 0
 	    elif (((x+1,y) in opp_pos and (x-1,y) in opp_pos) or ((x,y+1) 
 	    	in opp_pos and (x,y-1) in opp_pos)):
-		# In a deadly spot and will die
-		return False
+		# In a deadly spot and will die, even if we kill a piece
+		return 20
+                if (turn<=24):
+                    # placing phase, don’t go next to an opp unless setting up to kill it
+                    if (((x+1,y) in opp_pos and (x-1,y) in my_pos) or( (x-1,y) in opp_pos  and (x+1,y) in my_pos) or ((x,y+1)  in opp_pos and (x,y-1) in my_pos) or ((x,y-1) in opp_pos and (x,y+1) in my_pos)):
+                       # safe, since pos opp needs to kill piece is blocked by my piece
+                       return 0
+                    elif (((x+1,y) in opp_pos and (x+2,y) in my_pos) or( (x-1,y) in opp_pos  and (x-2,y) in my_pos) or ((x,y+1)  in opp_pos and (x,y+2) in my_pos) or ((x,y-1) in opp_pos and (x,y-2) in my_pos)):
+                        # Will kill opp and not in a deadly position
+                        return 0
+                    else:
+                        #may die next as next to an opponent
+                        return 10
+
+        # not next to opp
+        return 0
 	    
 	    
 		
@@ -154,7 +229,7 @@ class Player:
 
 
         for goal in goals:
-            WatchYourBack.remove_kamikaze(goal)
+            Player.remove_kamikaze(goal)
 
         return [goals, flanks]
     
@@ -214,6 +289,7 @@ class Player:
                 moves.append((x,y),(x,y-1));
 
             # Check if piece can jump to right
+            #FIX CHECK 2 AWAY TO BE USED IN HERE?
             if (x+2 in range(max_index + 1)) and (((x+1,y) in my_pos) or
                ((x+1,y) in opp_colour)) and ((x+2,y) in empty_list):
                 moves.append((x,y),(x+2,y));
@@ -327,6 +403,23 @@ class Player:
     def calc_shortest_dist(self, attacker, goals):
         return len(it_deepening(self, [], attacker, goals))
 
+
+    #CHANGE TO USE FOR JUMPS?
+    def check_two_away(self, pos):
+        x = pos[0] #CHECK THIS?
+        y = pos[1] 
+
+        if (x+2 in range(max_index + 1)) and ((x+2,y) in empty_list_spaces) and eval_move(self, (x+2,y)):
+            return(x+2,y)
+        if (x-2 in range(max_index + 1)) and ((x-2,y) in empty_list_spaces) and eval_move(self, (x-2,y)):
+            return(x-2,y)
+        if (y+2 in range(max_index + 1)) and ((x,y+2) in empty_list_spaces) and eval_move(self, (x,y+2)):
+            return(x,y+2)
+        if (y-2 in range(max_index + 1)) and ((x,y-2) in empty_list_spaces) and eval_move(self, (x,y-2)):
+            return(x,y-2)
+        return false
+            
+
     def action(self, turns):
         turn = turns
 
@@ -337,19 +430,20 @@ class Player:
         if turns == 128:
             min_index = 1
             max_index = 6
-            corners = update_corners(min_index, max_index)
+            corners = update_corners(self, min_index, max_index)
             
         elif turns == 192:
             min_index = 2
 	    max_index = 5
-     	    corners = update_corners(min_index, max_index)
+     	    corners = update_corners(self, min_index, max_index)
         
         if turns <=24:
+            possible_moves = []
             if turns == 1:
 		#Check not placing next to black
-                x = random.randint(min_index, max_index)
+                x = randint(min_index, max_index)
                 y_start_list = list(y_start)
-                y = random.randint(y_start_list[0], y_start_list[-1]) 
+                y = randint(y_start_list[0], y_start_list[-1]) 
 	    	return (x,y)
 	
             """if case_1 != false:
@@ -364,16 +458,18 @@ class Player:
 	   # First priority is to save our pieces if needed
            if len(save_pos) != 0:
                 for i in range(len(save_pos)):
-	          if check_surroundings(save_pos[i]):
+	          if eval_move(self, save_pos[i])==0:
                            return save_pos.pop(i)
+
 
 
            # Second priority is to place pieces in positions that will kill an opponent
 	   #If player is my_pos, change min and max index 
 	   if len(kill_pos) != 0:
                 for i in range(len(kill_pos)):
-	          if check_surroundings(kill_pos[i]):
-                           return kill_pos.pop(i)
+	          if eval_move(kill_pos[i])==0:
+                         check_confirmed_kill(self, kill_pos[i], 0)
+                         return kill_pos.pop(i)
 
 	   # If no priorising places, place a piece somewhere so that it is not next to an opponent 
 	   # (therefore preventing it from being taken in the next turn)
@@ -381,11 +477,12 @@ class Player:
                result = check_two_away(pos) #check surrounds of position 2 away so not going into a spot where will die
 	       if result != None:
 	           return result
-	
-	   for pos in empty_pos:
-	        if pos[1] in y_start:
-	            if check_surroundings(pos[0], pos[1]) is true:
-                        return (x,y) #check surrounds, say if in own area, then safe)
+
+	  while(True):
+	       pos = empty_list[randint(0, len(empty_list))
+                   if pos[1] in y_start:
+	            if eval_move(pos) == 0:
+                            return (x,y) #check surrounds, say if in own area, then safe)
 #CHECK EMPTY GUYS PLEASE or choose rand value from empty
 
 #priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
@@ -426,9 +523,8 @@ class Player:
             for i in len(moves_list):
                 val = calc_shortest_dist(self, moves_list[i][1], goals)
 		
-		# if move is a dumb move, add 20 to val
-		if eval_move(self, i) != true: #need to make this function
-			val += 20
+		# if move is a dumb move, add more to val
+		val += eval_move(self, i)
                 # Then add index of move as key and shortest dist as value in dictionary
                 eval_dict[i] = val
             
@@ -437,7 +533,7 @@ class Player:
                 break
             
             #      sort dictionary, use key (index of moves) to find and return that move
-            
+            check_confirmed_kill(self, action, 0)
             return action
             
        
@@ -456,6 +552,8 @@ class Player:
             if check_cases(self, action):
                 soon.add(action)
 
+            check_confirmed_kill(self, action, 1)
+
         else:
         # Moving Phase
             op_pos.add(action[1])
@@ -463,6 +561,8 @@ class Player:
             empty_spaces.add(action[0])
             if action[1] in kill_pos:
                 kill_pos.remove(action[1])
+
+            check_confirmed_kill(self, action[1], 1)
     
 
 
@@ -472,5 +572,6 @@ class Player:
     
     
 #principle variation search
+
 
 
