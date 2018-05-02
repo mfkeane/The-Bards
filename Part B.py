@@ -61,45 +61,69 @@ class Player:
         # My turn, check if opp is dead
             x = pos[0]
             y = pos[1] 
-if (((x+1,y) in opp_pos) and ((x+2,y) in my_pos)):
-    opp_pos.remove((x+1,y))
-    opp_dead += 1
-    empty_list.add((x+1,y)
-elif (((x-1,y) in opp_pos) and ((x-2,y) in my_pos)):
-    opp_pos.remove((x-1,y))
-    opp_dead += 1
-    empty_list.add((x-1,y)
-elif (((x,y+1) in opp_pos) and ((x,y+2) in my_pos)):
-    opp_pos.remove((x,y+1))
-    opp_dead += 1
-    empty_list.add((x,y+1)
-elif (((x,y-1) in opp_pos) and ((x,y-2) in my_pos)):
-    opp_pos.remove((x,y-1))
-    opp_dead += 1
-    empty_list.add((x,y-1)
+	    if (((x+1,y) in opp_pos) and ((x+2,y) in my_pos)):
+    		opp_pos.remove((x+1,y))
+    		opp_dead += 1
+    		empty_list.add((x+1,y)
+	    elif (((x-1,y) in opp_pos) and ((x-2,y) in my_pos)):
+    		opp_pos.remove((x-1,y))
+    		opp_dead += 1
+    		empty_list.add((x-1,y)
+	    elif (((x,y+1) in opp_pos) and ((x,y+2) in my_pos)):
+                opp_pos.remove((x,y+1))
+    		opp_dead += 1
+    		empty_list.add((x,y+1)
+            elif (((x,y-1) in opp_pos) and ((x,y-2) in my_pos)):
+    		opp_pos.remove((x,y-1))
+    		opp_dead += 1
+    		empty_list.add((x,y-1)
 
         elif type == 1:
         # Opp turn, check if my piece is dead
             x = pos[0]
             y = pos[1] 
             if (((x+1,y) in my_pos) and ((x+2,y) in opp_pos)):
-    my_pos.remove((x+1,y))
-    my_dead += 1
-    empty_list.add((x+1,y)
-elif (((x-1,y) in my_pos) and ((x-2,y) in opp_pos)):
-    my_pos.remove((x-1,y))
-    my_dead += 1
-    empty_list.add((x-1,y)
-elif (((x,y+1) in my_pos) and ((x,y+2) in opp_pos)):
-    my_pos.remove((x,y+1))
-    my_dead += 1
-    empty_list.add((x,y+1)
-elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
-    my_pos.remove((x,y-1))
-    my_dead += 1
-    empty_list.add((x,y-1)
+   		my_pos.remove((x+1,y))
+    		my_dead += 1
+    		empty_list.add((x+1,y)
+	    elif (((x-1,y) in my_pos) and ((x-2,y) in opp_pos)):
+    		my_pos.remove((x-1,y))
+    		my_dead += 1
+    		empty_list.add((x-1,y)
+	    elif (((x,y+1) in my_pos) and ((x,y+2) in opp_pos)):
+    		my_pos.remove((x,y+1))
+    		my_dead += 1
+    		empty_list.add((x,y+1)
+	    elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
+    		my_pos.remove((x,y-1))
+    		my_dead += 1
+    		empty_list.add((x,y-1)
 
-
+    def check_kill_save_pos(self, pos):
+	x = pos[0]
+	y = pos[1]
+			    
+	if ((x+1,y) in my_pos):
+	    if ((x-1,y) in empty_list):
+	        kill_pos.add((x-1,y))
+            elif ((x+2,y) in empty_list):
+	        save_pos.add(x+2,y)
+	elif ((x-1,y) in my_pos):
+            if ((x+1,y) in empty_list):
+	        kill_pos.add((x+1,y))
+            elif ((x-2,y) in empty_list):
+	        save_pos.add(x-2,y)
+	elif ((x,y+1) in my_pos):
+	    if ((x,y-1) in empty_list):
+	        kill_pos.add((x,y-1))
+            elif ((x,y+2) in empty_list):
+	        save_pos.add(x,y+2)
+	elif ((x,y-1) in my_pos:
+	    if ((x,y+1) in empty_list):
+	        kill_pos.add((x,y+1))
+            elif ((x,y-2) in empty_list):
+	        save_pos.add(x,y-2)
+			       
     def eval_move(self, pos):
 	x = pos[0]
 	y = pos[1]
@@ -521,7 +545,7 @@ elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
             eval_dict = defaultdict()
             # For every move, run search len function on every goal, keep track of shortest distance
             for i in len(moves_list):
-                val = calc_shortest_dist(self, moves_list[i][1], goals)
+                val = calc_shortest_dist(self, moves_list[i][1], goals) # do we want to split goals into kill and save?
 		
 		# if move is a dumb move, add more to val
 		val += eval_move(self, i)
@@ -548,11 +572,14 @@ elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
             empty_spaces.remove(action) 
             if action in kill_pos:
                 kill_pos.remove(action)
-
-            if check_cases(self, action):
+            if action[1] in save_pos:
+                save_pos.remove(action[1])
+				
+            if check_cases(self, action): #what are we doing with this?
                 soon.add(action)
 
             check_confirmed_kill(self, action, 1)
+	    check_kill_save_pos(self, action)
 
         else:
         # Moving Phase
@@ -561,9 +588,11 @@ elif (((x,y-1) in my_pos) and ((x,y-2) in opp_pos)):
             empty_spaces.add(action[0])
             if action[1] in kill_pos:
                 kill_pos.remove(action[1])
+            if action[1] in save_pos:
+                save_pos.remove(action[1])
 
             check_confirmed_kill(self, action[1], 1)
-    
+            check_kill_save_pos(self, action)
 
 
             #have list of my_pos & op_pos pos, update opponent pos, update board and find new goal pos
