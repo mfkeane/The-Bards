@@ -1,4 +1,4 @@
-self.max_index#fill lists with player and opponent positions
+#fill lists with player and opponent positions
 #implement update
 #board shrinking - move corners
 #fix search
