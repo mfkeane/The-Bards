@@ -544,9 +544,10 @@ class Player:
             # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
             eval_dict = defaultdict()
             # For every move, run search len function on every goal, keep track of shortest distance
+	    goals = kill_pos + save_pos
+	      
             for i in len(moves_list):
-                val = calc_shortest_dist(self, moves_list[i][1], goals) # do we want to split goals into kill and save?
-	        # NEED TO SORT OUT GOALS, MAYBE GOALS = KILL_POS + SAVE_POS??
+                val = calc_shortest_dist(self, moves_list[i][1], goals)
 		
 		# if move is a dumb move, add more to val
 		val += eval_move(self, i)
