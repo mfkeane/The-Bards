@@ -55,6 +55,44 @@ class Player:
         attackers = []
         flanks = []
 
+	
+	 # Appends avaliable moves to a list
+    def append_moves(board, x, y, path):
+        moves = []
+        if (x+1 in range(8)) and board[x+1][y] is EMPTY:
+            # Only append if not already a square that has been moved to
+            if (x+1, y) not in path:
+                moves.append((x+1, y))
+        if (x-1 in range(8)) and board[x-1][y] is EMPTY:
+            if (x-1, y) not in path:
+                moves.append((x-1, y))
+        if (y+1 in range(8)) and board[x][y+1] is EMPTY:
+            if (x, y+1) not in path:
+                moves.append((x, y+1))
+        if (y-1 in range(8)) and board[x][y-1] is EMPTY:
+            if (x, y-1) not in path:
+                moves.append((x, y-1))
+
+        # append jumps
+        if ((x+2 in range(8)) and ((board[x+1][y] is WHITE) or
+           (board[x+1][y] is BLACK)) and board[x+2][y] is EMPTY):
+            if (x+2, y) not in path:
+                moves.append((x+2, y))
+        if ((x-2 in range(8)) and ((board[x-1][y] is WHITE) or
+           (board[x-1][y] is BLACK)) and board[x-2][y] is EMPTY):
+            if (x-2, y) not in path:
+                moves.append((x-2, y))
+        if ((y+2 in range(8)) and ((board[x][y+1] is WHITE) or
+           (board[x][y+1] is BLACK)) and board[x][y+2] is EMPTY):
+            if (x, y+2) not in path:
+                moves.append((x, y+2))
+        if ((y-2 in range(8)) and ((board[x][y-1] is WHITE) or
+           (board[x][y-1] is BLACK)) and board[x][y-2] is EMPTY):
+            if (x, y-2) not in path:
+                moves.append((x, y-2))
+
+        return moves
+
     # Function checks if a piece has been killed and updates records
     def check_confirmed_kill(self, pos, type):
         if type == 0:
