@@ -74,11 +74,46 @@ class Player:
                 (self.max_index, self.min_index),
                 (self.max_index, self.max_index)]
 
+    def update_pos(self, pos, player):
+        if player==0:
+            if self.turn<=24:
+                self.my_pos.append(pos)
+                self.empty_list.remove(pos)
+                if pos in self.kill_pos:
+                    self.kill_pos.remove(pos)
+                if pos in self.save_pos:
+                    self.save_pos.remove(pos)
+            else:
+                self.my_pos.append(pos[1])
+                self.my_pos.remove(pos[0])
+                self.empty_list.remove(pos[1])
+                self.empty_list.append(pos[0])
+                if pos[1] in self.kill_pos:
+                    self.kill_pos.remove(pos[1])
+                if pos[1] in self.save_pos:
+                    self.save_pos.remove(pos[1])
 
+        elif player==1:
+            if self.turn<=24:
+                self.my_pos.append(pos)
+                self.empty_list.remove(pos)
+                if pos in self.kill_pos:
+                    self.kill_pos.remove(pos)
+                if pos in self.save_pos:
+                    self.save_pos.remove(pos)
+            else:
+                self.opp_pos.append(pos[1])
+                self.opp_pos.remove(pos[0])
+                self.empty_list.remove(pos[1])
+                self.empty_list.append(pos[0])
+                if pos[1] in self.kill_pos:
+                    self.kill_pos.remove(pos[1])
+                if pos[1] in self.save_pos:
+                    self.save_pos.remove(pos[1])
 
 
      # Appends avaliable moves to a list
-    def append_moves(board, x, y, path):
+    def append_moves(self,x,y,path):
         moves = []
         if (x+1 in range(8)) and (x+1,y) in self.empty_list:
             # Only append if not already a square that has been moved to
@@ -123,19 +158,19 @@ class Player:
             if (((x+1,y) in self.opp_pos) and ((x+2,y) in self.my_pos)):
                 self.opp_pos.remove((x+1,y))
                 self.opp_dead += 1
-                self.empty_list.add((x+1,y))
+                self.empty_list.append((x+1,y))
             elif (((x-1,y) in self.opp_pos) and ((x-2,y) in self.my_pos)):
                 self.opp_pos.remove((x-1,y))
                 self.opp_dead += 1
-                self.empty_list.add((x-1,y))
+                self.empty_list.append((x-1,y))
             elif (((x,y+1) in self.opp_pos) and ((x,y+2) in self.my_pos)):
                 self.opp_pos.remove((x,y+1))
                 self.opp_dead += 1
-                self.empty_list.add((x,y+1))
+                self.empty_list.append((x,y+1))
             elif (((x,y-1) in self.opp_pos) and ((x,y-2) in self.my_pos)):
                 self.opp_pos.remove((x,y-1))
                 self.opp_dead += 1
-                self.empty_list.add((x,y-1))
+                self.empty_list.append((x,y-1))
 
         elif type == 1:
         # Opp turn, check if my piece is dead
@@ -144,19 +179,19 @@ class Player:
             if (((x+1,y) in self.my_pos) and ((x+2,y) in self.opp_pos)):
                 self.my_pos.remove((x+1,y))
                 self.my_dead += 1
-                self.empty_list.add((x+1,y))
+                self.empty_list.append((x+1,y))
             elif (((x-1,y) in self.my_pos) and ((x-2,y) in self.opp_pos)):
                 self.my_pos.remove((x-1,y))
                 self.my_dead += 1
-                self.empty_list.add((x-1,y))
+                self.empty_list.append((x-1,y))
             elif (((x,y+1) in self.my_pos) and ((x,y+2) in self.opp_pos)):
                 self.my_pos.remove((x,y+1))
                 self.my_dead += 1
-                self.empty_list.add((x,y+1))
+                self.empty_list.append((x,y+1))
             elif (((x,y-1) in self.my_pos) and ((x,y-2) in self.opp_pos)):
                 self.my_pos.remove((x,y-1))
                 self.my_dead += 1
-                self.empty_list.add((x,y-1))
+                self.empty_list.append((x,y-1))
 
     def check_kill_save_pos(self, pos):
         x = pos[0]
@@ -164,24 +199,24 @@ class Player:
 
         if ((x+1,y) in self.my_pos):
             if ((x-1,y) in self.empty_list):
-                self.kill_pos.add((x-1,y))
+                self.kill_pos.append((x-1,y))
             elif ((x+2,y) in self.empty_list):
-                self.save_pos.add(x+2,y)
+                self.save_pos.append((x+2,y))
         elif ((x-1,y) in self.my_pos):
             if ((x+1,y) in self.empty_list):
-                self.kill_pos.add((x+1,y))
+                self.kill_pos.append((x+1,y))
             elif ((x-2,y) in self.empty_list):
-                self.save_pos.add(x-2,y)
+                self.save_pos.append((x-2,y))
         elif ((x,y+1) in self.my_pos):
             if ((x,y-1) in self.empty_list):
-                self.kill_pos.add((x,y-1))
+                self.kill_pos.append((x,y-1))
             elif ((x,y+2) in self.empty_list):
-                self.save_pos.add(x,y+2)
+                self.save_pos.append((x,y+2))
         elif ((x,y-1) in self.my_pos):
             if ((x,y+1) in self.empty_list):
-                self.kill_pos.add((x,y+1))
+                self.kill_pos.append((x,y+1))
             elif ((x,y-2) in self.empty_list):
-                self.save_pos.add(x,y-2)
+                self.save_pos.append((x,y-2))
 
     def eval_move(self, pos):
         x = pos[0]
@@ -518,19 +553,19 @@ class Player:
 
         if ((x+2 in range(self.max_index + 1)) and
            ((x+2,y) in self.empty_list) and
-           Player.eval_move(self, (x+2,y))):
+           Player.eval_move(self, (x+2,y))==0):
             return(x+2,y)
         if ((x-2 in range(self.max_index + 1)) and
            ((x-2,y) in self.empty_list) and
-           Player.eval_move(self, (x-2,y))):
+           Player.eval_move(self, (x-2,y))==0):
             return(x-2,y)
         if ((y+2 in range(self.max_index + 1)) and
            ((x,y+2) in self.empty_list)and
-           Player.eval_move(self, (x,y+2))):
+           Player.eval_move(self, (x,y+2))==0):
             return(x,y+2)
         if ((y-2 in range(self.max_index + 1)) and
            ((x,y-2) in self.empty_list) and
-           Player.eval_move(self, (x,y-2))):
+           Player.eval_move(self, (x,y-2))==0):
             return(x,y-2)
         return None
 
@@ -556,16 +591,20 @@ class Player:
                     x = random.randint(self.min_index, self.max_index)
                     y = random.randint(self.y_start_list[0], self.y_start_list[-1])
                     if (x, y) not in self.corners:
+                        self.my_pos.append((x,y))
+                        self.empty_list.remove((x,y))
                         return (x,y)
 
 
        # First priority is to save our pieces if needed
             if len(self.save_pos) != 0:
                 for i in range(len(self.save_pos)):
-                    if i[1] in self.y_start_list:
-                        if i[1] in self.empty_list:
+                    if i in self.y_start_list:
+                        if self.save_pos[i] in self.empty_list:
                             if Player.eval_move(self, self.save_pos[i])==0:
-                                return self.save_pos.pop(i)
+                                pos = self.save_pos[i]
+                                Player.update_pos(self, pos, 0)
+                                return pos
 
 
 
@@ -573,11 +612,13 @@ class Player:
        #If player is self.my_pos, change min and max index
             if len(self.kill_pos) != 0:
                 for i in range(len(self.kill_pos)):
-                    if i[1] in self.y_start_list:
-                        if i[1] in self.empty_list:
-                            if Player.eval_move(self.kill_pos[i])==0:
-                                Player.check_confirmed_kill(self, self.kill_pos[i], 0)
-                                return self.kill_pos.pop(i)
+                    if i in self.y_start_list:
+                        if self.kill_pos[i] in self.empty_list:
+                            if Player.eval_move(self,self.kill_pos[i])==0:
+                                pos = self.kill_pos[i]
+                                Player.check_confirmed_kill(self, pos, 0)
+                                Player.update_pos(self, pos, 0)
+                                return pos
 
        # If no priorising places, place a piece somewhere so that it is not next to an opponent
        # (therefore preventing it from being taken in the next turn)
@@ -585,13 +626,15 @@ class Player:
                 result = Player.check_two_away(self,pos) #check surrounds of position 2 away so not going into a spot where will die
                 if result != None:
                     if result[1] in self.y_start_list:
-                        if result[1] in self.empty_list:
+                        if result in self.empty_list:
+                            Player.update_pos(self, result, 0)
                             return result
 
             while(True):
                 pos = self.empty_list[random.randint(0, len(self.empty_list)-1)]
                 if pos[1] in self.y_start_list:
                         if Player.eval_move(self,pos) == 0:
+                            Player.update_pos(self, pos, 0)
                             return pos
 
 #priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
@@ -639,13 +682,8 @@ class Player:
 
         #update self.opp_pos and board
         if self.turn<=24:
-     # Placing Phase
-            self.opp_pos.append(action)
-            self.empty_list.remove(action)
-            if action in self.kill_pos:
-                self.kill_pos.remove(action)
-            if action[1] in self.save_pos:
-                self.save_pos.remove(action[1])
+        # Placing Phase
+            Player.update_pos(self, action, 1)
 
             #if check_cases(self, action): #what are we doing with this?
             #    soon.add(action)
@@ -655,13 +693,7 @@ class Player:
 
         else:
         # Moving Phase
-            self.opp_pos.add(action[1])
-            empty_spaces.remove(action[1])
-            empty_spaces.add(action[0])
-            if action[1] in self.kill_pos:
-                self.kill_pos.remove(action[1])
-            if action[1] in self.save_pos:
-                self.save_pos.remove(action[1])
+            Player.update_pos(self, action, 1)
 
             Player.check_confirmed_kill(self, action[1], 1)
             Player.check_kill_save_pos(self, action)
