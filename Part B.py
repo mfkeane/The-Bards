@@ -8,7 +8,7 @@ import random
 
 class Player:
 
-    
+
 
     def __init__(self, colour):
         self.turn= -1
@@ -95,7 +95,7 @@ class Player:
 
         elif player==1:
             if self.turn<24:
-                self.my_pos.append(pos)
+                self.opp_pos.append(pos)
                 self.empty_list.remove(pos)
                 if pos in self.kill_pos:
                     self.kill_pos.remove(pos)
@@ -629,7 +629,6 @@ class Player:
                         if result in self.empty_list:
                             Player.update_pos(self, result, 0)
                             return result
-
             while(True):
                 pos = self.empty_list[random.randint(0, len(self.empty_list)-1)]
                 if pos[1] in self.y_start_list:
