@@ -3,10 +3,12 @@
 #board shrinking - move corners
 #fix search
 
+from collections import defaultdict
+import random
+
 class Player:
 
-    from collections import defaultdict
-    from random import randint
+    
 
     def __init__(self, colour):
         self.turn= 0
@@ -357,7 +359,7 @@ class Player:
         if ((y-1 not in range(self.max_index + 1)) and
            ((x+1 in range(self.max_index + 1) and (x+1,y) in self.empty_list)
            and ((x-1 in range(self.max_index + 1))
-           and (x-1,y) in self.empty_list_spaces))):
+           and (x-1,y) in self.empty_list))):
             self.goals.append((x+1,y))
             self.goals.append((x-1,y))
             if (x,y+1) in self.goals:
@@ -514,22 +516,22 @@ class Player:
         y = pos[1]
 
         if ((x+2 in range(self.max_index + 1)) and
-           ((x+2,y) in self.empty_list_spaces) and
+           ((x+2,y) in self.empty_list) and
            Player.eval_move(self, (x+2,y))):
             return(x+2,y)
         if ((x-2 in range(self.max_index + 1)) and
-           ((x-2,y) in self.empty_list_spaces) and
+           ((x-2,y) in self.empty_list) and
            Player.eval_move(self, (x-2,y))):
             return(x-2,y)
         if ((y+2 in range(self.max_index + 1)) and
-           ((x,y+2) in self.empty_list_spaces) and
+           ((x,y+2) in self.empty_list)and
            Player.eval_move(self, (x,y+2))):
             return(x,y+2)
         if ((y-2 in range(self.max_index + 1)) and
-           ((x,y-2) in self.empty_list_spaces) and
+           ((x,y-2) in self.empty_list) and
            Player.eval_move(self, (x,y-2))):
             return(x,y-2)
-        return false
+        return False
 
 
     def action(self, turns):
@@ -550,9 +552,9 @@ class Player:
             possible_moves = []
             if self.turn== 0:
                 while(True):
-                    x = randint(self.min_index, max_index)
+                    x = random.randint(self.min_index, self.max_index)
                     self.y_start_list = list(self.y_start)
-                    y = randint(self.y_start_list[0], self.y_start_list[-1])
+                    y = random.randint(self.y_start_list[0], self.y_start_list[-1])
                     if (x, y) not in self.corners:
                         return (x,y)
 
@@ -576,12 +578,12 @@ class Player:
        # If no priorising places, place a piece somewhere so that it is not next to an opponent
        # (therefore preventing it from being taken in the next turn)
             for pos in self.opp_pos:
-                result = Player.check_two_away(pos) #check surrounds of position 2 away so not going into a spot where will die
+                result = Player.check_two_away(self,pos) #check surrounds of position 2 away so not going into a spot where will die
                 if result != None:
                     return result
 
             while(True):
-                pos = self.empty_list[randint(0, len(self.empty_list))]
+                pos = self.empty_list[random.randint(0, len(self.empty_list))]
                 if pos[1] in self.y_start:
                     if Player.eval_move(pos) == 0:
                         return (x,y) #check surrounds, say if in own area, then safe)
@@ -632,15 +634,15 @@ class Player:
         #update self.opp_pos and board
         if self.turn<=24:
      # Placing Phase
-            self.opp_pos.add(action)
-            empty_spaces.remove(action)
+            self.opp_pos.append(action)
+            self.empty_list.remove(action)
             if action in self.kill_pos:
                 self.kill_pos.remove(action)
             if action[1] in self.save_pos:
                 self.save_pos.remove(action[1])
 
-            if check_cases(self, action): #what are we doing with this?
-                soon.add(action)
+            #if check_cases(self, action): #what are we doing with this?
+            #    soon.add(action)
 
             Player.check_confirmed_kill(self, action, 1)
             Player.check_kill_save_pos(self, action)
