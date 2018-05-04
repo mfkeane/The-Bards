@@ -8,6 +8,36 @@ class Player:
     from collections import defaultdict
     from random import randint
 
+    def __init__(self, colour):
+        self.turn= 0
+
+        self.min_index = 0
+        self.max_index = 7
+        self.empty_list = []
+        for i in range(self.max_index+1):
+            for j in range(self.max_index+1):
+                self.empty_list.append((i,j))
+
+        self.my_pos  = []
+        self.opp_pos = []
+
+        self.my_dead  = 0
+        self.opp_dead = 0
+
+        if colour == "white":
+            self.y_start = range(0,6)
+        elif colour == "black":
+            self.y_start = range(2,8)
+
+        self.save_pos = [] # positions to place pieces to save another immediately
+        self.kill_pos = [] # positions to place pieces to kill an opponent immediately
+
+        #self.attackers = []
+        self.flanks = []
+        self.goals = []
+        self.corners = Player.update_corners(self)
+
+
   # Update Corners by.. well updating corners... Also kills off any pieces outside the new boundaries
     def update_corners(self):
       # Update empty and piece positions (including number of dead)
@@ -31,38 +61,17 @@ class Player:
                 self.opp_pos[i][1] > self.max_index):
                 self.opp_pos.pop(i)
                 self.opp_dead += 1
-        return [(self.min_index, self.min_index),(self.min_index, self.max_index),
-                (self.max_index, self.min_index),(self.max_index, self.max_index)]
 
-    def _init_(self, colour):
-        self.turn= 0
+        self.empty_list.remove((self.min_index, self.min_index))
+        self.empty_list.remove((self.min_index, self.max_index))
+        self.empty_list.remove((self.max_index, self.min_index))
+        self.empty_list.remove((self.max_index, self.max_index))
+        return [(self.min_index, self.min_index),
+                (self.min_index, self.max_index),
+                (self.max_index, self.min_index),
+                (self.max_index, self.max_index)]
 
-        self.min_index = 0
-        self.max_index = 7
-        self.corners = Player.update_corners(self)
-        self.empty_list = []
-        for i in range(self.max_index+1):
-            for j in range(self.max_index+1):
-                if (i,j) not in self.corners:
-                    self.empty_list.add((i,j))
 
-        self.my_pos  = []
-        self.opp_pos = []
-
-        self.my_dead  = 0
-        self.opp_dead = 0
-
-        if colour == "white":
-            self.y_start = range(0,6)
-        elif colour == "black":
-            self.y_start = range(2,8)
-
-        self.save_pos = [] # positions to place pieces to save another immediately
-        self.kill_pos = [] # positions to place pieces to kill an opponent immediately
-
-        #self.attackers = []
-        self.flanks = []
-        self.goals = []
 
 
      # Appends avaliable moves to a list
@@ -539,8 +548,8 @@ class Player:
 
         if self.turn<=24:
             possible_moves = []
-            if self.turn== 1:
-                while(true):
+            if self.turn== 0:
+                while(True):
                     x = randint(self.min_index, max_index)
                     self.y_start_list = list(self.y_start)
                     y = randint(self.y_start_list[0], self.y_start_list[-1])
