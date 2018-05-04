@@ -30,6 +30,7 @@ class Player:
             self.y_start = range(0,6)
         elif colour == "black":
             self.y_start = range(2,8)
+        self.y_start_list = list(self.y_start)
 
         self.save_pos = [] # positions to place pieces to save another immediately
         self.kill_pos = [] # positions to place pieces to kill an opponent immediately
@@ -198,7 +199,7 @@ class Player:
                (((x,y+2) in self.my_pos or (x,y+2) in self.corners) or
                ((x,y-2) in self.my_pos or (x,y-2) in self.corners))):
             # In a deadly spot, but we won't die as we're attacking
-                if (turn <= 24):
+                if (self.turn <= 24):
                     # Can cause a loop to form that is not productive in placing phase
                     return 5
                 return 0
@@ -208,7 +209,7 @@ class Player:
                  ((x,y-1) in self.opp_pos or (x,y-1) in self.corners))):
             # In a deadly spot and will die, even if we kill a piece
                 return 20
-            if (turn<=24):
+            if (self.turn<=24):
                 # placing phase, don’t go next to an opp unless setting up to kill it
                 if (((x+1,y) in self.opp_pos and (x-1,y) in self.my_pos) or
                    ((x-1,y) in self.opp_pos and (x+1,y) in self.my_pos) or
@@ -531,7 +532,7 @@ class Player:
            ((x,y-2) in self.empty_list) and
            Player.eval_move(self, (x,y-2))):
             return(x,y-2)
-        return False
+        return None
 
 
     def action(self, turns):
@@ -553,7 +554,6 @@ class Player:
             if self.turn== 0:
                 while(True):
                     x = random.randint(self.min_index, self.max_index)
-                    self.y_start_list = list(self.y_start)
                     y = random.randint(self.y_start_list[0], self.y_start_list[-1])
                     if (x, y) not in self.corners:
                         return (x,y)
@@ -562,8 +562,10 @@ class Player:
        # First priority is to save our pieces if needed
             if len(self.save_pos) != 0:
                 for i in range(len(self.save_pos)):
-                    if Player.eval_move(self, self.save_pos[i])==0:
-                        return self.save_pos.pop(i)
+                    if i[1] in self.y_start_list:
+                        if i[1] in self.empty_list:
+                            if Player.eval_move(self, self.save_pos[i])==0:
+                                return self.save_pos.pop(i)
 
 
 
@@ -571,22 +573,26 @@ class Player:
        #If player is self.my_pos, change min and max index
             if len(self.kill_pos) != 0:
                 for i in range(len(self.kill_pos)):
-                    if Player.eval_move(self.kill_pos[i])==0:
-                        Player.check_confirmed_kill(self, self.kill_pos[i], 0)
-                        return self.kill_pos.pop(i)
+                    if i[1] in self.y_start_list:
+                        if i[1] in self.empty_list:
+                            if Player.eval_move(self.kill_pos[i])==0:
+                                Player.check_confirmed_kill(self, self.kill_pos[i], 0)
+                                return self.kill_pos.pop(i)
 
        # If no priorising places, place a piece somewhere so that it is not next to an opponent
        # (therefore preventing it from being taken in the next turn)
             for pos in self.opp_pos:
                 result = Player.check_two_away(self,pos) #check surrounds of position 2 away so not going into a spot where will die
                 if result != None:
-                    return result
+                    if result[1] in self.y_start_list:
+                        if result[1] in self.empty_list:
+                            return result
 
             while(True):
-                pos = self.empty_list[random.randint(0, len(self.empty_list))]
-                if pos[1] in self.y_start:
-                    if Player.eval_move(pos) == 0:
-                        return (x,y) #check surrounds, say if in own area, then safe)
+                pos = self.empty_list[random.randint(0, len(self.empty_list)-1)]
+                if pos[1] in self.y_start_list:
+                        if Player.eval_move(self,pos) == 0:
+                            return pos
 
 #priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
 #place opponent, check if matches any of cases. If it matches, check place for my piece isn’t next to a black that is not in soon (not killable). If next to black not in soon, check if can place a white piece somewhere to make case 4 happen, if not, place randomly but not next to black
