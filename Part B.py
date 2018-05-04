@@ -11,7 +11,7 @@ class Player:
     
 
     def __init__(self, colour):
-        self.turn= 0
+        self.turn= -1
 
         self.min_index = 0
         self.max_index = 7
@@ -76,7 +76,7 @@ class Player:
 
     def update_pos(self, pos, player):
         if player==0:
-            if self.turn<=24:
+            if self.turn<24:
                 self.my_pos.append(pos)
                 self.empty_list.remove(pos)
                 if pos in self.kill_pos:
@@ -94,7 +94,7 @@ class Player:
                     self.save_pos.remove(pos[1])
 
         elif player==1:
-            if self.turn<=24:
+            if self.turn<24:
                 self.my_pos.append(pos)
                 self.empty_list.remove(pos)
                 if pos in self.kill_pos:
@@ -234,7 +234,7 @@ class Player:
                (((x,y+2) in self.my_pos or (x,y+2) in self.corners) or
                ((x,y-2) in self.my_pos or (x,y-2) in self.corners))):
             # In a deadly spot, but we won't die as we're attacking
-                if (self.turn <= 24):
+                if (self.turn < 24):
                     # Can cause a loop to form that is not productive in placing phase
                     return 5
                 return 0
@@ -244,7 +244,7 @@ class Player:
                  ((x,y-1) in self.opp_pos or (x,y-1) in self.corners))):
             # In a deadly spot and will die, even if we kill a piece
                 return 20
-            if (self.turn<=24):
+            if (self.turn<24):
                 # placing phase, don’t go next to an opp unless setting up to kill it
                 if (((x+1,y) in self.opp_pos and (x-1,y) in self.my_pos) or
                    ((x-1,y) in self.opp_pos and (x+1,y) in self.my_pos) or
@@ -278,7 +278,7 @@ class Player:
         y = goal[1]
 
         if (x in range(self.min_index+1,self.max_index-1)
-           and ((x+1,y) in opp_colour and (x-1,y) in opp_colour) and
+           and ((x+1,y) in self.opp_pos and (x-1,y) in self.opp_pos) and
            ((x+2 in range(self.max_index + 1) and (x+2,y) not in self.my_pos)
            or (x+2 not in range(self.max_index + 1))) and
            ((x-2 in range(self.max_index + 1) and
@@ -288,7 +288,7 @@ class Player:
             Player.remove_goal_pos(self.goals, x, y)
 
         if (y in range(self.min_index+1,self.max_index-1)
-           and ((x,y+1) in opp_colour and board[y-1][y] is opp_colour) and
+           and ((x,y+1) in self.opp_pos and (x,y-1) is self.opp_pos) and
            ((y+2 in range(self.max_index + 1) and
            (x,y+2) not in self.my_pos) or
            (y+2 not in range(self.max_index + 1))) and
@@ -305,16 +305,16 @@ class Player:
         #   all surrounding tiles are valid self.goals
 
         if ((x+1 in range(self.max_index + 1)) and
-           ((x+1,y) in self.empty_list_spaces)):
+           ((x+1,y) in self.empty_list)):
             self.goals.append((x+1, y))
         if ((x-1 in range(self.max_index + 1)) and
-           ((x-1,y) in self.empty_list_spaces)):
+           ((x-1,y) in self.empty_list)):
             self.goals.append((x-1, y))
         if ((y+1 in range(self.max_index + 1)) and
-           ((x,y+1) in self.empty_list_spaces)):
+           ((x,y+1) in self.empty_list)):
             self.goals.append((x, y+1))
         if ((y-1 in range(self.max_index + 1)) and
-           ((x,y-1) in self.empty_list_spaces)):
+           ((x,y-1) in self.empty_list)):
             self.goals.append((x, y-1))
 
         # If piece already surrounded by one Player piece,
@@ -368,7 +368,7 @@ class Player:
         if ((x+1 not in range(self.max_index + 1)) and
            ((y+1 in range(self.max_index + 1) and (x,y+1) in self.empty_list)
            and ((y-1 in range(self.max_index + 1))
-           and (x,y-1) in self.empty_list_spaces))):
+           and (x,y-1) in self.empty_list))):
             self.goals.append((x,y+1))
             self.goals.append((x,y-1))
             if (x-1,y) in self.goals:
@@ -377,7 +377,7 @@ class Player:
         if ((x-1 not in range(self.max_index + 1)) and
            ((y+1 in range(self.max_index + 1) and (x,y+1) in self.empty_list)
            and ((y-1 in range(self.max_index + 1))
-           and (x,y-1) in self.empty_list_spaces))):
+           and (x,y-1) in self.empty_list))):
             self.goals.append((x,y+1))
             self.goals.append((x,y-1))
             if (x+1,y) in self.goals:
@@ -386,7 +386,7 @@ class Player:
         if ((y+1 not in range(self.max_index + 1)) and
            ((x+1 in range(self.max_index + 1) and (x+1,y) in self.empty_list)
            and ((x-1 in range(self.max_index + 1))
-           and (x-1,y) in self.empty_list_spaces))):
+           and (x-1,y) in self.empty_list))):
             self.goals.append((x+1,y))
             self.goals.append((x-1,y))
             if (x,y-1) in self.goals:
@@ -431,38 +431,38 @@ class Player:
         moves = []
         # Check square to right
         if ((x+1 in range(self.max_index + 1)) and
-           ((x+1,y) in self.empty_list_spaces)):
-            moves.append((x,y),(x+1,y));
+           ((x+1,y) in self.empty_list)):
+            moves.append(((x,y),(x+1,y)));
         # Check square to left
         if ((x-1 in range(self.max_index + 1)) and
-           ((x-1,y) in self.empty_list_spaces)):
-            moves.append((x,y),(x-1,y));
+           ((x-1,y) in self.empty_list)):
+            moves.append(((x,y),(x-1,y)));
         # Check square below
         if ((y+1 in range(self.max_index + 1)) and
-           ((x,y+1) in self.empty_list_spaces)):
-            moves.append((x,y),(x,y+1));
+           ((x,y+1) in self.empty_list)):
+            moves.append(((x,y),(x,y+1)));
         # Check square above
         if ((y-1 in range(self.max_index + 1)) and
-           ((x,y-1) in self.empty_list_spaces)):
-            moves.append((x,y),(x,y-1));
+           ((x,y-1) in self.empty_list)):
+            moves.append(((x,y),(x,y-1)));
 
         # Check if piece can jump to right
         #FIX CHECK 2 AWAY TO BE USED IN HERE?
         if ((x+2 in range(self.max_index + 1)) and (((x+1,y) in self.my_pos) or
-           ((x+1,y) in opp_colour)) and ((x+2,y) in self.empty_list)):
-            moves.append((x,y),(x+2,y));
+           ((x+1,y) in self.opp_pos)) and ((x+2,y) in self.empty_list)):
+            moves.append(((x,y),(x+2,y)));
         # Check if piece can jump to left
         if ((x-2 in range(self.max_index + 1)) and (((x-1,y) in self.my_pos) or
-           ((x-1,y) in opp_colour)) and ((x-2,y) in self.empty_list)):
-            moves.append((x,y),(x-2,y));
+           ((x-1,y) in self.opp_pos)) and ((x-2,y) in self.empty_list)):
+            moves.append(((x,y),(x-2,y)));
         # Check if piece can jump down
         if ((y+2 in range(self.max_index + 1)) and (((x,y+1) in self.my_pos) or
-           ((x,y+1) in opp_colour)) and ((x,y+2) in self.empty_list)):
-            moves.append((x,y),(x,y+2));
+           ((x,y+1) in self.opp_pos)) and ((x,y+2) in self.empty_list)):
+            moves.append(((x,y),(x,y+2)));
         # Check if piece can jump up
         if ((y-2 in range(self.max_index + 1)) and (((x,y-1) in self.my_pos) or
-           ((x,y-1) in opp_colour)) and ((x,y-2) in self.empty_list)):
-            moves.append((x,y),(x,y-2));
+           ((x,y-1) in self.opp_pos)) and ((x,y-2) in self.empty_list)):
+            moves.append(((x,y),(x,y-2)));
 
         return moves
 
@@ -477,7 +477,7 @@ class Player:
 
         for x in range(self.max_index + 1):
             for y in range(self.max_index + 1):
-                if board[y][x] is self.my_pos:
+                if (x,y) in self.my_pos:
                     # Check available spaces
                     my_moves = my_moves + Player.check_moves(self, x, y)
 
@@ -499,7 +499,7 @@ class Player:
     def it_deepening(self, path, attacker, goals, max_depth=16):
         for depth in range(1, max_depth):
 
-            result = Player.depth_limited_search(board, attacker, self.goals
+            result = Player.depth_limited_search(self, attacker, self.goals
                                                         ,depth)
 
             if result is not None:
@@ -571,7 +571,7 @@ class Player:
 
 
     def action(self, turns):
-        self.turn= turns
+        self.turn+= 1
 
         # Handling board shrinking
         if self.turn== 128:
@@ -584,7 +584,7 @@ class Player:
             self.max_index = 5
             self.corners = Player.update_corners(self)
 
-        if self.turn<=24:
+        if self.turn<24:
             possible_moves = []
             if self.turn== 0:
                 while(True):
@@ -656,7 +656,7 @@ class Player:
             # For every move, run search len function on every goal, keep track of shortest distance
 
 
-            for i in len(moves_list):
+            for i in range(len(moves_list)):
                 val = Player.calc_shortest_dist(self,
                                                 moves_list[i][1], self.goals)
                 if i not in self.kill_pos:
@@ -681,7 +681,7 @@ class Player:
         self.turn+= 1
 
         #update self.opp_pos and board
-        if self.turn<=24:
+        if self.turn<24:
         # Placing Phase
             Player.update_pos(self, action, 1)
 
