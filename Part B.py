@@ -214,9 +214,12 @@ class Player:
             elif ((x,y-2) in self.empty_list):
                 self.save_pos.append((x,y-2))
 
-    def eval_move(self, pos):
+    def eval_move(self, pos, curr_pos):
         x = pos[0]
         y = pos[1]
+
+        if self.turn >= 24:
+            self.my_pos.remove(curr_pos)
 
         if (((x+1,y) in self.opp_pos) or ((x-1,y) in self.opp_pos) or 
             ((x,y+1) in self.opp_pos) or ((x,y-1) in self.opp_pos)):
@@ -233,12 +236,15 @@ class Player:
                 if (self.turn < 24):
                     # Can cause a loop to form that is not productive in placing phase
                     return 5
+                self.my_pos.append(curr_pos)   
                 return 0
             elif (((x+1,y) in self.opp_pos or (x+1,y) in self.corners) and
                  ((x-1,y) in self.opp_pos or (x-1,y) in self.corners) or
                  (((x,y+1) in self.opp_pos or (x,y+1) in self.corners) and
                  ((x,y-1) in self.opp_pos or (x,y-1) in self.corners))):
             # In a deadly spot and will die, even if we kill a piece
+                if self.turn>=24:
+                    self.my_pos.append(curr_pos)
                 return 20
             if (self.turn<24):
                 # placing phase, don’t go next to an opp unless setting up to kill it
@@ -249,22 +255,26 @@ class Player:
                    # safe, since pos opp needs to kill piece is blocked by my piece
                     return 0
                # in own safe zone
-                if ((self.y_start == range(0,6) and (y==0 or y==1)) or
+                elif ((self.y_start == range(0,6) and (y==0 or y==1)) or
                    (self.y_start == range(2,8) and (y==7 or y==6))):
                     return 0
-            elif (((x+1,y) in self.opp_pos and (x+2,y) in self.my_pos) or\
-                 ((x-1,y) in self.opp_pos and (x-2,y) in self.my_pos) or\
-                 ((x,y+1) in self.opp_pos and (x,y+2) in self.my_pos) or
-                 ((x,y-1) in self.opp_pos and (x,y-2) in self.my_pos)):
+                elif (((x+1,y) in self.opp_pos and (x+2,y) in self.my_pos) or\
+                     ((x-1,y) in self.opp_pos and (x-2,y) in self.my_pos) or\
+                    ((x,y+1) in self.opp_pos and (x,y+2) in self.my_pos) or
+                    ((x,y-1) in self.opp_pos and (x,y-2) in self.my_pos)):
                     # Will kill opp and not in a deadly position
-                return 0
-            else:
-                #may die next as next to an opponent
-                return 10
-        if ((x+1,y) in self.corners or (x-1,y) in self.corners or
-           (x,y+1) in self.corners or (x,y-1) in self.corners):
-            return 15
+                    return 0
+                else:
+                    #may die next as next to an opponent
+                    return 10
+            if ((x+1,y) in self.corners or (x-1,y) in self.corners or
+                (x,y+1) in self.corners or (x,y-1) in self.corners):
+                if self.turn>=24:
+                    self.my_pos.append(curr_pos)
+                return 15
         # not next to opp
+        if self.turn>=24:
+            self.my_pos.append(curr_pos)
         return 0
 
     #change y vals of out of bounds for moving
@@ -552,19 +562,19 @@ class Player:
 
         if ((x+2 in range(self.max_index + 1)) and
            ((x+2,y) in self.empty_list) and
-           Player.eval_move(self, (x+2,y))==0):
+           Player.eval_move(self, (x+2,y), pos)==0):
             return(x+2,y)
         if ((x-2 in range(self.max_index + 1)) and
            ((x-2,y) in self.empty_list) and
-           Player.eval_move(self, (x-2,y))==0):
+           Player.eval_move(self, (x-2,y), pos)==0):
             return(x-2,y)
         if ((y+2 in range(self.max_index + 1)) and
            ((x,y+2) in self.empty_list)and
-           Player.eval_move(self, (x,y+2))==0):
+           Player.eval_move(self, (x,y+2), pos)==0):
             return(x,y+2)
         if ((y-2 in range(self.max_index + 1)) and
            ((x,y-2) in self.empty_list) and
-           Player.eval_move(self, (x,y-2))==0):
+           Player.eval_move(self, (x,y-2), pos)==0):
             return(x,y-2)
         return None
 
@@ -573,13 +583,13 @@ class Player:
         self.turn+= 1
 
         # Handling board shrinking
-        if self.turn== 128:
+        if self.turn== 151:
             self.min_index = 1
             self.max_index = 6
             self.corners = Player.update_corners(self)
 
-        elif self.turn== 192:
-            min_index = 2
+        elif self.turn== 215:
+            self.min_index = 2
             self.max_index = 5
             self.corners = Player.update_corners(self)
 
@@ -598,9 +608,9 @@ class Player:
        # First priority is to save our pieces if needed
             if len(self.save_pos) != 0:
                 for i in range(len(self.save_pos)):
-                    if i in self.y_start_list:
+                    if self.save_pos[i][1]  in self.y_start_list:
                         if self.save_pos[i] in self.empty_list:
-                            if Player.eval_move(self, self.save_pos[i])==0:
+                            if Player.eval_move(self, self.save_pos[i], (-1,-1))==0:
                                 pos = self.save_pos[i]
                                 Player.update_pos(self, pos, 0)
                                 return pos
@@ -611,9 +621,9 @@ class Player:
        #If player is self.my_pos, change min and max index
             if len(self.kill_pos) != 0:
                 for i in range(len(self.kill_pos)):
-                    if i in self.y_start_list:
+                    if self.kill_pos[i][1] in self.y_start_list:
                         if self.kill_pos[i] in self.empty_list:
-                            if Player.eval_move(self,self.kill_pos[i])==0:
+                            if Player.eval_move(self,self.kill_pos[i], (-1,-1))==0:
                                 pos = self.kill_pos[i]
                                 Player.check_confirmed_kill(self, pos, 0)
                                 Player.update_pos(self, pos, 0)
@@ -631,7 +641,7 @@ class Player:
             while(True):
                 pos = self.empty_list[random.randint(0, len(self.empty_list)-1)]
                 if pos[1] in self.y_start_list:
-                        if Player.eval_move(self,pos) == 0:
+                        if Player.eval_move(self,pos,(-1,-1)) == 0:
                             Player.update_pos(self, pos, 0)
                             return pos
 
@@ -672,15 +682,19 @@ class Player:
 
 
             for i in range(len(moves_list)):
-                val = len(Player.depth_limited_search(self,
+                result = (Player.depth_limited_search(self,
                                                 moves_list[i][1], self.goals, 10))
+                if result == None:
+                    continue
+                val = len(result)
+
                 if moves_list[i] not in self.kill_pos:
                     val += 5
             # if move is a dumb move, add more to val
-            val += Player.eval_move(self, moves_list[i][1])
+            val += Player.eval_move(self, moves_list[i][1], moves_list[i][0])
                 # Then add index of move as key and shortest dist as value in dictionary
             eval_dict[i] = val
-            l = list(eval_dict.items())
+            l = list(eval_dict.items()) 
             for key, value in sorted(l,
                 key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
                 action = moves_list[key]
@@ -688,6 +702,9 @@ class Player:
 
             #      sort dictionary, use key (index of moves) to find and return that move
             Player.check_confirmed_kill(self, action[1], 0)
+            #print(self.opp_pos)
+            print(self.my_pos)
+            Player.update_pos(self, action, 0)
             return action
 
 
