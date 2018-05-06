@@ -146,24 +146,24 @@ class Player:
         return moves
 
     # Function checks if a piece has been killed and updates records
-    def check_confirmed_kill(self, pos, type):
+    def check_confirmed_kill(self, pos, curr_pos, type):
         if type == 0:
         # My turn, check if opp is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.opp_pos) and (((x+2,y) in self.my_pos) or ((x+2,y) in self.corners))):
+            if (((x+1,y) in self.opp_pos) and (((x+2,y) in self.my_pos) or ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
                 self.opp_pos.remove((x+1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners))):
+            elif (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.opp_pos.remove((x-1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners))):
+            elif (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.opp_pos.remove((x,y+1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners))):
+            elif (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.opp_pos.remove((x,y-1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y-1))
@@ -172,19 +172,19 @@ class Player:
         # Opp turn, check if my piece is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.my_pos) and (((x+2,y) in self.opp_pos) or ((x+2,y) in self.corners))):
+            if (((x+1,y) in self.my_pos) and (((x+2,y) in self.opp_pos) or ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
                 self.my_pos.remove((x+1,y))
                 self.my_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners))):
+            elif (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.my_pos.remove((x-1,y))
                 self.my_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners))):
+            elif (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.my_pos.remove((x,y+1))
                 self.my_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners))):
+            elif (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.my_pos.remove((x,y-1))
                 self.my_dead += 1
                 self.empty_list.append((x,y-1))
@@ -625,7 +625,7 @@ class Player:
                         if self.kill_pos[i] in self.empty_list:
                             if Player.eval_move(self,self.kill_pos[i], (-1,-1))==0:
                                 pos = self.kill_pos[i]
-                                Player.check_confirmed_kill(self, pos, 0)
+                                Player.check_confirmed_kill(self, pos, (-1,-1), 0)
                                 Player.update_pos(self, pos, 0)
                                 return pos
 
@@ -703,7 +703,7 @@ class Player:
                 break
 
             #      sort dictionary, use key (index of moves) to find and return that move
-            Player.check_confirmed_kill(self, action[1], 0)
+            Player.check_confirmed_kill(self, action[1], action[0], 0)
             #print(self.opp_pos)
             print(self.my_pos)
             Player.update_pos(self, action, 0)
@@ -722,7 +722,7 @@ class Player:
             #if check_cases(self, action): #what are we doing with this?
             #    soon.add(action)
 
-            Player.check_confirmed_kill(self, action, 1)
+            Player.check_confirmed_kill(self, action, (-1,-1), 1)
             Player.check_kill_save_pos(self, action)
 
         else:
@@ -732,7 +732,7 @@ class Player:
 
             Player.update_pos(self, action, 1)
 
-            Player.check_confirmed_kill(self, action[1], 1)
+            Player.check_confirmed_kill(self, action[1], action[0], 1)
             Player.check_kill_save_pos(self, action[1])
 
             self.goals = []
