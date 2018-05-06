@@ -151,19 +151,19 @@ class Player:
         # My turn, check if opp is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.opp_pos) and ((x+2,y) in self.my_pos)):
+            if (((x+1,y) in self.opp_pos) and (((x+2,y) in self.my_pos) or ((x+2,y) in self.corners))):
                 self.opp_pos.remove((x+1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.opp_pos) and ((x-2,y) in self.my_pos)):
+            elif (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners))):
                 self.opp_pos.remove((x-1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.opp_pos) and ((x,y+2) in self.my_pos)):
+            elif (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners))):
                 self.opp_pos.remove((x,y+1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.opp_pos) and ((x,y-2) in self.my_pos)):
+            elif (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners))):
                 self.opp_pos.remove((x,y-1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y-1))
@@ -172,19 +172,19 @@ class Player:
         # Opp turn, check if my piece is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.my_pos) and ((x+2,y) in self.opp_pos)):
+            if (((x+1,y) in self.my_pos) and (((x+2,y) in self.opp_pos) or ((x+2,y) in self.corners))):
                 self.my_pos.remove((x+1,y))
                 self.my_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.my_pos) and ((x-2,y) in self.opp_pos)):
+            elif (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners))):
                 self.my_pos.remove((x-1,y))
                 self.my_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.my_pos) and ((x,y+2) in self.opp_pos)):
+            elif (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners))):
                 self.my_pos.remove((x,y+1))
                 self.my_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.my_pos) and ((x,y-2) in self.opp_pos)):
+            elif (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners))):
                 self.my_pos.remove((x,y-1))
                 self.my_dead += 1
                 self.empty_list.append((x,y-1))
@@ -682,6 +682,8 @@ class Player:
 
 
             for i in range(len(moves_list)):
+                if (moves_list[i][1] not in self.empty_list):
+                    continue
                 result = (Player.depth_limited_search(self,
                                                 moves_list[i][1], self.goals, 10))
                 if result == None:
