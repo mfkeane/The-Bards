@@ -685,9 +685,9 @@ class Player:
             # Moving Phase
             # Will return a nested tuple
 
+
             if self.turn==24:
                 # First turn of moving phase before goals updated
-                self.attackers = list(self.my_pos)
                 self.goals = []
                 self.flanks = []
 
@@ -701,6 +701,10 @@ class Player:
                         if flank not in self.flanks:
                             self.flanks.append(flank)
                 
+            self.attackers = list(self.my_pos):
+            for i in range(len(self.flanks)):
+                if self.flanks[i] in self.attackers:
+                    self.attackers.remove(self.flanks[i])
 
             # Run moves, returns array of nested tuples (current pos, end pos)
             moves_list = Player.moves(self)
