@@ -76,7 +76,8 @@ class Player:
                 self.empty_list[i][1] < self.min_index or
                 self.empty_list[i][1] > self.max_index):
                 self.empty_list.pop(i)
-            i+=1
+            else:
+                i+=1
         i=0
         while i < len(self.my_pos):
             if (self.my_pos[i][0] < self.min_index or
@@ -85,7 +86,8 @@ class Player:
                 self.my_pos[i][1] > self.max_index):
                 self.my_pos.pop(i)
                 self.my_dead += 1
-            i+=1
+            else:
+                i+=1
         i=0
         while i < len(self.opp_pos):
             if (self.opp_pos[i][0] < self.min_index or
@@ -94,7 +96,8 @@ class Player:
                 self.opp_pos[i][1] > self.max_index):
                 self.opp_pos.pop(i)
                 self.opp_dead += 1
-            i+=1
+            else:
+                i+=1
 
         return [(self.min_index, self.min_index),
                 (self.min_index, self.max_index),
@@ -729,23 +732,38 @@ class Player:
                 eval_dict[i] = val
             l = list(eval_dict.items())
 
+            action = (-1,-1)
+
             for key, value in sorted(l,
                 key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
                 action = moves_list[key]
                 break
 
-            #      sort dictionary, use key (index of moves) to find and return that move
-            Player.check_confirmed_kill(self, action[1], action[0], 0)
-            #print(self.opp_pos)
-            print(self.my_pos)
-            print(self.empty_list)
-            Player.update_pos(self, action, 0)
-            return action
-
+            if action != (-1,-1):
+                #      sort dictionary, use key (index of moves) to find and return that move
+                Player.check_confirmed_kill(self, action[1], action[0], 0)
+                #print(self.opp_pos)
+                print(self.my_pos)
+                print(self.empty_list)
+                Player.update_pos(self, action, 0)
+                return action
+            else:
+                return None
 
 
     def update(self, action):
         self.turn+= 1
+
+        # Handling board shrinking
+        if self.turn== 151:
+            self.min_index = 1
+            self.max_index = 6
+            self.corners = Player.update_corners(self)
+
+        elif self.turn== 215:
+            self.min_index = 2
+            self.max_index = 5
+            self.corners = Player.update_corners(self)
 
         #update self.opp_pos and board
         if self.turn<24:
