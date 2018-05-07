@@ -524,7 +524,6 @@ class Player:
                     # Check available spaces
                     my_moves = my_moves + Player.check_moves(self, x, y)
 
-        #print(str(my_moves) + "\n"))
         return my_moves
 
     # -------------------SEARCH FUNCTIONS------------------
@@ -721,8 +720,9 @@ class Player:
                 result = (Player.depth_limited_search(self,
                                                 moves_list[i][1], self.goals, 10))
                 if result == None:
-                    continue
-                val = len(result)
+                    val=30
+                else:
+                    val = len(result)
 
                 if moves_list[i] not in self.kill_pos:
                     val += 5
@@ -730,10 +730,10 @@ class Player:
                 val += Player.eval_move(self, moves_list[i][1], moves_list[i][0])
                 # Then add index of move as key and shortest dist as value in dictionary
                 eval_dict[i] = val
+
             l = list(eval_dict.items())
-
             action = (-1,-1)
-
+ 
             for key, value in sorted(l,
                 key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
                 action = moves_list[key]
@@ -742,9 +742,6 @@ class Player:
             if action != (-1,-1):
                 #      sort dictionary, use key (index of moves) to find and return that move
                 Player.check_confirmed_kill(self, action[1], action[0], 0)
-                #print(self.opp_pos)
-                print(self.my_pos)
-                print(self.empty_list)
                 Player.update_pos(self, action, 0)
                 return action
             else:
