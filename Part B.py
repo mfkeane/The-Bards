@@ -31,15 +31,16 @@ class Player:
             self.y_start = range(2,8)
         self.y_start_list = list(self.y_start)
 
-        self.save_pos = [] # positions to place pieces to save another immediately
-        self.kill_pos = [] # positions to place pieces to kill an opponent immediately
+        # positions to place pieces to save another immediately
+        self.save_pos = []
+        # positions to place pieces to kill an opponent immediately
+        self.kill_pos = []
 
-        #self.attackers = []
         self.flanks = []
         self.goals = []
         self.corners = Player.update_corners(self)
 
-    # Update Corners by.. well updating corners... Also kills off any pieces outside the new boundaries
+    # Update Corners, kills off any pieces outside the new boundaries
     def update_corners(self):
         # Update empty and piece positions (including number of dead)
 
@@ -196,19 +197,23 @@ class Player:
         # My turn, check if opp is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.opp_pos) and (((x+2,y) in self.my_pos) or ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
+            if (((x+1,y) in self.opp_pos) and (((x+2,y) in self.my_pos) or
+               ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
                 self.opp_pos.remove((x+1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x+1,y))
-            if (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
+            if (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or
+               ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.opp_pos.remove((x-1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x-1,y))
-            if (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
+            if (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or
+               ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.opp_pos.remove((x,y+1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y+1))
-            if (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
+            if (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or
+               ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.opp_pos.remove((x,y-1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y-1))
@@ -236,19 +241,23 @@ class Player:
         # Opp turn, check if my piece is dead
             x = pos[0]
             y = pos[1]
-            if (((x+1,y) in self.my_pos) and (((x+2,y) in self.opp_pos) or ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
+            if (((x+1,y) in self.my_pos) and (((x+2,y) in self.opp_pos) or
+               ((x+2,y) in self.corners)) and ((x+2,y) != curr_pos)):
                 self.my_pos.remove((x+1,y))
                 self.my_dead += 1
                 self.empty_list.append((x+1,y))
-            if (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
+            if (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or
+               ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.my_pos.remove((x-1,y))
                 self.my_dead += 1
                 self.empty_list.append((x-1,y))
-            if (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
+            if (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or
+               ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.my_pos.remove((x,y+1))
                 self.my_dead += 1
                 self.empty_list.append((x,y+1))
-            if (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
+            if (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or
+               ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.my_pos.remove((x,y-1))
                 self.my_dead += 1
                 self.empty_list.append((x,y-1))
@@ -315,7 +324,7 @@ class Player:
         if self.turn >= 24:
             self.my_pos.remove(curr_pos)
 
-        if (((x+1,y) in self.opp_pos) or ((x-1,y) in self.opp_pos) or 
+        if (((x+1,y) in self.opp_pos) or ((x-1,y) in self.opp_pos) or
             ((x,y+1) in self.opp_pos) or ((x,y-1) in self.opp_pos)):
             # Check if we'll die since there’s an opp next to us
             if ((((x+1,y) in self.opp_pos or (x+1,y) in self.corners) and
@@ -328,9 +337,10 @@ class Player:
                ((x,y-2) in self.my_pos or (x,y-2) in self.corners)))):
             # In a deadly spot, but we won't die as we're attacking
                 if (self.turn < 24):
-                    # Can cause a loop to form that is not productive in placing phase
+                    # Can cause a loop to form that is not productive in
+                    #   placing phase
                     return 5
-                self.my_pos.append(curr_pos)   
+                self.my_pos.append(curr_pos)
                 return 0
             elif (((x+1,y) in self.opp_pos or (x+1,y) in self.corners) and
                  ((x-1,y) in self.opp_pos or (x-1,y) in self.corners) or
@@ -341,25 +351,27 @@ class Player:
                     self.my_pos.append(curr_pos)
                 return 20
             if (self.turn<24):
-                # placing phase, don’t go next to an opp unless setting up to kill it
+                # placing phase, don’t go next to an opp unless setting up
+                #   to kill it
                 if (((x+1,y) in self.opp_pos and (x-1,y) in self.my_pos) or
                    ((x-1,y) in self.opp_pos and (x+1,y) in self.my_pos) or
                    ((x,y+1)  in self.opp_pos and (x,y-1) in self.my_pos) or
                    ((x,y-1) in self.opp_pos and (x,y+1) in self.my_pos)):
-                   # safe, since pos opp needs to kill piece is blocked by my piece
+                   # safe, since pos opp needs to kill piece is blocked
+                   #    by my piece
                     return 0
                # in own safe zone
                 elif ((self.y_start == range(0,6) and (y==0 or y==1)) or
                    (self.y_start == range(2,8) and (y==7 or y==6))):
                     return 0
-                elif (((x+1,y) in self.opp_pos and (x+2,y) in self.my_pos) or\
-                     ((x-1,y) in self.opp_pos and (x-2,y) in self.my_pos) or\
+                elif (((x+1,y) in self.opp_pos and (x+2,y) in self.my_pos) or
+                     ((x-1,y) in self.opp_pos and (x-2,y) in self.my_pos) or
                     ((x,y+1) in self.opp_pos and (x,y+2) in self.my_pos) or
                     ((x,y-1) in self.opp_pos and (x,y-2) in self.my_pos)):
                     # Will kill opp and not in a deadly position
                     return 0
                 else:
-                    #may die next as next to an opponent
+                    # may die next as next to an opponent
                     return 10
 
             if ((x+1,y) in self.corners or (x-1,y) in self.corners or
@@ -374,7 +386,7 @@ class Player:
             self.my_pos.append(curr_pos)
         return 0
 
-    #change y vals of out of bounds for moving
+    # change y vals of out of bounds for moving
 
     def remove_kamikaze(self, goal, goals):
         x = goal[0]
@@ -430,9 +442,9 @@ class Player:
            (x-1 in range(self.max_index + 1)) and
            (((x+1,y) in self.my_pos) or (x+1,y) in self.corners)):
             goals.append((x-1, y))
-    
+
             flanks.append((x+1, y))
-            #if (x+1,y) in self.attackers: #(x+1,y) in self.my_pos and
+            # if (x+1,y) in self.attackers: #(x+1,y) in self.my_pos and
             #    self.attackers.remove((x+1, y))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
@@ -443,9 +455,9 @@ class Player:
            (x+1 in range(self.max_index + 1)) and (((x-1,y) in self.my_pos)
            or (x-1,y) in self.corners)):
             goals.append((x+1, y))
-            
+
             flanks.append((x-1, y))
-            #if (x-1,y) in self.attackers: #(x-1,y) in self.my_pos and 
+            # if (x-1,y) in self.attackers: #(x-1,y) in self.my_pos and
             #    self.attackers.remove((x-1, y))
 
             if (x,y+1) in goals:
@@ -457,7 +469,7 @@ class Player:
            (y-1 in range(self.max_index + 1)) and (((x,y+1) is self.my_pos)
            or (x,y+1) in self.corners)):
             goals.append((x, y-1))
-            
+
             flanks.append((x, y+1))
             #if  (x,y+1) in self.attackers: #(x,y+1) in self.my_pos and
             #    self.attackers.remove((x, y+1))
@@ -471,7 +483,7 @@ class Player:
            (y+1 in range(self.max_index + 1)) and (((x,y-1) is self.my_pos)
            or (x,y-1) in self.corners)):
             goals.append((x, y+1))
-             
+
             flanks.append((x, y-1))
             #if (x,y-1) in self.attackers: #(x,y-1) in self.my_pos and
             #    self.attackers.remove((x, y-1))
@@ -521,9 +533,6 @@ class Player:
 
         for goal in goals:
             Player.remove_kamikaze(self, goal, goals)
-
-        #print("flanks ", flanks)
-
         return [goals, flanks]
 
     # remove any self.goals that will result in self.my_pos's death
@@ -566,7 +575,6 @@ class Player:
             moves.append(((x,y),(x,y-1)));
 
         # Check if piece can jump to right
-        #FIX CHECK 2 AWAY TO BE USED IN HERE?
         if ((x+2 in range(self.max_index + 1)) and (((x+1,y) in self.my_pos) or
            ((x+1,y) in self.opp_pos)) and ((x+2,y) in self.empty_list)):
             moves.append(((x,y),(x+2,y)));
@@ -691,7 +699,7 @@ class Player:
         self.turn+= 1
 
         # Handling board shrinking
-        if self.turn== 151:
+        if self.turn== 152:
             self.min_index = 1
             self.max_index = 6
             self.corners = Player.update_corners(self)
@@ -701,7 +709,7 @@ class Player:
             for pos in self.opp_pos:
                 Player.check_kill_save_pos(self, pos)
 
-        elif self.turn== 215:
+        elif self.turn== 216:
             self.min_index = 2
             self.max_index = 5
             self.corners = Player.update_corners(self)
@@ -716,7 +724,8 @@ class Player:
             if self.turn== 0:
                 while(True):
                     x = random.randint(self.min_index, self.max_index)
-                    y = random.randint(self.y_start_list[0], self.y_start_list[-1])
+                    y = random.randint(self.y_start_list[0],
+                                       self.y_start_list[-1])
                     if (x, y) not in self.corners:
                         self.my_pos.append((x,y))
                         self.empty_list.remove((x,y))
@@ -728,29 +737,37 @@ class Player:
                 for i in range(len(self.save_pos)):
                     if self.save_pos[i][1]  in self.y_start_list:
                         if self.save_pos[i] in self.empty_list:
-                            if Player.eval_move(self, self.save_pos[i], (-1,-1))==0:
+                            if Player.eval_move(self, self.save_pos[i],
+                                                (-1,-1))==0:
                                 pos = self.save_pos[i]
                                 Player.update_pos(self, pos, 0)
                                 return pos
 
 
 
-           # Second priority is to place pieces in positions that will kill an opponent
-       #If player is self.my_pos, change min and max index
+           # Second priority is to place pieces in positions that
+           #    will kill an opponent
+
+           # If player is self.my_pos, change min and max index
             if len(self.kill_pos) != 0:
                 for i in range(len(self.kill_pos)):
                     if self.kill_pos[i][1] in self.y_start_list:
                         if self.kill_pos[i] in self.empty_list:
-                            if Player.eval_move(self,self.kill_pos[i], (-1,-1))==0:
+                            if Player.eval_move(self,self.kill_pos[i],
+                                                (-1,-1))==0:
                                 pos = self.kill_pos[i]
-                                Player.check_confirmed_kill(self, pos, (-1,-1), 0)
+                                Player.check_confirmed_kill(self, pos,
+                                                            (-1,-1), 0)
                                 Player.update_pos(self, pos, 0)
                                 return pos
 
-       # If no priorising places, place a piece somewhere so that it is not next to an opponent
-       # (therefore preventing it from being taken in the next turn)
+       # If no priorising places, place a piece somewhere so that it
+       #    is not next to an opponent (therefore preventing it from being
+       #    taken in the next turn)
             for pos in self.opp_pos:
-                result = Player.check_two_away(self,pos) #check surrounds of position 2 away so not going into a spot where will die
+                # check surrounds of position 2 away so not going into a
+                #   spot where will die
+                result = Player.check_two_away(self,pos)
                 if result != None:
                     if result[1] in self.y_start_list:
                         if result in self.empty_list:
@@ -763,14 +780,9 @@ class Player:
                             Player.update_pos(self, pos, 0)
                             return pos
 
-#priority: case 1 (next to black), case 2 (next to my zone), case 3 (next to wall or 2 from my zone), case 4 (2 from my piece)
-#place opponent, check if matches any of cases. If it matches, check place for my piece isn’t next to a black that is not in soon (not killable). If next to black not in soon, check if can place a white piece somewhere to make case 4 happen, if not, place randomly but not next to black
-
         else:
             # Moving Phase
             # Will return a nested tuple
-
-
             if self.turn == 24:
                 self.kill_pos = []
                 self.save_pos = []
@@ -782,42 +794,34 @@ class Player:
 
             for pos in self.opp_pos:
                 returns = Player.find_goal_pos(self, pos[0], pos[1])
-                #print(returns[1])
                 for goal in returns[0]:
                     if goal not in self.goals:
                         self.goals.append(goal)
                 for flank in returns[1]:
                     if flank not in self.flanks:
                         self.flanks.append(flank)
-            
-            #print("flanks: ", self.flanks)
-
-            #self.attackers = copy.copy(self.my_pos)
-
-            #for i in range(len(self.flanks)):
-            #    if self.flanks[i] in self.attackers:
-            #        self.attackers.remove(self.flanks[i])
 
             # Run moves, returns array of nested tuples (current pos, end pos)
             moves_list = Player.moves(self)
-
-            print("my ", self.my_pos) # coming up empty or wrong
 
             if len(moves_list) < 1:
                 # No avaliable moves
                 print("here")
                 return None
 
-            # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
+            # Use search function as evaluation on every move and every goal,
+            #   len of return is distance to goal pos
             eval_dict = defaultdict()
-            # For every move, run search len function on every goal, keep track of shortest distance
+            # For every move, run search len function on every goal,
+            #   keep track of shortest distance
 
 
             for i in range(len(moves_list)):
                 if (moves_list[i][1] not in self.empty_list):
                     continue
                 result = (Player.depth_limited_search(self,
-                                                moves_list[i][1], self.goals, 10))
+                                                      moves_list[i][1],
+                                                      self.goals, 10))
                 if result == None:
                     val=30
                 else:
@@ -836,29 +840,26 @@ class Player:
                         val += 10
 
                 # if move is a dumb move, add more to val
-                val += Player.eval_move(self, moves_list[i][1], moves_list[i][0])
-                # Then add index of move as key and shortest dist as value in dictionary
+                val += Player.eval_move(self, moves_list[i][1],
+                                        moves_list[i][0])
+                # Then add index of move as key and shortest dist as value
+                #   in dictionary
                 eval_dict[i] = val
 
             l = list(eval_dict.items())
             action = (-1,-1)
- 
+
             for key, value in sorted(l,
-                key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
+                key=lambda item: (item[1], item[0])):
                 action = moves_list[key]
                 break
-            #print(action)
+
             if action != (-1,-1):
-                #      sort dictionary, use key (index of moves) to find and return that move
-                #print(self.my_pos)
+                # sort dictionary, use key (index of moves) to find and return that move
                 Player.update_pos(self, action, 0)
                 Player.check_confirmed_kill(self, action[1], action[0], 0)
-                
-                #print(self.my_pos)
-                #print(self.kill_pos)
                 return action
             else:
-                print("here2")
                 return None
 
 
@@ -866,7 +867,7 @@ class Player:
         self.turn+= 1
 
         # Handling board shrinking
-        if self.turn== 151:
+        if self.turn== 152:
             self.min_index = 1
             self.max_index = 6
             self.corners = Player.update_corners(self)
@@ -876,7 +877,7 @@ class Player:
             for pos in self.opp_pos:
                 Player.check_kill_save_pos(self, pos)
 
-        elif self.turn== 215:
+        elif self.turn== 216:
             self.min_index = 2
             self.max_index = 5
             self.corners = Player.update_corners(self)
@@ -886,21 +887,16 @@ class Player:
             for pos in self.opp_pos:
                 Player.check_kill_save_pos(self, pos)
 
-        #update self.opp_pos and board
+        # update self.opp_pos and board
         if self.turn<24:
         # Placing Phase
             Player.update_pos(self, action, 1)
-
-            #if check_cases(self, action): #what are we doing with this?
-            #    soon.add(action)
-
             Player.check_confirmed_kill(self, action, (-1,-1), 1)
             Player.check_kill_save_pos(self, action)
 
         else:
         # Moving Phase
             if self.turn == 24:
-                #self.attackers = copy.copy(self.my_pos)
                 self.kill_pos = []
                 self.save_pos = []
 
@@ -908,32 +904,3 @@ class Player:
 
             Player.check_confirmed_kill(self, action[1], action[0], 1)
             Player.check_kill_save_pos(self, action[1])
-
-            """self.goals = []
-            self.flanks = []
-
-            for pos in self.opp_pos:
-                returns = Player.find_goal_pos(self, pos[0], pos[1])
-                print(returns[1])
-
-                for goal in returns[0]:
-                    if goal not in self.goals:
-                        self.goals.append(goal)
-                for flank in returns[1]:
-                    if flank not in self.flanks:
-                        self.flanks.append(flank)
-                        print("appended")
-                        print(self.flanks)
-
-            print("at ", self.attackers)
-            print"""
-
-
-
-
-            #have list of self.my_pos & op_pos pos, update opponent pos, update board and find new goal pos
-
-
-
-
-#principle variation search
