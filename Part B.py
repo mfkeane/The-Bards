@@ -40,31 +40,62 @@ class Player:
     # Update Corners by.. well updating corners... Also kills off any pieces outside the new boundaries
     def update_corners(self):
         # Update empty and piece positions (including number of dead)
-        for i in range(len(self.empty_list)):
+
+        # Remove things that are in the corner positions
+        if (self.min_index,self.min_index) in self.empty_list:
+            self.empty_list.remove((self.min_index, self.min_index))
+        if (self.min_index,self.max_index) in self.empty_list:
+            self.empty_list.remove((self.min_index, self.max_index))
+        if (self.max_index,self.min_index) in self.empty_list:
+            self.empty_list.remove((self.max_index, self.min_index))
+        if (self.max_index,self.max_index) in self.empty_list:
+            self.empty_list.remove((self.max_index, self.max_index))
+
+        if (self.min_index,self.min_index) in self.my_pos:
+            self.my_pos.remove((self.min_index, self.min_index))
+        if (self.min_index,self.max_index) in self.my_pos:
+            self.my_pos.remove((self.min_index, self.max_index))
+        if (self.max_index,self.min_index) in self.my_pos:
+            self.my_pos.remove((self.max_index, self.min_index))
+        if (self.max_index,self.max_index) in self.my_pos:
+            self.my_pos.remove((self.max_index, self.max_index))
+
+        if (self.min_index,self.min_index) in self.opp_pos:
+            self.opp_pos.remove((self.min_index, self.min_index))
+        if (self.min_index,self.max_index) in self.opp_pos:
+            self.opp_pos.remove((self.min_index, self.max_index))
+        if (self.max_index,self.min_index) in self.opp_pos:
+            self.opp_pos.remove((self.max_index, self.min_index))
+        if (self.max_index,self.max_index) in self.opp_pos:
+            self.opp_pos.remove((self.max_index, self.max_index))
+
+        i=0
+        while i < len(self.empty_list):
             if (self.empty_list[i][0] < self.min_index or
                 self.empty_list[i][0] > self.max_index or
                 self.empty_list[i][1] < self.min_index or
                 self.empty_list[i][1] > self.max_index):
                 self.empty_list.pop(i)
-        for i in range(len(self.my_pos)):
+            i+=1
+        i=0
+        while i < len(self.my_pos):
             if (self.my_pos[i][0] < self.min_index or
                 self.my_pos[i][0] > self.max_index or
                 self.my_pos[i][1] < self.min_index or
                 self.my_pos[i][1] > self.max_index):
                 self.my_pos.pop(i)
                 self.my_dead += 1
-        for i in range(len(self.opp_pos)):
+            i+=1
+        i=0
+        while i < len(self.opp_pos):
             if (self.opp_pos[i][0] < self.min_index or
                 self.opp_pos[i][0] > self.max_index or
                 self.opp_pos[i][1] < self.min_index or
                 self.opp_pos[i][1] > self.max_index):
                 self.opp_pos.pop(i)
                 self.opp_dead += 1
+            i+=1
 
-        self.empty_list.remove((self.min_index, self.min_index))
-        self.empty_list.remove((self.min_index, self.max_index))
-        self.empty_list.remove((self.max_index, self.min_index))
-        self.empty_list.remove((self.max_index, self.max_index))
         return [(self.min_index, self.min_index),
                 (self.min_index, self.max_index),
                 (self.max_index, self.min_index),
@@ -692,11 +723,12 @@ class Player:
 
                 if moves_list[i] not in self.kill_pos:
                     val += 5
-            # if move is a dumb move, add more to val
-            val += Player.eval_move(self, moves_list[i][1], moves_list[i][0])
+                # if move is a dumb move, add more to val
+                val += Player.eval_move(self, moves_list[i][1], moves_list[i][0])
                 # Then add index of move as key and shortest dist as value in dictionary
-            eval_dict[i] = val
-            l = list(eval_dict.items()) 
+                eval_dict[i] = val
+            l = list(eval_dict.items())
+
             for key, value in sorted(l,
                 key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
                 action = moves_list[key]
@@ -706,6 +738,7 @@ class Player:
             Player.check_confirmed_kill(self, action[1], action[0], 0)
             #print(self.opp_pos)
             print(self.my_pos)
+            print(self.empty_list)
             Player.update_pos(self, action, 0)
             return action
 
