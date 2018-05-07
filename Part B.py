@@ -367,7 +367,7 @@ class Player:
            (x-1 in range(self.max_index + 1)) and
            (((x+1,y) in self.my_pos) or (x+1,y) in self.corners)):
             goals.append((x-1, y))
-            if (x+1,y) in self.my_pos and (x+1,y) in self.attackers:
+            if (x+1,y) in self.attackers: #(x+1,y) in self.my_pos and 
                 flanks.append(self.attackers.pop(self.attackers.index((x+1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
@@ -378,7 +378,7 @@ class Player:
            (x+1 in range(self.max_index + 1)) and (((x-1,y) in self.my_pos)
            or (x-1,y) in self.corners)):
             goals.append((x+1, y))
-            if (x-1,y) in self.my_pos and (x-1,y) in self.attackers:
+            if (x-1,y) in self.attackers: #(x-1,y) in self.my_pos and 
                 flanks.append(self.attackers.pop(self.attackers.index((x-1, y))))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
@@ -389,7 +389,7 @@ class Player:
            (y-1 in range(self.max_index + 1)) and (((x,y+1) is self.my_pos)
            or (x,y+1) in self.corners)):
             goals.append((x, y-1))
-            if (x,y+1) in self.my_pos and (x,y+1) in self.attackers:
+            if  (x,y+1) in self.attackers: #(x,y+1) in self.my_pos and
                 flanks.append(self.attackers.pop(self.attackers.index((x, y+1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -400,7 +400,7 @@ class Player:
            (y+1 in range(self.max_index + 1)) and (((x,y-1) is self.my_pos)
            or (x,y-1) in self.corners)):
             goals.append((x, y+1))
-            if (x,y-1) in self.my_pos and (x,y-1) in self.attackers:
+            if (x,y-1) in self.attackers: #(x,y-1) in self.my_pos and 
                 flanks.append(self.attackers.pop(self.attackers.index((x, y-1))))
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -447,6 +447,8 @@ class Player:
 
         for goal in goals:
             Player.remove_kamikaze(self, goal, goals)
+
+        print("flanks ", flanks)
 
         return [goals, flanks]
 
@@ -692,6 +694,7 @@ class Player:
 
             for pos in self.opp_pos:
                 returns = Player.find_goal_pos(self, pos[0], pos[1])
+                print(returns[1])
                 for goal in returns[0]:
                     if goal not in self.goals:
                         self.goals.append(goal)
@@ -700,7 +703,7 @@ class Player:
                         self.flanks.append(flank)
                 
             self.attackers = list(self.my_pos)
-            
+
             for i in range(len(self.flanks)):
                 if self.flanks[i] in self.attackers:
                     self.attackers.remove(self.flanks[i])
@@ -791,6 +794,7 @@ class Player:
 
             for pos in self.opp_pos:
                 returns = Player.find_goal_pos(self, pos[0], pos[1])
+                print(returns[1])
 
                 for goal in returns[0]:
                     if goal not in self.goals:
@@ -798,6 +802,11 @@ class Player:
                 for flank in returns[1]:
                     if flank not in self.flanks:
                         self.flanks.append(flank)
+                        print("appended")
+                        print(self.flanks)
+
+            print("at ", self.attackers)
+            print
 
 
 
