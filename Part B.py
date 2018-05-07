@@ -688,7 +688,7 @@ class Player:
 
             if self.turn==24:
                 # First turn of moving phase before goals updated
-                self.attackers = self.my_pos
+                self.attackers = list(self.my_pos)
                 self.goals = []
                 self.flanks = []
 
@@ -779,7 +779,7 @@ class Player:
         else:
         # Moving Phase
             if self.turn==24:
-                self.attackers = self.my_pos
+                self.attackers = list(self.my_pos)
 
             Player.update_pos(self, action, 1)
 
