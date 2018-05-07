@@ -5,6 +5,8 @@
 
 from collections import defaultdict
 import random
+import copy
+
 class Player:
 
     def __init__(self, colour):
@@ -32,7 +34,7 @@ class Player:
         self.save_pos = [] # positions to place pieces to save another immediately
         self.kill_pos = [] # positions to place pieces to kill an opponent immediately
 
-        self.attackers = []
+        #self.attackers = []
         self.flanks = []
         self.goals = []
         self.corners = Player.update_corners(self)
@@ -430,8 +432,8 @@ class Player:
             goals.append((x-1, y))
     
             flanks.append((x+1, y))
-            if (x+1,y) in self.attackers: #(x+1,y) in self.my_pos and
-                self.attackers.remove((x+1, y))
+            #if (x+1,y) in self.attackers: #(x+1,y) in self.my_pos and
+            #    self.attackers.remove((x+1, y))
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
             if (x,y-1) in goals:
@@ -443,8 +445,8 @@ class Player:
             goals.append((x+1, y))
             
             flanks.append((x-1, y))
-            if (x-1,y) in self.attackers: #(x-1,y) in self.my_pos and 
-                self.attackers.remove((x-1, y))
+            #if (x-1,y) in self.attackers: #(x-1,y) in self.my_pos and 
+            #    self.attackers.remove((x-1, y))
 
             if (x,y+1) in goals:
                 goals.remove((x,y+1))
@@ -457,8 +459,8 @@ class Player:
             goals.append((x, y-1))
             
             flanks.append((x, y+1))
-            if  (x,y+1) in self.attackers: #(x,y+1) in self.my_pos and
-                self.attackers.remove((x, y+1))
+            #if  (x,y+1) in self.attackers: #(x,y+1) in self.my_pos and
+            #    self.attackers.remove((x, y+1))
 
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -471,8 +473,8 @@ class Player:
             goals.append((x, y+1))
              
             flanks.append((x, y-1))
-            if (x,y-1) in self.attackers: #(x,y-1) in self.my_pos and
-                self.attackers.remove((x, y-1))
+            #if (x,y-1) in self.attackers: #(x,y-1) in self.my_pos and
+            #    self.attackers.remove((x, y-1))
 
             if (x+1,y) in goals:
                 goals.remove((x+1,y))
@@ -586,7 +588,6 @@ class Player:
     def moves(self):
         # Initialise moves variables
         my_moves = []
-
 
         # For each square on board:
         #       - check if it's a piece
@@ -791,18 +792,20 @@ class Player:
             
             #print("flanks: ", self.flanks)
 
-            self.attackers = list(self.my_pos)
+            #self.attackers = copy.copy(self.my_pos)
 
-            for i in range(len(self.flanks)):
-                if self.flanks[i] in self.attackers:
-                    self.attackers.remove(self.flanks[i])
+            #for i in range(len(self.flanks)):
+            #    if self.flanks[i] in self.attackers:
+            #        self.attackers.remove(self.flanks[i])
 
             # Run moves, returns array of nested tuples (current pos, end pos)
             moves_list = Player.moves(self)
 
+            print("my ", self.my_pos) # coming up empty or wrong
+
             if len(moves_list) < 1:
                 # No avaliable moves
-                #print("here")
+                print("here")
                 return None
 
             # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
@@ -855,7 +858,7 @@ class Player:
                 #print(self.kill_pos)
                 return action
             else:
-                #print("here2")
+                print("here2")
                 return None
 
 
@@ -897,7 +900,7 @@ class Player:
         else:
         # Moving Phase
             if self.turn == 24:
-                self.attackers = list(self.my_pos)
+                #self.attackers = copy.copy(self.my_pos)
                 self.kill_pos = []
                 self.save_pos = []
 
