@@ -99,6 +99,15 @@ class Player:
             else:
                 i+=1
 
+        self.corners = [(self.min_index, self.min_index),
+                        (self.min_index, self.max_index),
+                        (self.max_index, self.min_index),
+                        (self.max_index, self.max_index)]
+
+        for pos in self.corners:
+            Player.check_confirmed_kill(self, pos, (-1,-1), 0)
+            Player.check_confirmed_kill(self, pos, (-1,-1), 1)
+
         return [(self.min_index, self.min_index),
                 (self.min_index, self.max_index),
                 (self.max_index, self.min_index),
@@ -189,18 +198,37 @@ class Player:
                 self.opp_pos.remove((x+1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
+            if (((x-1,y) in self.opp_pos) and (((x-2,y) in self.my_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.opp_pos.remove((x-1,y))
                 self.opp_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
+            if (((x,y+1) in self.opp_pos) and (((x,y+2) in self.my_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.opp_pos.remove((x,y+1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
+            if (((x,y-1) in self.opp_pos) and (((x,y-2) in self.my_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.opp_pos.remove((x,y-1))
                 self.opp_dead += 1
                 self.empty_list.append((x,y-1))
+
+            if ((((x+1,y) in self.opp_pos or (x+1,y) in self.corners) and
+               ((x-1,y) in self.opp_pos or (x-1,y) in self.corners) and
+               (((x+2,y) in self.my_pos or (x+2,y) in self.corners) or
+               ((x-2,y) in self.my_pos or (x-2,y) in self.corners))) or
+               (((x,y+1) in self.opp_pos or (x,y+1) in self.corners) and
+               ((x,y-1) in self.opp_pos or (x,y-1) in self.corners) and
+               (((x,y+2) in self.my_pos or (x,y+2) in self.corners) or
+               ((x,y-2) in self.my_pos or (x,y-2) in self.corners)))):
+            # In a deadly spot, but we won't die as we're attacking
+                safe = True
+            elif (((x+1,y) in self.opp_pos or (x+1,y) in self.corners) and
+                 ((x-1,y) in self.opp_pos or (x-1,y) in self.corners) or
+                 (((x,y+1) in self.opp_pos or (x,y+1) in self.corners) and
+                 ((x,y-1) in self.opp_pos or (x,y-1) in self.corners))):
+            # In a deadly spot and will die, even if we kill a piece
+                self.my_pos.remove((x+1,y))
+                self.my_dead += 1
+                self.empty_list.append((x+1,y))
 
         elif type == 1:
         # Opp turn, check if my piece is dead
@@ -210,18 +238,37 @@ class Player:
                 self.my_pos.remove((x+1,y))
                 self.my_dead += 1
                 self.empty_list.append((x+1,y))
-            elif (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
+            if (((x-1,y) in self.my_pos) and (((x-2,y) in self.opp_pos) or ((x-2,y) in self.corners)) and ((x-2,y) != curr_pos)):
                 self.my_pos.remove((x-1,y))
                 self.my_dead += 1
                 self.empty_list.append((x-1,y))
-            elif (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
+            if (((x,y+1) in self.my_pos) and (((x,y+2) in self.opp_pos) or ((x,y+2) in self.corners)) and ((x,y+2) != curr_pos)):
                 self.my_pos.remove((x,y+1))
                 self.my_dead += 1
                 self.empty_list.append((x,y+1))
-            elif (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
+            if (((x,y-1) in self.my_pos) and (((x,y-2) in self.opp_pos) or ((x,y-2) in self.corners)) and ((x,y-2) != curr_pos)):
                 self.my_pos.remove((x,y-1))
                 self.my_dead += 1
                 self.empty_list.append((x,y-1))
+
+            if ((((x+1,y) in self.my_pos or (x+1,y) in self.corners) and
+               ((x-1,y) in self.my_pos or (x-1,y) in self.corners) and
+               (((x+2,y) in self.opp_pos or (x+2,y) in self.corners) or
+               ((x-2,y) in self.opp_pos or (x-2,y) in self.corners))) or
+               (((x,y+1) in self.my_pos or (x,y+1) in self.corners) and
+               ((x,y-1) in self.my_pos or (x,y-1) in self.corners) and
+               (((x,y+2) in self.opp_pos or (x,y+2) in self.corners) or
+               ((x,y-2) in self.opp_pos or (x,y-2) in self.corners)))):
+            # In a deadly spot, but we won't die as we're attacking
+                safe = True
+            elif (((x+1,y) in self.my_pos or (x+1,y) in self.corners) and
+                 ((x-1,y) in self.my_pos or (x-1,y) in self.corners) or
+                 (((x,y+1) in self.my_pos or (x,y+1) in self.corners) and
+                 ((x,y-1) in self.my_pos or (x,y-1) in self.corners))):
+            # In a deadly spot and will die, even if we kill a piece
+                self.opp_pos.remove((x+1,y))
+                self.opp_dead += 1
+                self.empty_list.append((x+1,y))
 
     def check_kill_save_pos(self, pos):
         x = pos[0]
@@ -713,6 +760,7 @@ class Player:
 
             if len(moves_list) < 1:
                 # No avaliable moves
+                print("here")
                 return None
 
             # Use search function as evaluation on every move and every goal, len of return is distance to goal pos
@@ -744,13 +792,16 @@ class Player:
                 key=lambda item: (item[1], item[0])): # PRINT LIST TO SEE IF IT WORKS
                 action = moves_list[key]
                 break
-
+            print(action)
             if action != (-1,-1):
                 #      sort dictionary, use key (index of moves) to find and return that move
+                print(self.my_pos)
                 Player.check_confirmed_kill(self, action[1], action[0], 0)
                 Player.update_pos(self, action, 0)
+                print(self.my_pos)
                 return action
             else:
+                print("here2")
                 return None
 
 
@@ -789,7 +840,7 @@ class Player:
             Player.check_confirmed_kill(self, action[1], action[0], 1)
             Player.check_kill_save_pos(self, action[1])
 
-            self.goals = []
+            """self.goals = []
             self.flanks = []
 
             for pos in self.opp_pos:
@@ -806,7 +857,7 @@ class Player:
                         print(self.flanks)
 
             print("at ", self.attackers)
-            print
+            print"""
 
 
 
