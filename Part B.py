@@ -378,7 +378,7 @@ class Player:
                (x, y+1) in self.corners or (x, y-1) in self.corners):
                 if self.turn >= 24:
                     self.my_pos.append(curr_pos)
-                if (self.turn > 215):
+                if (self.turn > 216):
                     return 0
                 return 15
         # not next to opp
@@ -830,13 +830,13 @@ class Player:
                     val = len(result)
 
                 if moves_list[i][1] not in self.kill_pos:
-                    if self.turn > 215:
+                    if self.turn > 216:
                         val += 20
                     else:
                         val += 5
 
                 if moves_list[i][0] in self.flanks:
-                    if self.turn > 215:
+                    if self.turn > 216:
                         val += 1
                     else:
                         val += 10
