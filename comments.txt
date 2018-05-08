@@ -1,5 +1,3 @@
-
-
 Strategy:
 
 Placing Phase:
@@ -17,10 +15,36 @@ our decision making in four parts:
           3. Thirdly, we wish to place our pieces in strategic positions. If we place our piece two spaces
              away from an opponent, not only is it safe, but we can place another piece between the two, 
              safely placing a piece next to an opponent so we can kill it without being at risk of being
-             killed ourselves. (visually, O - @ to O O @ configuration)
+             killed ourselves. (visually, if we are the white player, O - @ to O O @ configuration)
           4. Lastly, if none of the above strategies can safely be executed, we want to place pieces in 
              positions that won't get them killed. Therefore, we will choose a random position, check 
              whether it is safe, and place the piece there if it is, or else choose another position 
              until it matches our constraints.
 
 Moving Phase:
+This phase is where things get a little reckless. In the Moving Phase, we are not concerned with saving pieces, but with killing
+the enemy. Of course this doesn't mean our pieces are bent on making stupid moves, but rather we are trying to maximise the 
+efficiency with which our pieces can position themselves in relatively safe positions that bring them closer to ideal positions. 
+Due to this, our decision making is based upon the depth limited search algorithm ( Player.depth_limited_search() ), and an 
+evaluation function ( Player.eval_move() ) Our program firstly finds all avaliable moves by using modified versions of the 
+functions made for Part A, and then evaluates each move by checking if it is valid, finding the shortest distance from the new 
+position to a goal position (by number of moves), and adding a number to that value depending on how smartthe move is. For example,
+if the move is a good one, we add zero, but if it is not ideal, say the player will die, we add a large number like 20.
+We then go through all these moves and their values (distance + evaluation) and choose the move with the 
+lowest value, making it the move that brings us closer to an ideal position at minimal risk. 
+
+There are a few select cases where our strategy is tweaked, and they are as follows:
+          Nearing the Shrinking of the Board:
+              To minimise unnecessary loss of pieces, as the game nears the times when the board shrinks, we
+              aim to have all of our pieces outside of the kill zone. For this, we use the same search function
+              and evaluation, but with a higher priority on getting our pieces out of harms way instead of focusing
+              on killing our opponents. We also swap the usual goal positions for a set of positions just outside 
+              of the kill zone, within step or jumping distance, so that our pieces in danger aim for these positions.
+          
+          At the Smallest Size of the Board:
+              Usually, as the positions beside the corners make the pieces easy picking for their opponents, we
+              avoid these places. But, when the board is at its smallest, these positions beside the corners become
+              strategic, only if we are killing a piece. E.g. with the configuration of "X - @ X" while playing 
+              as white, if we are to place a piece next to the corner, "X O @ X", we will kill the black piece, our
+              opponent, while being safe as we are attacking. Therefore, the evaluation value of being next to a
+              corner should be tweaked to be very low if the position will result in killing an opponent.
