@@ -398,10 +398,12 @@ class Player:
         y = pos[1]
 
         # If in Moving Phase, remove curr_pos as we will have no piece there
-        #       after it moves from it. Add it back in after evaluation
-        #       testing complete
-        if self.turn >= 24:
+        #       after it moves from it if testing actual move, not the path.
+        #       Add it back in after evaluation testing complete
+        curr_pos_removed = False
+        if self.turn >= 24 and curr_pos in self.my_pos:
             self.my_pos.remove(curr_pos)
+            curr_pos_removed = True
 
         # Check if we'll die since there’s an opp next to us
         if (((x+1, y) in self.opp_pos) or ((x-1, y) in self.opp_pos) or
@@ -420,7 +422,8 @@ class Player:
                 #   placing phase
                 if (self.turn < 24):
                     return 5
-                self.my_pos.append(curr_pos)
+                if curr_pos_removed:
+                    self.my_pos.append(curr_pos)
                 return 0
 
             # In a deadly spot and will die, even if we kill a piece
@@ -428,7 +431,7 @@ class Player:
                   ((x-1, y) in self.opp_pos or (x-1, y) in self.corners) or
                   (((x, y+1) in self.opp_pos or (x, y+1) in self.corners) and
                   ((x, y-1) in self.opp_pos or (x, y-1) in self.corners))):
-                if self.turn >= 24:
+                if curr_pos_removed:
                     self.my_pos.append(curr_pos)
                 return 20
 
@@ -466,14 +469,14 @@ class Player:
             # board is at its smallest size
             if ((x+1, y) in self.corners or (x-1, y) in self.corners or
                     (x, y+1) in self.corners or (x, y-1) in self.corners):
-                if self.turn >= 24:
+                if curr_pos_removed:
                     self.my_pos.append(curr_pos)
                 if (self.turn > 216):
                     return 0
                 return 15
 
         # Not next to opponent, safe
-        if self.turn >= 24:
+        if curr_pos_removed:
             self.my_pos.append(curr_pos)
         return 0
 
@@ -933,10 +936,10 @@ class Player:
                     priority = 0
 
                 # If the piece can't reach a goal position, set the starting
-                # value at 30. If it can, set it to the number of moves
+                # value at 100. If it can, set it to the number of moves
                 # away it is
                 if result is None:
-                    val = 30
+                    val = 100
                 else:
                     val = len(result)
 
@@ -955,7 +958,7 @@ class Player:
                     if self.turn > 216:
                         val += 1
                     else:
-                        val += 10
+                        val += 30
 
                 if (Player.on_boarder(self, moves_list[i][1]) and
                     (self.turn > (152-((12-self.my_dead)/2) and
@@ -967,6 +970,10 @@ class Player:
                 # if move is a dumb move, add more to val
                 val += Player.eval_move(self, moves_list[i][1],
                                         moves_list[i][0])
+                if result is not None:
+                    for i in range(len(result)-1):
+                        val += Player.eval_move(self, result[i], result[i+1])
+
                 # Then add index of move as key and shortest dist as value
                 #   in dictionary
                 eval_dict[i] = val
