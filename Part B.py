@@ -70,6 +70,7 @@ class Player:
         # Strategic tracking for Moving Phase
         self.flanks = []
         self.goals = []
+        self.next_boarders = []
 
         # Set corner positions
         self.corners = Player.update_corners(self)
@@ -145,6 +146,18 @@ class Player:
                 self.opp_dead += 1
             else:
                 i+=1
+
+        self.next_boarders = []
+        for i in range(self.min_index+2, self.max_index-1):
+            self.next_boarders.append((i, self.min_index+1))
+            self.next_boarders.append((i, self.max_index-1))
+            self.next_boarders.append((self.min_index+1, i))
+            self.next_boarders.append((self.max_index-1, i))
+            self.next_boarders.append((i, self.min_index+2))
+            self.next_boarders.append((i, self.max_index-2))
+            self.next_boarders.append((self.min_index+2, i))
+            self.next_boarders.append((self.max_index-2, i))
+
 
         self.corners = [(self.min_index, self.min_index),
                         (self.min_index, self.max_index),
@@ -700,6 +713,20 @@ class Player:
             return(x,y-2)
         return None
 
+    # Checks if position is on the edge of the board
+    def on_boarder(self, pos):
+        if ((pos[0] == self.min_index) or
+            (pos[1] == self.min_index) or
+            (pos[0] == self.max_index) or
+            (pos[1] == self.max_index) or
+            (pos == (self.min_index+1, self.min_index+1)) or
+            (pos == (self.min_index+1, self.max_index-1)) or
+            (pos == (self.max_index-1, self.min_index+1)) or
+            (pos == (self.max_index-1, self.max_index-1))):
+            return True
+        else:
+            return False
+
 #----------------------------SEARCH FUNCTIONS-----------------------------
 
 #***
@@ -721,7 +748,7 @@ class Player:
 
             current = visited.pop()
             # once goal state reached, return the path to it
-            if current in self.goals and current!=start:
+            if current in goals and current!=start:
                 path.append(current)
                 return path
 
@@ -883,9 +910,22 @@ class Player:
             for i in range(len(moves_list)):
                 if (moves_list[i][1] not in self.empty_list):
                     continue
-                result = (Player.depth_limited_search(self,
+
+                if (Player.on_boarder(self, moves_list[i][0]) and ((self.turn > (152-(12-self.my_dead)) and self.turn < 152) or 
+                    (self.turn > (216-(12-self.my_dead)) and self.turn < 216))):
+                    # Coming up to the shrinking of the board, make sure pieces aren't on the boarders
+                    result = (Player.depth_limited_search(self,
+                                                      moves_list[i][1],
+                                                      self.next_boarders, 10))
+                    # Give higher priority to moving pieces
+                    priority = -20
+
+
+                else:
+                    result = (Player.depth_limited_search(self,
                                                       moves_list[i][1],
                                                       self.goals, 10))
+                    priority = 0
 
                 # If the piece can't reach a goal position, set the starting value at 30
                 # If it can, set it to the number of moves away it is
@@ -893,6 +933,8 @@ class Player:
                     val=30
                 else:
                     val = len(result)
+
+                val += priority
 
                 # Higher Priority give to the moves that kill another
                 if moves_list[i][1] not in self.kill_pos:
@@ -908,29 +950,10 @@ class Player:
                     else:
                         val += 10
 
+                if (Player.on_boarder(self, moves_list[i][1]) and (self.turn > (152-((12-self.my_dead)/2) and self.turn < 152) or 
+                    (self.turn > (216-((12-self.my_dead)/2)) and self.turn < 216))) and priority==0:
+                    val += 50
 
-
-                if ((self.turn > (152-(12-self.my_dead)) and self.turn < 152) and 
-                    (self.turn > (216-(12-self.my_dead)) and self.turn < 216)):
-                    # Coming up to the shrinking of the board, make sure pieces aren't on the boarders
-
-                    if ((moves_list[i][0][0] < min_index+1) or
-                        (moves_list[i][0][1] < min_index+1) or
-                        (moves_list[i][0][0] < max_index-1) or
-                        (moves_list[i][0][1] < max_index-1)):
-                        if (self.turn == 152 or self.turn == 216):
-                            val -= 10
-                        else:
-                            val -= 5
-
-                    elif ((moves_list[i][1][0] < min_index+1) or
-                        (moves_list[i][1][1] < min_index+1) or
-                        (moves_list[i][1][0] < max_index-1) or
-                        (moves_list[i][1][1] < max_index-1)):
-                        if (self.turn == 152 or self.turn == 216):
-                            val += 10
-                        else:
-                            val += 5
 
                 # if move is a dumb move, add more to val
                 val += Player.eval_move(self, moves_list[i][1],
