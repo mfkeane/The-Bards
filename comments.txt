@@ -1,0 +1,26 @@
+
+
+Strategy:
+
+Placing Phase:
+After playing the placing phase ourselves, we have decided that the best strategy is simply one where your pieces do not die.
+The more pieces you are left with at the start of the Moving Phase, the better positioned you are to take as many of your 
+opponents pieces as possible. That being said, if there are opportunities to take your opponents pieces during the Placing
+Phase, you shouldn't miss the chance, but should ensure your pieces won't die in the process. Due to this, we have designed
+our decision making in four parts:
+          1. Firstly, as our first priority is to keep our pieces alive, check if there are any of our
+             pieces in imminent danger, and if so, place a piece in the position our opponent would use
+             to kill the piece in danger, as long as it is safe to do so.
+          2. Secondly, the idea of the game is to kill all your opponents pieces by flanking, so that is
+             our second priority. If there are any positions that will instantly kill an opponent piece
+             and are reasonably safe positions, place a piece there.
+          3. Thirdly, we wish to place our pieces in strategic positions. If we place our piece two spaces
+             away from an opponent, not only is it safe, but we can place another piece between the two, 
+             safely placing a piece next to an opponent so we can kill it without being at risk of being
+             killed ourselves. (visually, O - @ to O O @ configuration)
+          4. Lastly, if none of the above strategies can safely be executed, we want to place pieces in 
+             positions that won't get them killed. Therefore, we will choose a random position, check 
+             whether it is safe, and place the piece there if it is, or else choose another position 
+             until it matches our constraints.
+
+Moving Phase:
