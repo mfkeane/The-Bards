@@ -829,7 +829,7 @@ class Player:
                 Player.check_confirmed_kill(self, child[1], child[0],
                                             board, [board[3], board[4]],
                                             0)
-                v = minimax(self, board, parent_id, depth, 1)
+                v = minimax(self, board, parent_id, depth-1, 1)
                 if v > best_value:
                     return v
                 else:
@@ -843,7 +843,7 @@ class Player:
                 Player.check_confirmed_kill(self, child[1], child[0],
                                             board, [board[4], board[3]],
                                             1)
-                v = minimax(self, board, parent_id, depth, 0)
+                v = minimax(self, board, parent_id, depth-1, 0)
                 if v < best_value:
                     return v
                 else:
