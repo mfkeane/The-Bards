@@ -831,9 +831,8 @@ class Player:
                                             0)
                 v = minimax(self, board, parent_id, depth-1, 1)
                 if v > best_value:
-                    return v
-                else:
-                    return best_value
+                    best_value = v
+            return best_value
 
         if type == 1:
             best_value = 1000000
@@ -845,9 +844,8 @@ class Player:
                                             1)
                 v = minimax(self, board, parent_id, depth-1, 0)
                 if v < best_value:
-                    return v
-                else:
-                    return best_value
+                    best_value = v
+            return best_value
 
     # -------------------------END OF SEARCH FUNCTIONS-------------------------
     # __________________________________________________________________________
