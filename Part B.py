@@ -8,7 +8,7 @@
 |                                                                          |
 |           Title : the-bards.py                                           |
 |         Authors : Michelle Keane & Courtney Downes                       |
-|              ID :      832948           695049                           |
+|              ID :      832948           ######                           |
 |            Team : The Bards                                              |
 |                                                                          |
 |        Made for : COMP30024 Artificial Intelligence                      |
@@ -388,63 +388,70 @@ class Player:
 
     # Function evaluates moves based on the risk of taking them
     #   against the reward caused by it
-    def eval_move(self, pos, curr_pos):
+    def eval_move(self, pos, curr_pos, board, dead):
         x = pos[0]
         y = pos[1]
+
+        empty_list = board[0]
+        my_pos = board[1]
+        opp_pos = board[2]
+
+        my_dead = dead[0]
+        opp_dead = dead[1]
 
         # If in Moving Phase, remove curr_pos as we will have no piece there
         #       after it moves from it if testing actual move, not the path.
         #       Add it back in after evaluation testing complete
         curr_pos_removed = False
-        if self.turn >= 24 and curr_pos in self.my_pos:
-            self.my_pos.remove(curr_pos)
+        if self.turn >= 24 and curr_pos in my_pos:
+            my_pos.remove(curr_pos)
             curr_pos_removed = True
 
         # Check if we'll die since there’s an opp next to us
-        if (((x+1, y) in self.opp_pos) or ((x-1, y) in self.opp_pos) or
-                ((x, y+1) in self.opp_pos) or ((x, y-1) in self.opp_pos)):
+        if (((x+1, y) in opp_pos) or ((x-1, y) in opp_pos) or
+                ((x, y+1) in opp_pos) or ((x, y-1) in opp_pos)):
 
             # In a deadly spot, but we won't die as we're attacking
-            if ((((x+1, y) in self.opp_pos or (x+1, y) in self.corners) and
-                ((x-1, y) in self.opp_pos or (x-1, y) in self.corners) and
-                (((x+2, y) in self.my_pos or (x+2, y) in self.corners) or
-                ((x-2, y) in self.my_pos or (x-2, y) in self.corners))) or
-                (((x, y+1) in self.opp_pos or (x, y+1) in self.corners) and
-                ((x, y-1) in self.opp_pos or (x, y-1) in self.corners) and
-                (((x, y+2) in self.my_pos or (x, y+2) in self.corners) or
-                    ((x, y-2) in self.my_pos or (x, y-2) in self.corners)))):
+            if ((((x+1, y) in opp_pos or (x+1, y) in self.corners) and
+                ((x-1, y) in opp_pos or (x-1, y) in self.corners) and
+                (((x+2, y) in my_pos or (x+2, y) in self.corners) or
+                ((x-2, y) in my_pos or (x-2, y) in self.corners))) or
+                (((x, y+1) in opp_pos or (x, y+1) in self.corners) and
+                ((x, y-1) in opp_pos or (x, y-1) in self.corners) and
+                (((x, y+2) in my_pos or (x, y+2) in self.corners) or
+                    ((x, y-2) in my_pos or (x, y-2) in self.corners)))):
                 # Can cause a loop to form that is not productive in
                 #   placing phase
                 if (self.turn < 24):
                     return 5
                 if curr_pos_removed:
-                    self.my_pos.append(curr_pos)
+                    my_pos.append(curr_pos)
                 return 0
 
             # In a deadly spot and will die, even if we kill a piece
-            elif (((x+1, y) in self.opp_pos or (x+1, y) in self.corners) and
-                  ((x-1, y) in self.opp_pos or (x-1, y) in self.corners) or
-                  (((x, y+1) in self.opp_pos or (x, y+1) in self.corners) and
-                  ((x, y-1) in self.opp_pos or (x, y-1) in self.corners))):
+            elif (((x+1, y) in opp_pos or (x+1, y) in self.corners) and
+                  ((x-1, y) in opp_pos or (x-1, y) in self.corners) or
+                  (((x, y+1) in opp_pos or (x, y+1) in self.corners) and
+                  ((x, y-1) in opp_pos or (x, y-1) in self.corners))):
                 if curr_pos_removed:
-                    self.my_pos.append(curr_pos)
+                    my_pos.append(curr_pos)
                 return 20
 
             if (self.turn >= 24):
                 if Player.check_kill_save_pos(self, pos, 1) is not None:
                     # Will die after this turn
                     if curr_pos_removed:
-                        self.my_pos.append(curr_pos)
+                        my_pos.append(curr_pos)
                     return 20
 
             if (self.turn < 24):
 
                 # placing phase, don’t go next to an opp unless setting up
                 #   to kill it
-                if (((x+1, y) in self.opp_pos and (x-1, y) in self.my_pos) or
-                   ((x-1, y) in self.opp_pos and (x+1, y) in self.my_pos) or
-                   ((x, y+1) in self.opp_pos and (x, y-1) in self.my_pos) or
-                   ((x, y-1) in self.opp_pos and (x, y+1) in self.my_pos)):
+                if (((x+1, y) in opp_pos and (x-1, y) in my_pos) or
+                   ((x-1, y) in opp_pos and (x+1, y) in my_pos) or
+                   ((x, y+1) in opp_pos and (x, y-1) in my_pos) or
+                   ((x, y-1) in opp_pos and (x, y+1) in my_pos)):
                     # safe, since pos opp needs to kill piece is blocked
                     #    by my piece
                     return 0
@@ -455,11 +462,11 @@ class Player:
                     return 0
 
                 # Will kill opp and not in a deadly position
-                elif (((x+1, y) in self.opp_pos and (x+2, y) in self.my_pos) or
-                      ((x-1, y) in self.opp_pos and (x-2, y) in self.my_pos) or
-                      ((x, y+1) in self.opp_pos and (x, y+2) in self.my_pos) or
-                      ((x, y-1) in self.opp_pos and
-                       (x, y-2) in self.my_pos)):
+                elif (((x+1, y) in opp_pos and (x+2, y) in my_pos) or
+                      ((x-1, y) in opp_pos and (x-2, y) in my_pos) or
+                      ((x, y+1) in opp_pos and (x, y+2) in my_pos) or
+                      ((x, y-1) in opp_pos and
+                       (x, y-2) in my_pos)):
                     return 0
 
                 # May die next as next to an opponent
@@ -472,14 +479,14 @@ class Player:
             if ((x+1, y) in self.corners or (x-1, y) in self.corners or
                     (x, y+1) in self.corners or (x, y-1) in self.corners):
                 if curr_pos_removed:
-                    self.my_pos.append(curr_pos)
+                    my_pos.append(curr_pos)
                 if (self.turn > 216):
                     return 0
                 return 15
 
         # Not next to opponent, safe
         if curr_pos_removed:
-            self.my_pos.append(curr_pos)
+            my_pos.append(curr_pos)
         return 0
 
     # Function removes goal positions that result in death
@@ -715,19 +722,27 @@ class Player:
 
         if ((x+2 in range(self.max_index + 1)) and
            ((x+2, y) in self.empty_list) and
-           Player.eval_move(self, (x+2, y), pos) == 0):
+           Player.eval_move(self, (x+2, y), pos,
+                            [self.empty_list, self.my_pos, self.opp_pos], 
+                            [self.my_dead, self.opp_dead]) == 0):
             return(x+2, y)
         if ((x-2 in range(self.max_index + 1)) and
            ((x-2, y) in self.empty_list) and
-           Player.eval_move(self, (x-2, y), pos) == 0):
+           Player.eval_move(self, (x-2, y), pos, 
+                            [self.empty_list, self.my_pos, self.opp_pos], 
+                            [self.my_dead, self.opp_dead]) == 0):
             return(x-2, y)
         if ((y+2 in range(self.max_index + 1)) and
            ((x, y+2) in self.empty_list)and
-           Player.eval_move(self, (x, y+2), pos) == 0):
+           Player.eval_move(self, (x, y+2), pos,
+                            [self.empty_list, self.my_pos, self.opp_pos], 
+                            [self.my_dead, self.opp_dead]) == 0):
             return(x, y+2)
         if ((y-2 in range(self.max_index + 1)) and
            ((x, y-2) in self.empty_list) and
-           Player.eval_move(self, (x, y-2), pos) == 0):
+           Player.eval_move(self, (x, y-2), pos,
+                            [self.empty_list, self.my_pos, self.opp_pos], 
+                            [self.my_dead, self.opp_dead]) == 0):
             return(x, y-2)
         return None
 
@@ -756,20 +771,38 @@ class Player:
             return None
         else:
             # See if there's any safe places for our piece to run to
-            if Player.eval_move(self, killing_move_pos, pos) < 20:
+            if Player.eval_move(self, killing_move_pos, pos,
+                                [self.empty_list, self.my_pos, self.opp_pos],
+                                [self.my_dead, self.opp_dead]) < 20:
                 return killing_move_pos
             else:
                 if (x+1, y) in self.empty_list:
-                    if Player.eval_move(self, (x+1, y), pos) < 20:
+                    if Player.eval_move(self, (x+1, y), pos,
+                                        [self.empty_list, self.my_pos,
+                                         self.opp_pos],
+                                        [self.my_dead,
+                                         self.opp_dead]) < 20:
                         return (x+1, y)
                 if (x-1, y) in self.empty_list:
-                    if Player.eval_move(self, (x-1, y), pos) < 20:
+                    if Player.eval_move(self, (x-1, y), pos,
+                                        [self.empty_list, self.my_pos,
+                                         self.opp_pos],
+                                        [self.my_dead,
+                                         self.opp_dead]) < 20:
                         return (x-1, y)
                 if (x, y+1) in self.empty_list:
-                    if Player.eval_move(self, (x, y+1), pos) < 20:
+                    if Player.eval_move(self, (x, y+1), pos,
+                                        [self.empty_list, self.my_pos,
+                                         self.opp_pos],
+                                        [self.my_dead,
+                                         self.opp_dead]) < 20:
                         return (x, y+1)
                 if (x, y-1) in self.empty_list:
-                    if Player.eval_move(self, (x, y-1), pos) < 20:
+                    if Player.eval_move(self, (x, y-1), pos,
+                                        [self.empty_list, self.my_pos,
+                                         self.opp_pos],
+                                        [self.my_dead,
+                                         self.opp_dead]) < 20:
                         return (x, y-1)
 
     # ----------------------------SEARCH FUNCTIONS-----------------------------
@@ -817,35 +850,46 @@ class Player:
     #    END OF MODIFIED CODE
     # ***
 
-    def minimax(self, board, parent_id, depth, type):
-        if depth == 0 or moves(self, type) is None:
-            return #heuristic value of node
+    def minimax(self, board, depth, type, node, move):
+        if (((depth == 0) or (Player.moves(self, type) is None) or 
+             (board[4] > 11) or (board[5] > 11))):
+            value = Player.eval_move(self, node[1], node[0], board, dead)
+            if type == 0:
+                return -value
+            elif type == 1:
+                return value
 
         if type == 0:
             best_value = -1000000
-            moves_list = moves(self, 0)
+            moves_list = Player.moves(self, 0)
             for child in moves_list:
+                if node == (-1, -1):
+                    move = child
                 Player.update_pos(self, child, board, 0, 1)
                 Player.check_confirmed_kill(self, child[1], child[0],
                                             board, [board[3], board[4]],
                                             0)
-                v = minimax(self, board, parent_id, depth-1, 1)
-                if v > best_value:
-                    best_value = v
-            return best_value
+                v = [Player.minimax(self, board, depth-1, 1, child, move), move]
+                if v[0] > best_value:
+                    return v[0]
+                else:
+                    return best_value
 
         if type == 1:
             best_value = 1000000
-            moves_list = moves(self, 1)
+            moves_list = Player.moves(self, 1)
             for child in moves_list:
+                if node == (-1, -1):
+                    move = child
                 Player.update_pos(self, child, board, 1, 1)
                 Player.check_confirmed_kill(self, child[1], child[0],
                                             board, [board[4], board[3]],
                                             1)
-                v = minimax(self, board, parent_id, depth-1, 0)
-                if v < best_value:
-                    best_value = v
-            return best_value
+                v = [Player.minimax(self, board, depth-1, 0, child, move), move]
+                if v[0] < best_value:
+                    return v[0]
+                else:
+                    return best_value
 
     # -------------------------END OF SEARCH FUNCTIONS-------------------------
     # __________________________________________________________________________
@@ -901,6 +945,10 @@ class Player:
                     if self.save_pos[i][1] in self.y_start_list:
                         if self.save_pos[i] in self.empty_list:
                             if Player.eval_move(self, self.save_pos[i],
+                                                [self.empty_list, self.my_pos,
+                                                 self.opp_pos],
+                                                [self.my_dead,
+                                                 self.opp_dead],
                                                 (-1, -1)) == 0:
                                 pos = self.save_pos[i]
                                 Player.update_pos(self, pos, [self.empty_list,
@@ -915,7 +963,11 @@ class Player:
                     if self.kill_pos[i][1] in self.y_start_list:
                         if self.kill_pos[i] in self.empty_list:
                             if Player.eval_move(self, self.kill_pos[i],
-                                                (-1, -1)) == 0:
+                                                [self.empty_list, self.my_pos,
+                                                 self.opp_pos], 
+                                                [self.my_dead,
+                                                 self.opp_dead],
+                                                 (-1, -1)) == 0:
                                 pos = self.kill_pos[i]
                                 Player.check_confirmed_kill(self, pos,
                                                             (-1, -1), 
@@ -948,7 +1000,11 @@ class Player:
                 pos = self.empty_list[random.randint(0,
                                                      len(self.empty_list)-1)]
                 if pos[1] in self.y_start_list:
-                        if Player.eval_move(self, pos, (-1, -1)) == 0:
+                        if Player.eval_move(self, pos, (-1, -1),
+                                            [self.empty_list, self.my_pos,
+                                             self.opp_pos],
+                                            [self.my_dead,
+                                             self.opp_dead]) == 0:
                             Player.update_pos(self, pos, [self.empty_list, 
                                                           self.my_pos, 
                                                           self.opp_pos],0)
@@ -990,9 +1046,32 @@ class Player:
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
 
+            if self.my_dead > 8:
+                board = []
+                empty = []
+                my = []
+                opp = []
+                for pos in self.empty_list:
+                    empty.append(pos)
+                board[0] = empty
+                for pos in self.my_pos:
+                    my.append(pos)
+                board[1] = my
+                for pos in self.opp_pos:
+                    opp.append(pos)
+                board[2] = opp
+
+                board.append(self.my_dead) 
+                board.append(self.opp_dead)
+
+                returns = Player.minimax(self, board, 4, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                if returns is not None:
+                    return returns[1]
+
             # For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
             for i in range(len(moves_list)):
+
                 if (moves_list[i][1] not in self.empty_list):
                     continue
 
@@ -1066,7 +1145,11 @@ class Player:
 
                 # if move is a dumb move, add more to val
                 first_eval = Player.eval_move(self, moves_list[i][1],
-                                              moves_list[i][0])
+                                              moves_list[i][0],
+                                              [self.empty_list, self.my_pos,
+                                               self.opp_pos],
+                                              [self.my_dead,
+                                               self.opp_dead])
                 val += first_eval
                 # Piece dies immediately
                 if first_eval == 20:
@@ -1074,7 +1157,11 @@ class Player:
 
                 if result is not None:
                     for j in range(len(result)-1):
-                        val += Player.eval_move(self, result[j], result[j+1])
+                        val += Player.eval_move(self, result[j], result[j+1],
+                                                [self.empty_list, self.my_pos,
+                                                 self.opp_pos], 
+                                                [self.my_dead,
+                                                 self.opp_dead])
 
                 # Then add index of move as key and shortest dist as value
                 #   in dictionary
