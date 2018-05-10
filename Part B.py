@@ -974,6 +974,7 @@ class Player:
                 # print("dead ", dead)
 
                 v = Player.minimax(self, board, dead, kill, depth-1, 0, child, move)
+                print("v ", v)
                 v[0] = v[0] + priority
                 # print("v", v)
                 if v[0] < best_value:
@@ -1149,7 +1150,11 @@ class Player:
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
             # print(self.my_dead)
-            if self.turn >= 216:
+            if ((self.turn < (152-8) and
+                 self.turn >= 0) or
+                (self.turn < (216-8) and
+                 self.turn >= 152) or
+                (self.turn >= 216)):
                 # print("MINIMAX")
                 board = [[], [], []]
                 dead = []
