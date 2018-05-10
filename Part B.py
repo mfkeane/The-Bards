@@ -8,7 +8,7 @@
 |                                                                          |
 |           Title : the-bards.py                                           |
 |         Authors : Michelle Keane & Courtney Downes                       |
-|              ID :      832948           ######                           |
+|              ID :      832948           695049                           |
 |            Team : The Bards                                              |
 |                                                                          |
 |        Made for : COMP30024 Artificial Intelligence                      |
@@ -710,7 +710,7 @@ class Player:
         if type == 0:
             my_pos = board[1]
         elif type == 1:
-            opp_pos = board[2]
+            my_pos = board[2]
 
         # For each square on board:
         #       - check if it's a piece
@@ -865,12 +865,13 @@ class Player:
             value = Player.eval_move(self, node[1], node[0], board, dead)
             if type == 0:
                 if dead[0] > 11:
-                    value = -value - 1000
-                return -value
+                    value = value + 1000
+                
+                return [-value, move]
             elif type == 1:
                 if dead[1] > 11:
-                    value = -value - 1000
-                return value
+                    value = value + 1000
+                return [value, move]
 
         if type == 0:
             best_value = -1000000
@@ -884,11 +885,12 @@ class Player:
                 board = result[0]
                 dead = result[1]
 
-                v = [Player.minimax(self, board, dead, depth-1, 1, child, move), move]
+                v = Player.minimax(self, board, dead, depth-1, 1, child, move)
+                print(v)
                 if v[0] > best_value:
-                    return v[0]
+                    return v
                 else:
-                    return best_value
+                    return [best_value, move]
 
         if type == 1:
             best_value = 1000000
@@ -902,11 +904,12 @@ class Player:
                 board = result[0]
                 dead = result[1]
 
-                v = [Player.minimax(self, board, dead, depth-1, 0, child, move), move]
+                v = Player.minimax(self, board, dead, depth-1, 0, child, move)
+                print("v", v)
                 if v[0] < best_value:
-                    return v[0]
+                    return v
                 else:
-                    return best_value
+                    return [best_value, move]
 
     # -------------------------END OF SEARCH FUNCTIONS-------------------------
     # __________________________________________________________________________
@@ -1085,9 +1088,17 @@ class Player:
                 dead.append(self.my_dead) 
                 dead.append(self.opp_dead)
 
-                returns = Player.minimax(self, board, dead, 4, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                returns = Player.minimax(self, board, dead, 8, 0, (-1,-1), ((-1, -1), (-1, -1)))
                 
                 print("MINIMAX")
+                Player.update_pos(self, returns[1], [self.empty_list, 
+                                                     self.my_pos, 
+                                                     self.opp_pos], 0)
+                Player.check_confirmed_kill(self, returns[1][1], returns[1][0],
+                                            [self.empty_list, self.my_pos,
+                                             self.opp_pos],
+                                            [self.my_dead, self.opp_dead],
+                                            0)
                 return returns[1]
 
             # For every valid possible move, find the distance to the nearest
