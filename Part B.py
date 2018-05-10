@@ -169,12 +169,12 @@ class Player:
 
         # Check if the corners killed anyone by changing position
         for pos in self.corners:
-            Player.check_confirmed_kill(self, pos, (-1, -1), 
+            Player.check_confirmed_kill(self, pos,
                                         [self.empty_list, self.my_pos,
                                          self.opp_pos],
                                         [self.my_dead, self.opp_dead],
                                         0)
-            Player.check_confirmed_kill(self, pos, (-1, -1), 
+            Player.check_confirmed_kill(self, pos,
                                         [self.empty_list, self.my_pos,
                                          self.opp_pos],
                                         [self.my_dead, self.opp_dead],
@@ -260,7 +260,7 @@ class Player:
         return moves
 
     # Function checks if a piece has been killed and updates records
-    def check_confirmed_kill(self, pos, curr_pos, board, dead, player, type=0):
+    def check_confirmed_kill(self, pos, board, dead, player, type=0):
         empty_list = board[0]
         if player == 0:
             # My turn, check if opp is dead
@@ -279,22 +279,22 @@ class Player:
         y = pos[1]
 
         if (((x+1, y) in opp_pos) and (((x+2, y) in my_pos) or
-           ((x+2, y) in self.corners)) and ((x+2, y) != curr_pos)):
+           ((x+2, y) in self.corners))):
             opp_pos.remove((x+1, y))
             opp_dead += 1
             empty_list.append((x+1, y))
         if (((x-1, y) in opp_pos) and (((x-2, y) in my_pos) or
-           ((x-2, y) in self.corners)) and ((x-2, y) != curr_pos)):
+           ((x-2, y) in self.corners))):
             opp_pos.remove((x-1, y))
             opp_dead += 1
             empty_list.append((x-1, y))
         if (((x, y+1) in opp_pos) and (((x, y+2) in my_pos) or
-           ((x, y+2) in self.corners)) and ((x, y+2) != curr_pos)):
+           ((x, y+2) in self.corners))):
             opp_pos.remove((x, y+1))
             opp_dead += 1
             empty_list.append((x, y+1))
         if (((x, y-1) in opp_pos) and (((x, y-2) in my_pos) or
-           ((x, y-2) in self.corners)) and ((x, y-2) != curr_pos)):
+           ((x, y-2) in self.corners))):
             opp_pos.remove((x, y-1))
             opp_dead += 1
             empty_list.append((x, y-1))
@@ -865,12 +865,11 @@ class Player:
             value = Player.eval_move(self, node[1], node[0], board, dead)
             if type == 0:
                 if dead[0] > 11:
-                    value = value + 1000
-                
+                    value = value + 1000 + (8-depth)
                 return [-value, move]
             elif type == 1:
                 if dead[1] > 11:
-                    value = value + 1000
+                    value = value + 1000 + (8-depth)
                 return [value, move]
 
         if type == 0:
@@ -880,12 +879,19 @@ class Player:
                 if node == (-1, -1):
                     move = child
                 board = Player.update_pos(self, child, board, 0, 1)
-                result = Player.check_confirmed_kill(self, child[1], child[0],
+                result = Player.check_confirmed_kill(self, child[1],
                                                      board, dead, 0, 1)
+                priority = 0
+                if dead[1] < result[1][1]:
+                    priority = 100
+                else:
+                    priority = 0
                 board = result[0]
                 dead = result[1]
+                print("dead ", dead)
 
                 v = Player.minimax(self, board, dead, depth-1, 1, child, move)
+                v[0] = v[0] + priority
                 print(v)
                 if v[0] > best_value:
                     return v
@@ -899,12 +905,20 @@ class Player:
                 if node == (-1, -1):
                     move = child
                 board = Player.update_pos(self, child, board, 1, 1)
-                result = Player.check_confirmed_kill(self, child[1], child[0],
+                result = Player.check_confirmed_kill(self, child[1],
                                             board, dead, 1, 1)
+                priority = 0
+                if dead[0] < result[1][0]:
+                    priority = -100
+                else:
+                    priority = 0
+
                 board = result[0]
                 dead = result[1]
+                print("dead ", dead)
 
                 v = Player.minimax(self, board, dead, depth-1, 0, child, move)
+                v[0] = v[0] + priority
                 print("v", v)
                 if v[0] < best_value:
                     return v
@@ -990,7 +1004,6 @@ class Player:
                                                  self.opp_dead]) == 0:
                                 pos = self.kill_pos[i]
                                 Player.check_confirmed_kill(self, pos,
-                                                            (-1, -1), 
                                                             [self.empty_list, 
                                                              self.my_pos, 
                                                              self.opp_pos], 
@@ -1094,7 +1107,7 @@ class Player:
                 Player.update_pos(self, returns[1], [self.empty_list, 
                                                      self.my_pos, 
                                                      self.opp_pos], 0)
-                Player.check_confirmed_kill(self, returns[1][1], returns[1][0],
+                Player.check_confirmed_kill(self, returns[1][1],
                                             [self.empty_list, self.my_pos,
                                              self.opp_pos],
                                             [self.my_dead, self.opp_dead],
@@ -1214,7 +1227,7 @@ class Player:
                 Player.update_pos(self, action, [self.empty_list, 
                                                  self.my_pos, 
                                                  self.opp_pos], 0)
-                Player.check_confirmed_kill(self, action[1], action[0],
+                Player.check_confirmed_kill(self, action[1],
                                             [self.empty_list, self.my_pos,
                                              self.opp_pos],
                                             [self.my_dead, self.opp_dead],
@@ -1258,7 +1271,7 @@ class Player:
             Player.update_pos(self, action, [self.empty_list, 
                                              self.my_pos, 
                                              self.opp_pos], 1)
-            Player.check_confirmed_kill(self, action, (-1, -1),
+            Player.check_confirmed_kill(self, action,
                                         [self.empty_list, self.my_pos, 
                                          self.opp_pos], 
                                         [self.my_dead, self.opp_dead],  1)
@@ -1273,7 +1286,7 @@ class Player:
             Player.update_pos(self, action, [self.empty_list, 
                                              self.my_pos, 
                                              self.opp_pos], 1)
-            Player.check_confirmed_kill(self, action[1], action[0],
+            Player.check_confirmed_kill(self, action[1],
                                         [self.empty_list, self.my_pos, 
                                          self.opp_pos], 
                                         [self.my_dead, self.opp_dead], 1)
