@@ -1346,7 +1346,7 @@ class Player:
                                                      [self.my_dead,
                                                       self.opp_dead])) < 20:
                                     if len(r) <= best_on_border[0]:
-                                        best_on_border = [len(result),
+                                        best_on_border = [len(r),
                                                           moves_list[i]]
 
                     if best_on_border[1] != ((-1, -1), (-1, -1)):
