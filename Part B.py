@@ -921,17 +921,19 @@ class Player:
             best_value = -1000000
             moves_list = Player.moves(self, board, 0)
             for child in moves_list:
+                priority = 0
                 if node == (-1, -1):
                     move = child
+                    if move[1] in kill[0]:
+                        if eval_move(self, move[1], move[0], board, dead, 0) < 20:
+                            priority += -500
                 board = Player.update_pos(self, child, board, 0, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                                      board, dead, 0, 1)
                 kill_save = Player.check_kill_save_pos(self, child[1], board, kill_save, 1)
                 kill[1] = kill_save[0]
 
-                priority = 0
-
-                if child[1] not in self.kill_pos:
+                if child[1] not in kill[0]:
                     if self.turn > 216:
                         priority += -100
                     else:
@@ -954,16 +956,17 @@ class Player:
             best_value = 1000000
             moves_list = Player.moves(self, board, 1)
             for child in moves_list:
+                priority = 0
                 if node == (-1, -1):
                     move = child
+        
                 board = Player.update_pos(self, child, board, 1, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                             board, dead, 1, 1)
                 kill_save = Player.check_kill_save_pos(self, child[1], board, kill_save, 0)
                 kill[0] = kill_save[0]
 
-                priority = 0
-                if child[1] not in self.kill_pos:
+                if child[1] not in kill[1]:
                     if self.turn > 216:
                         priority += 100
                     else:
@@ -1150,11 +1153,11 @@ class Player:
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
             # print(self.my_dead)
-            if ((self.turn < (152-8) and
+            if ((self.turn < (152-len(self.my_pos)) and
                  self.turn >= 0) or
-                (self.turn < (216-8) and
-                 self.turn >= 152) or
-                (self.turn >= 216)):
+                (self.turn < (216-len(self.my_pos)) and
+                 self.turn >= 152)):
+                # or self.turn >= 216)):
                 # print("MINIMAX")
                 board = [[], [], []]
                 dead = []
@@ -1243,7 +1246,7 @@ class Player:
                 # Higher Priority give to the moves that kill another
                 if moves_list[i][1] not in self.kill_pos:
                     if self.turn > 216:
-                        val += 100
+                        val += 500
                     else:
                         val += 30
 
