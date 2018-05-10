@@ -922,10 +922,11 @@ class Player:
     # ***
 
     # Searching algorithm function: Depth Limited Search
-    def depth_limited_search(self, start, goals, depth, board, player=0):
+    def depth_limited_search(self, start, goals, max_depth, board, player=0):
         SENTINEL = object()
         path = []
         visited = [start]
+        depth = 1
 
         while visited:
 
@@ -950,6 +951,8 @@ class Player:
                 visited.append(SENTINEL)
                 visited.extend(Player.append_moves(self, current[0],
                                                    current[1], path, board, player))
+            elif depth == max_depth:
+                return None
 
     # ***
     #    END OF MODIFIED CODE
@@ -1017,7 +1020,7 @@ class Player:
                             flanks.append(flank)
 
                 path = Player.depth_limited_search(self, child[1],
-                                                   goals, 1, new_board)
+                                                   goals, 6, new_board)
                 if path is not None:
                     priority -= len(path)
 
@@ -1105,7 +1108,7 @@ class Player:
                             flanks.append(flank)
 
                 path = Player.depth_limited_search(self, child[1],
-                                                   goals, 1, new_board, 1)
+                                                   goals, 4, new_board, 1)
                 if path is not None:
                     priority += len(path)
 
@@ -1120,6 +1123,15 @@ class Player:
                     if priority_move is not None:
                         if child is priority_move:
                             priority += -50
+                    if (((self.turn > (152-(len(self.my_pos))) and
+                          self.turn < 152) or
+                         (self.turn > (216-(len(self.my_pos))) and
+                          self.turn < 216))):
+                        if Player.on_boarder(self, move[1]):
+                            if not Player.on_boarder(self, move[0]):
+                                priority += -100
+                        if Player.on_boarder(self, move[0]):
+                            priority += 50
 
 
                 if child[1] not in kill[1]:
@@ -1313,81 +1325,82 @@ class Player:
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
             # # # print(self.my_dead)
-            if (((self.turn > (152-(len(self.my_pos))) and
-                  self.turn < 152) or
-                 (self.turn > (216-(len(self.my_pos))) and
-                  self.turn < 216))):
+            if self.turn > 120 or len(self.my_pos) < 6:
+                if (((self.turn > (152-(len(self.my_pos))) and
+                      self.turn < 152) or
+                     (self.turn > (216-(len(self.my_pos))) and
+                      self.turn < 216))):
 
-                best_on_boarder = [100, ((-1, -1), (-1, -1))]
-                for i in range(len(moves_list)):
-                    if Player.on_boarder(self, moves_list[i][0]):
-                          
-                        # Coming up to the shrinking of the board, make sure pieces
-                        #   aren't on the boarders
-                        result = (Player.depth_limited_search(self,
-                                                              moves_list[i][1],
-                                                              self.next_boarders,
-                                                              10, 
-                                                              [self.empty_list, 
-                                                               self.my_pos, 
-                                                               self.opp_pos]))
-                        if result is not None:
-                            if (Player.eval_move(self, moves_list[i][1],
-                                                 moves_list[i][0],
-                                                 [self.empty_list, self.my_pos,
-                                                  self.opp_pos],
-                                                 [self.my_dead,
-                                                  self.opp_dead])) < 20:
-                                if len(result) <= best_on_boarder[0]:
-                                    best_on_boarder = [len(result), moves_list[i]]
+                    best_on_boarder = [100, ((-1, -1), (-1, -1))]
+                    for i in range(len(moves_list)):
+                        if Player.on_boarder(self, moves_list[i][0]):
+                              
+                            # Coming up to the shrinking of the board, make sure pieces
+                            #   aren't on the boarders
+                            result = (Player.depth_limited_search(self,
+                                                                  moves_list[i][1],
+                                                                  self.next_boarders,
+                                                                  10, 
+                                                                  [self.empty_list, 
+                                                                   self.my_pos, 
+                                                                   self.opp_pos]))
+                            if result is not None:
+                                if (Player.eval_move(self, moves_list[i][1],
+                                                     moves_list[i][0],
+                                                     [self.empty_list, self.my_pos,
+                                                      self.opp_pos],
+                                                     [self.my_dead,
+                                                      self.opp_dead])) < 20:
+                                    if len(result) <= best_on_boarder[0]:
+                                        best_on_boarder = [len(result), moves_list[i]]
 
-                if best_on_boarder[1] != ((-1, -1), (-1, -1)):
-                    Player.update_pos(self, best_on_boarder[1], [self.empty_list, 
-                                                 self.my_pos, 
-                                                 self.opp_pos], 0)
-                    Player.check_confirmed_kill(self, best_on_boarder[1][1],
+                    if best_on_boarder[1] != ((-1, -1), (-1, -1)):
+                        Player.update_pos(self, best_on_boarder[1], [self.empty_list, 
+                                                     self.my_pos, 
+                                                     self.opp_pos], 0)
+                        Player.check_confirmed_kill(self, best_on_boarder[1][1],
+                                                [self.empty_list, self.my_pos,
+                                                 self.opp_pos],
+                                                [self.my_dead, self.opp_dead],
+                                                0)
+                        return best_on_boarder[1]
+
+                # # # print("MINIMAX")
+                board = [[], [], []]
+                dead = []
+                empty = []
+                my = []
+                opp = []
+                for pos in self.empty_list:
+                    empty.append(pos)
+                board[0] = empty
+                for pos in self.my_pos:
+                    my.append(pos)
+                board[1] = my
+                for pos in self.opp_pos:
+                    opp.append(pos)
+                board[2] = opp
+
+                dead.append(self.my_dead) 
+                dead.append(self.opp_dead)
+
+                returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)), [-10000, (-1,-1)], [10000, (-1,-1)])
+                
+                # # # print("MINIMAX")
+                if returns is None:
+                    return None
+
+                Player.update_pos(self, returns[1], [self.empty_list, 
+                                                     self.my_pos, 
+                                                     self.opp_pos], 0)
+                Player.check_confirmed_kill(self, returns[1][1],
                                             [self.empty_list, self.my_pos,
                                              self.opp_pos],
                                             [self.my_dead, self.opp_dead],
                                             0)
-                    return best_on_boarder[1]
+                return returns[1]
 
-            # # # print("MINIMAX")
-            board = [[], [], []]
-            dead = []
-            empty = []
-            my = []
-            opp = []
-            for pos in self.empty_list:
-                empty.append(pos)
-            board[0] = empty
-            for pos in self.my_pos:
-                my.append(pos)
-            board[1] = my
-            for pos in self.opp_pos:
-                opp.append(pos)
-            board[2] = opp
-
-            dead.append(self.my_dead) 
-            dead.append(self.opp_dead)
-
-            returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)), [-10000, (-1,-1)], [10000, (-1,-1)])
-            
-            # # # print("MINIMAX")
-            if returns is None:
-                return None
-
-            Player.update_pos(self, returns[1], [self.empty_list, 
-                                                 self.my_pos, 
-                                                 self.opp_pos], 0)
-            Player.check_confirmed_kill(self, returns[1][1],
-                                        [self.empty_list, self.my_pos,
-                                         self.opp_pos],
-                                        [self.my_dead, self.opp_dead],
-                                        0)
-            return returns[1]
-
-            """# For every valid possible move, find the distance to the nearest
+            # For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
             for i in range(len(moves_list)):
 
@@ -1521,7 +1534,6 @@ class Player:
                 return action
             else:
                 return None
-"""
     # __________________________________________________________________________
     # __________________________________________________________________________
     #                                 update
