@@ -227,37 +227,42 @@ class Player:
                     return [empty_list, opp_pos, my_pos]
 
     # Appends avaliable moves to a list
-    def append_moves(self, x, y, path):
+    def append_moves(self, x, y, path, board):
         moves = []
-        if (x+1 in range(8)) and (x+1, y) in self.empty_list:
+
+        empty_list = board[0]
+        my_pos = board[1]
+        opp_pos = board[2]
+
+        if (x+1, y) in empty_list:
             # Only append if not already a square that has been moved to
             if (x+1, y) not in path:
                 moves.append((x+1, y))
-        if (x-1 in range(8)) and (x-1, y) in self.empty_list:
+        if (x-1, y) in empty_list:
             if (x-1, y) not in path:
                 moves.append((x-1, y))
-        if (y+1 in range(8)) and (x, y+1) in self.empty_list:
+        if (x, y+1) in empty_list:
             if (x, y+1) not in path:
                 moves.append((x, y+1))
-        if (y-1 in range(8)) and (x, y-1) in self.empty_list:
+        if (x, y-1) in empty_list:
             if (x, y-1) not in path:
                 moves.append((x, y-1))
 
         # Append jumps
-        if ((x+2 in range(8)) and (((x+1, y) in self.my_pos) or
-           ((x+1, y) in self.opp_pos)) and (x+2, y) in self.empty_list):
+        if ((((x+1, y) in my_pos) or
+           ((x+1, y) in opp_pos)) and (x+2, y) in empty_list):
             if (x+2, y) not in path:
                 moves.append((x+2, y))
-        if ((x-2 in range(8)) and (((x-1, y) in self.my_pos) or
-           ((x-1, y) in self.opp_pos)) and (x-2, y) in self.empty_list):
+        if ((((x-1, y) in my_pos) or
+           ((x-1, y) in opp_pos)) and (x-2, y) in empty_list):
             if (x-2, y) not in path:
                 moves.append((x-2, y))
-        if ((y+2 in range(8)) and (((x, y+1) in self.my_pos) or
-           ((x, y+1) in self.opp_pos)) and (x, y+2) in self.empty_list):
+        if ((((x, y+1) in my_pos) or
+           ((x, y+1) in opp_pos)) and (x, y+2) in empty_list):
             if (x, y+2) not in path:
                 moves.append((x, y+2))
-        if ((y-2 in range(8)) and (((x, y-1) in self.my_pos) or
-           ((x, y-1) in self.opp_pos)) and (x, y-2) in self.empty_list):
+        if ((((x, y-1) in my_pos) or
+           ((x, y-1) in opp_pos)) and (x, y-2) in empty_list):
             if (x, y-2) not in path:
                 moves.append((x, y-2))
 
@@ -560,60 +565,68 @@ class Player:
         return 0
 
     # Function removes goal positions that result in death
-    def remove_kamikaze(self, goal, goals):
+    def remove_kamikaze(self, goal, goals, board):
         x = goal[0]
         y = goal[1]
 
+        empty_list = board[0]
+        my_pos = board[1]
+        opp_pos = board[2]
+
         if ((x in range(self.min_index+1, self.max_index-1) and
-             ((x+1, y) in self.opp_pos and (x-1, y) in self.opp_pos) and
+             ((x+1, y) in opp_pos and (x-1, y) in opp_pos) and
              ((x+2 in range(self.max_index + 1) and
-              (x+2, y) not in self.my_pos) or
+              (x+2, y) not in my_pos) or
               (x+2 not in range(self.max_index + 1))) and
              ((x-2 in range(self.max_index + 1) and
-              (x-2, y) not in self.my_pos) or
+              (x-2, y) not in my_pos) or
               (x+2 not in range(self.max_index + 1))))):
 
             Player.remove_goal_pos(self, goals, x, y)
 
         if (y in range(self.min_index+1, self.max_index-1) and
-            ((x, y+1) in self.opp_pos and (x, y-1) is self.opp_pos) and
+            ((x, y+1) in opp_pos and (x, y-1) is opp_pos) and
             ((y+2 in range(self.max_index + 1) and
-             (x, y+2) not in self.my_pos) or
+             (x, y+2) not in my_pos) or
              (y+2 not in range(self.max_index + 1))) and
             ((y-2 in range(self.max_index + 1) and
-             (x, y-2) not in self.my_pos) or
+             (x, y-2) not in my_pos) or
              (y+2 not in range(self.max_index + 1)))):
 
             Player.remove_goal_pos(self, goals, x, y)
 
     # Check if piece already partially surrounded
     #   and mark goal positions for Player
-    def find_goal_pos(self, x, y):
+    def find_goal_pos(self, x, y, board):
 
         goals = []
         flanks = []
+
+        empty_list = board[0]
+        my_pos = board[1]
+        opp_pos = board[2]
 
         # If no Player pieces surround Opponent,
         #   all surrounding tiles are valid goals
         #   and will kill the opponent equally well
         if ((x+1 in range(self.max_index + 1)) and
-           ((x+1, y) in self.empty_list)):
+           ((x+1, y) in empty_list)):
             goals.append((x+1, y))
         if ((x-1 in range(self.max_index + 1)) and
-           ((x-1, y) in self.empty_list)):
+           ((x-1, y) in empty_list)):
             goals.append((x-1, y))
         if ((y+1 in range(self.max_index + 1)) and
-           ((x, y+1) in self.empty_list)):
+           ((x, y+1) in empty_list)):
             goals.append((x, y+1))
         if ((y-1 in range(self.max_index + 1)) and
-           ((x, y-1) in self.empty_list)):
+           ((x, y-1) in empty_list)):
             goals.append((x, y-1))
 
         # If piece already surrounded by one Player piece,
         #   or is next to a corner, opposite square is goal
         if ((x+1 in range(self.max_index + 1)) and
            (x-1 in range(self.max_index + 1)) and
-           (((x+1, y) in self.my_pos) or (x+1, y) in self.corners)):
+           (((x+1, y) in my_pos) or (x+1, y) in self.corners)):
             goals.append((x-1, y))
             flanks.append((x+1, y))
 
@@ -623,7 +636,7 @@ class Player:
                 goals.remove((x, y-1))
 
         if ((x-1 in range(self.max_index + 1)) and
-           (x+1 in range(self.max_index + 1)) and (((x-1, y) in self.my_pos) or
+           (x+1 in range(self.max_index + 1)) and (((x-1, y) in my_pos) or
            (x-1, y) in self.corners)):
             goals.append((x+1, y))
             flanks.append((x-1, y))
@@ -634,7 +647,7 @@ class Player:
                 goals.remove((x, y-1))
 
         if ((y+1 in range(self.max_index + 1)) and
-           (y-1 in range(self.max_index + 1)) and (((x, y+1) is self.my_pos) or
+           (y-1 in range(self.max_index + 1)) and (((x, y+1) is my_pos) or
            (x, y+1) in self.corners)):
             goals.append((x, y-1))
             flanks.append((x, y+1))
@@ -645,7 +658,7 @@ class Player:
                 goals.remove((x-1, y))
 
         if ((y-1 in range(self.max_index + 1)) and
-           (y+1 in range(self.max_index + 1)) and (((x, y-1) is self.my_pos) or
+           (y+1 in range(self.max_index + 1)) and (((x, y-1) is my_pos) or
            (x, y-1) in self.corners)):
             goals.append((x, y+1))
             flanks.append((x, y-1))
@@ -659,9 +672,9 @@ class Player:
         #   to the boarder, on either side of the opponent, are goals
         if ((x+1 not in range(self.max_index + 1)) and
             ((y+1 in range(self.max_index + 1) and
-              (x, y+1) in self.empty_list) and
+              (x, y+1) in empty_list) and
             ((y-1 in range(self.max_index + 1)) and
-             (x, y-1) in self.empty_list))):
+             (x, y-1) in empty_list))):
             goals.append((x, y+1))
             goals.append((x, y-1))
             if (x-1, y) in goals:
@@ -669,9 +682,9 @@ class Player:
 
         if ((x-1 not in range(self.max_index + 1)) and
             ((y+1 in range(self.max_index + 1) and
-             (x, y+1) in self.empty_list) and
+             (x, y+1) in empty_list) and
             ((y-1 in range(self.max_index + 1)) and
-             (x, y-1) in self.empty_list))):
+             (x, y-1) in empty_list))):
             goals.append((x, y+1))
             goals.append((x, y-1))
             if (x+1, y) in goals:
@@ -679,9 +692,9 @@ class Player:
 
         if ((y+1 not in range(self.max_index + 1)) and
             ((x+1 in range(self.max_index + 1) and
-             (x+1, y) in self.empty_list) and
+             (x+1, y) in empty_list) and
             ((x-1 in range(self.max_index + 1)) and
-             (x-1, y) in self.empty_list))):
+             (x-1, y) in empty_list))):
             goals.append((x+1, y))
             goals.append((x-1, y))
             if (x, y-1) in goals:
@@ -689,9 +702,9 @@ class Player:
 
         if ((y-1 not in range(self.max_index + 1)) and
             ((x+1 in range(self.max_index + 1) and
-             (x+1, y) in self.empty_list) and
+             (x+1, y) in empty_list) and
             ((x-1 in range(self.max_index + 1)) and
-             (x-1, y) in self.empty_list))):
+             (x-1, y) in empty_list))):
             goals.append((x+1, y))
             goals.append((x-1, y))
             if (x, y+1) in goals:
@@ -699,7 +712,7 @@ class Player:
 
         # Remove any goals that will result in self.my_pos's death
         for goal in goals:
-            Player.remove_kamikaze(self, goal, goals)
+            Player.remove_kamikaze(self, goal, goals, board)
         return [goals, flanks]
 
     # Remove co-ordinate from goal list
@@ -901,7 +914,7 @@ class Player:
     # ***
 
     # Searching algorithm function: Depth Limited Search
-    def depth_limited_search(self, start, goals, depth):
+    def depth_limited_search(self, start, goals, depth, board):
         SENTINEL = object()
         path = []
         visited = [start]
@@ -928,7 +941,7 @@ class Player:
                 path.append(current)
                 visited.append(SENTINEL)
                 visited.extend(Player.append_moves(self, current[0],
-                                                   current[1], path))
+                                                   current[1], path, board))
 
     # ***
     #    END OF MODIFIED CODE
@@ -981,6 +994,23 @@ class Player:
                 # # print("kill_save ", kill_save)
                 # # print("kill ", kill)
 
+                goals = []
+                flanks = []
+
+                for pos in board[2]:
+                    returns = Player.find_goal_pos(self, pos[0], pos[1], new_board)
+                    for goal in returns[0]:
+                        if goal not in goals:
+                            goals.append(goal)
+                    for flank in returns[1]:
+                        if flank not in flanks:
+                            flanks.append(flank)
+
+                path = Player.depth_limited_search(self, child[1],
+                                                   goals, 10, new_board)
+                if path is not None:
+                    priority -= len(path)*10
+
                 if node == (-1, -1):
                     move = child
                     # # print(move)
@@ -988,12 +1018,12 @@ class Player:
                     if move[0] in kill[0]:
                         # # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 0))
                         if Player.eval_move(self, move[1], move[0], new_board, new_dead, 0) < 20:
-                            priority += 1000
+                            priority += 200
                             # # print("can kill in first turn")
                     priority_move = Player.about_to_die(self, child[0], new_board, new_dead, [kill[0], []], type)
                     if priority_move is not None:
                         if child is priority_move:
-                            priority += 500
+                            priority += 50
 
                 if child[1] not in kill[0]:
                     if self.turn > 216:
@@ -1049,12 +1079,12 @@ class Player:
                     if move[0] in kill[1]:
                         # # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 1))
                         if Player.eval_move(self, move[1], move[0], new_board, new_dead, 1) < 20:
-                            priority += -1000
+                            priority += -200
                             # # print("can kill in first turn")
                     priority_move = Player.about_to_die(self, child[0], new_board, new_dead, [kill[1], []], type)
                     if priority_move is not None:
                         if child is priority_move:
-                            priority += -500
+                            priority += -50
 
 
                 if child[1] not in kill[1]:
@@ -1224,7 +1254,10 @@ class Player:
             self.flanks = []
 
             for pos in self.opp_pos:
-                returns = Player.find_goal_pos(self, pos[0], pos[1])
+                returns = Player.find_goal_pos(self, pos[0], pos[1], 
+                                               [self.empty_list, 
+                                                self.my_pos, 
+                                                self.opp_pos])
                 for goal in returns[0]:
                     if goal not in self.goals:
                         self.goals.append(goal)
@@ -1300,7 +1333,10 @@ class Player:
                     if i != moves_list.index(action):
                         result = (Player.depth_limited_search(self,
                                                               moves_list[i][1],
-                                                              self.goals, 10))
+                                                              self.goals, 10,
+                                                              [self.empty_list, 
+                                                               self.my_pos, 
+                                                               self.opp_pos]))
                         priority = 50
                     else:
                         result = [priority_move]
@@ -1319,14 +1355,20 @@ class Player:
                     result = (Player.depth_limited_search(self,
                                                           moves_list[i][1],
                                                           self.next_boarders,
-                                                          10))
+                                                          10, 
+                                                          [self.empty_list, 
+                                                           self.my_pos, 
+                                                           self.opp_pos]))
                     # Give higher priority to moving pieces
                     priority = -20
 
                 else:
                     result = (Player.depth_limited_search(self,
                                                           moves_list[i][1],
-                                                          self.goals, 10))
+                                                          self.goals, 10,
+                                                          [self.empty_list, 
+                                                           self.my_pos, 
+                                                           self.opp_pos]))
                     priority = 0
 
                 # If the piece can't reach a goal position, set the starting
