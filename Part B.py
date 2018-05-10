@@ -220,7 +220,10 @@ class Player:
                 if pos[1] in self.save_pos:
                     self.save_pos.remove(pos[1])
             elif type == 1:
-                return [empty_list, my_pos, opp_pos]
+                if player == 0:
+                    return [empty_list, my_pos, opp_pos]
+                elif player == 1:
+                    return [empty_list, opp_pos, my_pos]
 
     # Appends avaliable moves to a list
     def append_moves(self, x, y, path):
@@ -320,78 +323,65 @@ class Player:
             empty_list.append((x, y))
 
         if type == 1:
-            return [[empty_list, my_pos, opp_pos], [my_dead, opp_dead]]
+            if player == 0:
+                return [[empty_list, my_pos, opp_pos], [my_dead, opp_dead]]
+            elif player == 1:
+                return [[empty_list, opp_pos, my_pos], [opp_dead, my_dead]]
 
     # Check and add positions to kill_pos and save_pos
     #   kill_pos: positions that will kill an opponent immediately
     #   save_pos: positions that will save a friendly from imminent death
-    def check_kill_save_pos(self, pos, type=0):
+    def check_kill_save_pos(self, pos, board, kill_save, player=0):
         x = pos[0]
         y = pos[1]
 
-        if type == 0:
-            if ((x+1, y) in self.my_pos) or ((x+1, y) in self.corners):
-                if ((x-1, y) in self.empty_list):
-                    if ((x-1, y) not in self.kill_pos):
-                        self.kill_pos.append((x-1, y))
-                elif ((x+2, y) in self.empty_list):
-                    if ((x+2, y) not in self.save_pos):
-                        self.save_pos.append((x+2, y))
+        empty_list = board[0]
+        if player == 0:
+            # My Turn
+            my_pos = board[1]
+            opp_pos = board[2]
+        elif player == 1:
+            # Opponents Turn
+            my_pos = board[2]
+            opp_pos = board[1]
 
-            if ((x-1, y) in self.my_pos) or ((x-1, y) in self.corners):
-                if ((x+1, y) in self.empty_list):
-                    if ((x+1, y) not in self.kill_pos):
-                        self.kill_pos.append((x+1, y))
-                elif ((x-2, y) in self.empty_list):
-                    if ((x-2, y) not in self.save_pos):
-                        self.save_pos.append((x-2, y))
+        kill_pos = kill_save[0]
+        save_pos = kill_save[1]
 
-            if ((x, y+1) in self.my_pos) or ((x, y+1) in self.corners):
-                if ((x, y-1) in self.empty_list):
-                    if ((x, y-1) not in self.kill_pos):
-                        self.kill_pos.append((x, y-1))
-                elif ((x, y+2) in self.empty_list):
-                    if ((x, y+2) not in self.save_pos):
-                        self.save_pos.append((x, y+2))
 
-            if ((x, y-1) in self.my_pos) or ((x, y-1) in self.corners):
-                if ((x, y+1) in self.empty_list):
-                    if ((x, y+1) not in self.kill_pos):
-                        self.kill_pos.append((x, y+1))
-                elif ((x, y-2) in self.empty_list):
-                    if ((x, y-2) not in self.save_pos):
-                        self.save_pos.append((x, y-2))
+        if ((x+1, y) in my_pos) or ((x+1, y) in self.corners):
+            if ((x-1, y) in empty_list):
+                if ((x-1, y) not in kill_pos):
+                    kill_pos.append((x-1, y))
+            elif ((x+2, y) in empty_list):
+                if ((x+2, y) not in save_pos):
+                    save_pos.append((x+2, y))
 
-        if type == 1:
-            if ((x+1, y) in self.opp_pos) or ((x+1, y) in self.corners):
-                if ((x-1, y) in self.empty_list):
-                    if ((((x-2, y) in self.opp_pos) or
-                         ((x-1, y+1) in self.opp_pos) or
-                         ((x-1, y-1) in self.opp_pos))):
-                        return (x-1, y)
+        if ((x-1, y) in my_pos) or ((x-1, y) in self.corners):
+            if ((x+1, y) in empty_list):
+                if ((x+1, y) not in kill_pos):
+                    kill_pos.append((x+1, y))
+            elif ((x-2, y) in empty_list):
+                if ((x-2, y) not in save_pos):
+                    save_pos.append((x-2, y))
 
-            if ((x-1, y) in self.opp_pos) or ((x-1, y) in self.corners):
-                if ((x+1, y) in self.empty_list):
-                    if ((((x+2, y) in self.opp_pos) or
-                         ((x+1, y+1) in self.opp_pos) or
-                         ((x+1, y-1) in self.opp_pos))):
-                        return (x+1, y)
+        if ((x, y+1) in my_pos) or ((x, y+1) in self.corners):
+            if ((x, y-1) in empty_list):
+                if ((x, y-1) not in kill_pos):
+                    kill_pos.append((x, y-1))
+            elif ((x, y+2) in empty_list):
+                if ((x, y+2) not in save_pos):
+                    save_pos.append((x, y+2))
 
-            if ((x, y+1) in self.opp_pos) or ((x, y+1) in self.corners):
-                if ((x, y-1) in self.empty_list):
-                    if ((((x, y-2) in self.opp_pos) or
-                         ((x+1, y-1) in self.opp_pos) or
-                         ((x-1, y-1) in self.opp_pos))):
-                        return (x, y-1)
+        if ((x, y-1) in my_pos) or ((x, y-1) in self.corners):
+            if ((x, y+1) in empty_list):
+                if ((x, y+1) not in kill_pos):
+                    kill_pos.append((x, y+1))
+            elif ((x, y-2) in empty_list):
+                if ((x, y-2) not in save_pos):
+                    save_pos.append((x, y-2))
 
-            if ((x, y-1) in self.opp_pos) or ((x, y-1) in self.corners):
-                if ((x, y+1) in self.empty_list):
-                    if ((((x, y+2) in self.opp_pos) or
-                         ((x+1, y+1) in self.opp_pos) or
-                         ((x-1, y+1) in self.opp_pos))):
-                        return (x, y+1)
-
-            return None
+        return None
 
     # Function evaluates moves based on the risk of taking them
     #   against the reward caused by it
@@ -445,7 +435,13 @@ class Player:
                 return 20
 
             if (self.turn >= 24):
-                if Player.check_kill_save_pos(self, pos, 1) is not None:
+                if Player.check_kill_save_pos(self, pos, 
+                                              [self.empty_list, 
+                                               self.my_pos, 
+                                               self.opp_pos],
+                                              [self.kill_pos,
+                                               self.save_pos],
+                                              1) is not None:
                     # Will die after this turn
                     if curr_pos_removed:
                         my_pos.append(curr_pos)
@@ -774,7 +770,12 @@ class Player:
         y = pos[1]
 
         # Check if there is an opponent one move away from killing our piece
-        killing_move_pos = Player.check_kill_save_pos(self, pos, 1)
+        killing_move_pos = Player.check_kill_save_pos(self, pos, 
+                                                      [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos], 1)
         if killing_move_pos is None:
             return None
         else:
@@ -858,7 +859,7 @@ class Player:
     #    END OF MODIFIED CODE
     # ***
 
-    def minimax(self, board, dead, depth, type, node, move):
+    def minimax(self, board, dead, kill, depth, type, node, move):
         moves_list = []
         if (((depth == 0) or (Player.moves(self, board, type) is None) or 
              (dead[0] > 11) or (dead[1] > 11))):
@@ -873,6 +874,7 @@ class Player:
                 return [value, move]
 
         if type == 0:
+            kill_save = [kill[1], []]
             best_value = -1000000
             moves_list = Player.moves(self, board, 0)
             for child in moves_list:
@@ -881,16 +883,22 @@ class Player:
                 board = Player.update_pos(self, child, board, 0, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                                      board, dead, 0, 1)
+                kill_save = Player.check_kill_save_pos(self, child[1], board, kill_save, 1)
+                kill[1] = kill_save[0]
+
                 priority = 0
-                if dead[1] < result[1][1]:
-                    priority = 100
-                else:
-                    priority = 0
+
+                if child[1] not in self.kill_pos:
+                    if self.turn > 216:
+                        priority += -100
+                    else:
+                        priority += -30
+      
                 board = result[0]
                 dead = result[1]
                 print("dead ", dead)
 
-                v = Player.minimax(self, board, dead, depth-1, 1, child, move)
+                v = Player.minimax(self, board, dead, kill, depth-1, 1, child, move)
                 v[0] = v[0] + priority
                 print(v)
                 if v[0] > best_value:
@@ -899,6 +907,7 @@ class Player:
                     return [best_value, move]
 
         if type == 1:
+            kill_save = [kill[0], []]
             best_value = 1000000
             moves_list = Player.moves(self, board, 1)
             for child in moves_list:
@@ -907,17 +916,21 @@ class Player:
                 board = Player.update_pos(self, child, board, 1, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                             board, dead, 1, 1)
+                kill_save = Player.check_kill_save_pos(self, child[1], board, kill_save, 0)
+                kill[0] = kill_save[0]
+
                 priority = 0
-                if dead[0] < result[1][0]:
-                    priority = -100
-                else:
-                    priority = 0
+                if child[1] not in self.kill_pos:
+                    if self.turn > 216:
+                        priority += 100
+                    else:
+                        priority += 30
 
                 board = result[0]
                 dead = result[1]
                 print("dead ", dead)
 
-                v = Player.minimax(self, board, dead, depth-1, 0, child, move)
+                v = Player.minimax(self, board, dead, kill, depth-1, 0, child, move)
                 v[0] = v[0] + priority
                 print("v", v)
                 if v[0] < best_value:
@@ -944,7 +957,11 @@ class Player:
             self.kill_pos = []
             self.save_pos = []
             for pos in self.opp_pos:
-                Player.check_kill_save_pos(self, pos)
+                Player.check_kill_save_pos(self, pos, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
         # And at Moving Turn 191
         elif self.turn == 216:
@@ -955,7 +972,11 @@ class Player:
             self.kill_pos = []
             self.save_pos = []
             for pos in self.opp_pos:
-                Player.check_kill_save_pos(self, pos)
+                Player.check_kill_save_pos(self, pos, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
         if self.turn < 24:
             # Placing Phase:
@@ -1054,7 +1075,11 @@ class Player:
                 self.kill_pos = []
                 self.save_pos = []
                 for pos in self.opp_pos:
-                    Player.check_kill_save_pos(self, pos)
+                    Player.check_kill_save_pos(self, pos, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
             self.goals = []
             self.flanks = []
@@ -1101,7 +1126,7 @@ class Player:
                 dead.append(self.my_dead) 
                 dead.append(self.opp_dead)
 
-                returns = Player.minimax(self, board, dead, 8, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                returns = Player.minimax(self, board, dead, [[], []], 8, 0, (-1,-1), ((-1, -1), (-1, -1)))
                 
                 print("MINIMAX")
                 Player.update_pos(self, returns[1], [self.empty_list, 
@@ -1253,7 +1278,11 @@ class Player:
             self.kill_pos = []
             self.save_pos = []
             for pos in self.opp_pos:
-                Player.check_kill_save_pos(self, pos)
+                Player.check_kill_save_pos(self, pos, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
         elif self.turn == 216:
             self.min_index = 2
@@ -1263,7 +1292,11 @@ class Player:
             self.kill_pos = []
             self.save_pos = []
             for pos in self.opp_pos:
-                Player.check_kill_save_pos(self, pos)
+                Player.check_kill_save_pos(self, pos, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
         # Updating opp_pos and checking for goal positions and deaths
         if self.turn < 24:
@@ -1275,7 +1308,11 @@ class Player:
                                         [self.empty_list, self.my_pos, 
                                          self.opp_pos], 
                                         [self.my_dead, self.opp_dead],  1)
-            Player.check_kill_save_pos(self, action)
+            Player.check_kill_save_pos(self, action, [self.empty_list, 
+                                                       self.my_pos, 
+                                                       self.opp_pos],
+                                                      [self.kill_pos,
+                                                      self.save_pos])
 
         else:
             # Moving Phase
@@ -1290,7 +1327,11 @@ class Player:
                                         [self.empty_list, self.my_pos, 
                                          self.opp_pos], 
                                         [self.my_dead, self.opp_dead], 1)
-            Player.check_kill_save_pos(self, action[1])
+            Player.check_kill_save_pos(self, action[1], [self.empty_list, 
+                                                         self.my_pos, 
+                                                         self.opp_pos],
+                                                        [self.kill_pos,
+                                                         self.save_pos])
 
 """
 __________________________________________________________________________
