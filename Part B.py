@@ -711,7 +711,7 @@ class Player:
                 for y in range(self.max_index + 1):
                     if (x, y) in self.opp_pos:
                         # Check available spaces
-                        my_moves = my_moves + Player.check_moves(self, x, y, 1)
+                        my_moves = my_moves + Player.check_moves(self, x, y)
 
             return my_moves
 
@@ -850,9 +850,9 @@ class Player:
     #    END OF MODIFIED CODE
     # ***
 
-    def minimax(self, board, depth, type, node, move):
+    def minimax(self, board, dead, depth, type, node, move):
         if (((depth == 0) or (Player.moves(self, type) is None) or 
-             (board[4] > 11) or (board[5] > 11))):
+             (dead[0] > 11) or (dead[1] > 11))):
             value = Player.eval_move(self, node[1], node[0], board, dead)
             if type == 0:
                 return -value
@@ -867,9 +867,9 @@ class Player:
                     move = child
                 Player.update_pos(self, child, board, 0, 1)
                 Player.check_confirmed_kill(self, child[1], child[0],
-                                            board, [board[3], board[4]],
+                                            board, dead,
                                             0)
-                v = [Player.minimax(self, board, depth-1, 1, child, move), move]
+                v = [Player.minimax(self, board, dead, depth-1, 1, child, move), move]
                 if v[0] > best_value:
                     return v[0]
                 else:
@@ -883,9 +883,9 @@ class Player:
                     move = child
                 Player.update_pos(self, child, board, 1, 1)
                 Player.check_confirmed_kill(self, child[1], child[0],
-                                            board, [board[4], board[3]],
+                                            board, dead,
                                             1)
-                v = [Player.minimax(self, board, depth-1, 0, child, move), move]
+                v = [Player.minimax(self, board, dead, depth-1, 0, child, move), move]
                 if v[0] < best_value:
                     return v[0]
                 else:
@@ -944,12 +944,12 @@ class Player:
                 for i in range(len(self.save_pos)):
                     if self.save_pos[i][1] in self.y_start_list:
                         if self.save_pos[i] in self.empty_list:
-                            if Player.eval_move(self, self.save_pos[i],
+                            if Player.eval_move(self, self.save_pos[i], 
+                                                (-1, -1),
                                                 [self.empty_list, self.my_pos,
                                                  self.opp_pos],
                                                 [self.my_dead,
-                                                 self.opp_dead],
-                                                (-1, -1)) == 0:
+                                                 self.opp_dead]) == 0:
                                 pos = self.save_pos[i]
                                 Player.update_pos(self, pos, [self.empty_list,
                                                               self.my_pos, 
@@ -963,11 +963,11 @@ class Player:
                     if self.kill_pos[i][1] in self.y_start_list:
                         if self.kill_pos[i] in self.empty_list:
                             if Player.eval_move(self, self.kill_pos[i],
+                                                (-1, -1),
                                                 [self.empty_list, self.my_pos,
                                                  self.opp_pos], 
                                                 [self.my_dead,
-                                                 self.opp_dead],
-                                                 (-1, -1)) == 0:
+                                                 self.opp_dead]) == 0:
                                 pos = self.kill_pos[i]
                                 Player.check_confirmed_kill(self, pos,
                                                             (-1, -1), 
@@ -1045,9 +1045,11 @@ class Player:
 
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
-
-            if self.my_dead > 8:
-                board = []
+            print(self.my_dead)
+            if self.turn >= 216:
+                print("MINIMAX")
+                board = [[], [], []]
+                dead = []
                 empty = []
                 my = []
                 opp = []
@@ -1061,12 +1063,13 @@ class Player:
                     opp.append(pos)
                 board[2] = opp
 
-                board.append(self.my_dead) 
-                board.append(self.opp_dead)
+                dead.append(self.my_dead) 
+                dead.append(self.opp_dead)
 
-                returns = Player.minimax(self, board, 4, 0, (-1,-1), ((-1, -1), (-1, -1)))
-                if returns is not None:
-                    return returns[1]
+                returns = Player.minimax(self, board, dead, 4, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                
+                print("MINIMAX")
+                return returns[1]
 
             # For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
