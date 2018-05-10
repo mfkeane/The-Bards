@@ -208,6 +208,8 @@ class Player:
                 self.save_pos.remove(pos)
         else:
             # Moving Phase (need to sort out old position as well)
+            print(my_pos)
+            print(pos)
             my_pos.append(pos[1])
             my_pos.remove(pos[0])
             empty_list.remove(pos[1])
@@ -217,6 +219,8 @@ class Player:
                     self.kill_pos.remove(pos[1])
                 if pos[1] in self.save_pos:
                     self.save_pos.remove(pos[1])
+            elif type == 1:
+                return [empty_list, my_pos, opp_pos]
 
     # Appends avaliable moves to a list
     def append_moves(self, x, y, path):
@@ -256,15 +260,15 @@ class Player:
         return moves
 
     # Function checks if a piece has been killed and updates records
-    def check_confirmed_kill(self, pos, curr_pos, board, dead, type):
+    def check_confirmed_kill(self, pos, curr_pos, board, dead, player, type=0):
         empty_list = board[0]
-        if type == 0:
+        if player == 0:
             # My turn, check if opp is dead
             my_pos = board[1]
             opp_pos = board[2]
             my_dead = dead[0]
             opp_dead = dead[1]
-        elif type == 1:
+        elif player == 1:
             # Opp turn, check if my piece is dead
             my_pos = board[2]
             opp_pos = board[1]
@@ -314,6 +318,9 @@ class Player:
             my_pos.remove((x, y))
             my_dead += 1
             empty_list.append((x, y))
+
+        if type == 1:
+            return [[empty_list, my_pos, opp_pos], [my_dead, opp_dead]]
 
     # Check and add positions to kill_pos and save_pos
     #   kill_pos: positions that will kill an opponent immediately
@@ -851,12 +858,17 @@ class Player:
     # ***
 
     def minimax(self, board, dead, depth, type, node, move):
+        moves_list = []
         if (((depth == 0) or (Player.moves(self, type) is None) or 
              (dead[0] > 11) or (dead[1] > 11))):
             value = Player.eval_move(self, node[1], node[0], board, dead)
             if type == 0:
+                if dead[0] > 11:
+                    value = -value - 1000
                 return -value
             elif type == 1:
+                if dead[1] > 11:
+                    value = -value - 1000
                 return value
 
         if type == 0:
@@ -865,10 +877,12 @@ class Player:
             for child in moves_list:
                 if node == (-1, -1):
                     move = child
-                Player.update_pos(self, child, board, 0, 1)
-                Player.check_confirmed_kill(self, child[1], child[0],
-                                            board, dead,
-                                            0)
+                board = Player.update_pos(self, child, board, 0, 1)
+                result = Player.check_confirmed_kill(self, child[1], child[0],
+                                                     board, dead, 0, 1)
+                board = result[0]
+                dead = result[1]
+
                 v = [Player.minimax(self, board, dead, depth-1, 1, child, move), move]
                 if v[0] > best_value:
                     return v[0]
@@ -881,10 +895,12 @@ class Player:
             for child in moves_list:
                 if node == (-1, -1):
                     move = child
-                Player.update_pos(self, child, board, 1, 1)
-                Player.check_confirmed_kill(self, child[1], child[0],
-                                            board, dead,
-                                            1)
+                board = Player.update_pos(self, child, board, 1, 1)
+                result = Player.check_confirmed_kill(self, child[1], child[0],
+                                            board, dead, 1, 1)
+                board = result[0]
+                dead = result[1]
+
                 v = [Player.minimax(self, board, dead, depth-1, 0, child, move), move]
                 if v[0] < best_value:
                     return v[0]
