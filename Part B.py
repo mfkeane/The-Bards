@@ -24,6 +24,7 @@
 
 from collections import defaultdict
 import random
+import copy
 
 """
 ___________________________________________________________________________
@@ -208,8 +209,8 @@ class Player:
                 self.save_pos.remove(pos)
         else:
             # Moving Phase (need to sort out old position as well)
-            print(my_pos)
-            print(pos)
+            # print(my_pos)
+            # print(pos)
             my_pos.append(pos[1])
             my_pos.remove(pos[0])
             empty_list.remove(pos[1])
@@ -445,7 +446,7 @@ class Player:
     def eval_move(self, pos, curr_pos, board, dead, player = 0):
         x = pos[0]
         y = pos[1]
-        # # print("pos ", pos)
+        # # # print("pos ", pos)
 
         empty_list = board[0]
         my_pos = []
@@ -453,7 +454,7 @@ class Player:
         if player == 0:
             my_pos = board[1]
             opp_pos = board[2]
-            # # print("opp ", opp_pos)
+            # # # print("opp ", opp_pos)
             my_dead = dead[0]
             opp_dead = dead[1]
         if player == 1:
@@ -937,16 +938,16 @@ class Player:
         moves_list = []
         if (((depth == 0) or (Player.moves(self, board, type) is None) or 
              (len(board[1]) < 1) or (len(board[2]) < 1))):
-            print("here")
+            # print("here")
             if type == 0:
                 value = -Player.eval_move(self, node[1], node[0], board, dead)
-                value -= (8-depth)*10
+                value -= (3-depth)*10
                 if len(board[1]) < 1:
                     value = value + 1000
                 return [value, move]
             elif type == 1:
                 value = Player.eval_move(self, node[1], node[0], board, dead, 1)
-                value += (8-depth)*10
+                value += (3-depth)*10
                 if len(board[2]) < 1:
                     value = value - 1000
                 return [value, move]
@@ -955,11 +956,20 @@ class Player:
             kill_save = [kill[1], []]
             best_value = [-1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 0)
-            # print(moves_list)
+            # # print(moves_list)
             for child in moves_list:
                 priority = 0
-                new_board = board
-                new_dead = dead
+                empty = board[0][:]
+                my = board[1][:]
+                opp = board[2][:]
+
+                new_board = [empty, my, opp]
+                #new_board = copy.deepcopy(board)
+                new_dead = []
+                for num_dead in dead:
+                    new_dead.append(num_dead)
+
+
                 new_board = Player.update_pos(self, child, new_board, 0, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                                      new_board, new_dead, 0, 1)
@@ -968,18 +978,18 @@ class Player:
 
                 new_board = result[0]
                 new_dead = result[1]
-                # print("kill_save ", kill_save)
-                # print("kill ", kill)
+                # # print("kill_save ", kill_save)
+                # # print("kill ", kill)
 
                 if node == (-1, -1):
                     move = child
-                    # print(move)
-                    # print(kill)
+                    # # print(move)
+                    # # print(kill)
                     if move[0] in kill[0]:
-                        # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 0))
+                        # # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 0))
                         if Player.eval_move(self, move[1], move[0], new_board, new_dead, 0) < 20:
                             priority += 1000
-                            # print("can kill in first turn")
+                            # # print("can kill in first turn")
                     priority_move = Player.about_to_die(self, child[0], new_board, new_dead, [kill[0], []], type)
                     if priority_move is not None:
                         if child is priority_move:
@@ -991,14 +1001,14 @@ class Player:
                     else:
                         priority += -30
                 
-                # # print("dead ", dead)
+                # # # print("dead ", dead)
 
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 1, child, move)
                 v[0] = v[0] + priority
-                print("my last", v)
+                # print("my last", v)
                 if v[0] > best_value[0]:
                     best_value = v
-            print("POP MINE")
+            # print("POP MINE")
             return best_value
     
 
@@ -1010,8 +1020,16 @@ class Player:
                 priority = 0
                 if node == (-1, -1):
                     move = child
-                new_board = board
-                new_dead = dead
+                empty = board[0][:]
+                my = board[1][:]
+                opp = board[2][:]
+
+                new_board = [empty, my, opp]
+                #new_board = copy.deepcopy(board)
+                new_dead = []
+                for num_dead in dead:
+                    new_dead.append(num_dead)
+
                 new_board = Player.update_pos(self, child, new_board, 1, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                             new_board, new_dead, 1, 1)
@@ -1021,13 +1039,16 @@ class Player:
                 new_board = result[0]
                 new_dead = result[1]
 
+                # print("new before ", new_board[2])
+                # print("old before ", board[2])
+
                 if node == (-1, -1):
                     move = child
                     if move[0] in kill[1]:
-                        # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 1))
+                        # # print("eval ", Player.eval_move(self, move[1], move[0], board, dead, 1))
                         if Player.eval_move(self, move[1], move[0], new_board, new_dead, 1) < 20:
                             priority += -1000
-                            # print("can kill in first turn")
+                            # # print("can kill in first turn")
                     priority_move = Player.about_to_die(self, child[0], new_board, new_dead, [kill[1], []], type)
                     if priority_move is not None:
                         if child is priority_move:
@@ -1040,15 +1061,16 @@ class Player:
                     else:
                         priority += 30
 
-                # # print("dead ", dead)
+                # # # print("dead ", dead)
 
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0, child, move)
-                print("opp last ", v)
+
+                # print("opp last ", v)
                 v[0] = v[0] + priority
-                # # print("v", v)
+                # # # print("v", v)
                 if v[0] < best_value[0]:
                     best_value = v
-            print("POP OPP")
+            # print("POP OPP")
             return best_value
 
     # -------------------------END OF SEARCH FUNCTIONS-------------------------
@@ -1218,13 +1240,13 @@ class Player:
 
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
-            # # print(self.my_dead)
+            # # # print(self.my_dead)
             if ((self.turn < (152-len(self.my_pos)) and
                  self.turn >= 0) or
                 (self.turn < (216-len(self.my_pos)) and
                  self.turn >= 152) or
                 (self.turn >= 216)):
-                # # print("MINIMAX")
+                # # # print("MINIMAX")
                 board = [[], [], []]
                 dead = []
                 empty = []
@@ -1243,9 +1265,9 @@ class Player:
                 dead.append(self.my_dead) 
                 dead.append(self.opp_dead)
 
-                returns = Player.minimax(self, board, dead, [[], []], 8, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)))
                 
-                # # print("MINIMAX")
+                # # # print("MINIMAX")
                 Player.update_pos(self, returns[1], [self.empty_list, 
                                                      self.my_pos, 
                                                      self.opp_pos], 0)
