@@ -969,6 +969,8 @@ class Player:
             kill_save = [kill[1], []]
             v = [-1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 0)
+            if moves_list is None and node == (-1, -1):
+                return None
             # # print(moves_list)
             for child in moves_list:
                 priority = 0
@@ -1316,7 +1318,16 @@ class Player:
                                                   self.opp_dead])) < 20:
                                 if len(result) <= best_on_boarder[0]:
                                     best_on_boarder = [len(result), moves_list[i]]
+
                 if best_on_boarder[1] != ((-1, -1), (-1, -1)):
+                    Player.update_pos(self, best_on_boarder[1], [self.empty_list, 
+                                                 self.my_pos, 
+                                                 self.opp_pos], 0)
+                    Player.check_confirmed_kill(self, best_on_boarder[1][1],
+                                            [self.empty_list, self.my_pos,
+                                             self.opp_pos],
+                                            [self.my_dead, self.opp_dead],
+                                            0)
                     return best_on_boarder[1]
 
             # # # print("MINIMAX")
@@ -1341,6 +1352,9 @@ class Player:
             returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)), [-10000, (-1,-1)], [10000, (-1,-1)])
             
             # # # print("MINIMAX")
+            if returns is None:
+                return None
+
             Player.update_pos(self, returns[1], [self.empty_list, 
                                                  self.my_pos, 
                                                  self.opp_pos], 0)
@@ -1351,7 +1365,7 @@ class Player:
                                         0)
             return returns[1]
 
-            # For every valid possible move, find the distance to the nearest
+            """# For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
             for i in range(len(moves_list)):
 
@@ -1485,7 +1499,7 @@ class Player:
                 return action
             else:
                 return None
-
+"""
     # __________________________________________________________________________
     # __________________________________________________________________________
     #                                 update
