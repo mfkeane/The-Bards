@@ -1009,9 +1009,9 @@ class Player:
                             flanks.append(flank)
 
                 path = Player.depth_limited_search(self, child[1],
-                                                   goals, 8, new_board)
+                                                   goals, 6, new_board)
                 if path is not None:
-                    priority -= len(path)*10
+                    priority -= len(path)
 
                 if node == (-1, -1):
                     move = child
