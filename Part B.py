@@ -934,7 +934,7 @@ class Player:
     #    END OF MODIFIED CODE
     # ***
 
-    def minimax(self, board, dead, kill, depth, type, node, move):
+    def minimax(self, board, dead, kill, depth, type, node, move, alpha, beta):
         moves_list = []
         if (((depth == 0) or (Player.moves(self, board, type) is None) or 
              (len(board[1]) < 1) or (len(board[2]) < 1))):
@@ -954,7 +954,7 @@ class Player:
 
         if type == 0:
             kill_save = [kill[1], []]
-            best_value = [-1000000, (-1, -1)]
+            v = [-1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 0)
             # # print(moves_list)
             for child in moves_list:
@@ -1003,18 +1003,20 @@ class Player:
                 
                 # # # print("dead ", dead)
 
-                v = Player.minimax(self, new_board, new_dead, kill, depth-1, 1, child, move)
+                v = Player.minimax(self, new_board, new_dead, kill, depth-1, 1, child, move, alpha, beta)
                 v[0] = v[0] + priority
                 # print("my last", v)
-                if v[0] > best_value[0]:
-                    best_value = v
+                if v[0] > alpha[0]:
+                    alpha = v
+                if beta <= alpha:
+                    break
             # print("POP MINE")
-            return best_value
+            return alpha
     
 
         if type == 1:
             kill_save = [kill[0], []]
-            best_value = [1000000, (-1, -1)]
+            v = [1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 1)
             for child in moves_list:
                 priority = 0
@@ -1063,15 +1065,17 @@ class Player:
 
                 # # # print("dead ", dead)
 
-                v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0, child, move)
+                v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0, child, move, alpha, beta)
 
                 # print("opp last ", v)
                 v[0] = v[0] + priority
                 # # # print("v", v)
-                if v[0] < best_value[0]:
-                    best_value = v
+                if v[0] < beta[0]:
+                    beta = v
+                if beta <= alpha:
+                    break
             # print("POP OPP")
-            return best_value
+            return beta
 
     # -------------------------END OF SEARCH FUNCTIONS-------------------------
     # __________________________________________________________________________
@@ -1265,7 +1269,7 @@ class Player:
                 dead.append(self.my_dead) 
                 dead.append(self.opp_dead)
 
-                returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)))
+                returns = Player.minimax(self, board, dead, [[], []], 3, 0, (-1,-1), ((-1, -1), (-1, -1)), [-10000, (-1,-1)], [10000, (-1,-1)])
                 
                 # # # print("MINIMAX")
                 Player.update_pos(self, returns[1], [self.empty_list, 
