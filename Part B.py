@@ -461,7 +461,7 @@ class Player:
 
     # Function evaluates moves based on the risk of taking them
     #   against the reward caused by it
-    def eval_move(self, pos, curr_pos, board, dead, player = 0):
+    def eval_move(self, pos, curr_pos, board, dead, player=0):
         x = pos[0]
         y = pos[1]
 
@@ -1330,14 +1330,14 @@ class Player:
 
                             # Coming up to the shrinking of the board,
                             #   make sure pieces aren't on the borders
-                            result = (Player.depth_limited_search(self,
-                                                                  moves_list[i][1],
-                                                                  self.next_borders,
-                                                                  10,
-                                                                  [self.empty_list,
-                                                                   self.my_pos,
-                                                                   self.opp_pos]))
-                            if result is not None:
+                            r = (Player.depth_limited_search(self,
+                                                             moves_list[i][1],
+                                                             self.next_borders,
+                                                             10,
+                                                             [self.empty_list,
+                                                              self.my_pos,
+                                                              self.opp_pos]))
+                            if r is not None:
                                 if (Player.eval_move(self, moves_list[i][1],
                                                      moves_list[i][0],
                                                      [self.empty_list,
@@ -1345,9 +1345,9 @@ class Player:
                                                       self.opp_pos],
                                                      [self.my_dead,
                                                       self.opp_dead])) < 20:
-                                    if len(result) <= best_on_border[0]:
+                                    if len(r) <= best_on_border[0]:
                                         best_on_border = [len(result),
-                                                           moves_list[i]]
+                                                          moves_list[i]]
 
                     if best_on_border[1] != ((-1, -1), (-1, -1)):
                         Player.update_pos(self, best_on_border[1],
