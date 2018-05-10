@@ -656,71 +656,72 @@ class Player:
             goals.remove((x, y-1))
 
     # Function to check the available moves surrounding a piece
-    def check_moves(self, x, y):
+    def check_moves(self, board, x, y):
         moves = []
+        empty_list = board[0]
+        my_pos = board[1]
+        opp_pos = board[2]
+
         # Check square to right
         if ((x+1 in range(self.max_index + 1)) and
-           ((x+1, y) in self.empty_list)):
+           ((x+1, y) in empty_list)):
             moves.append(((x, y), (x+1, y)))
         # Check square to left
         if ((x-1 in range(self.max_index + 1)) and
-           ((x-1, y) in self.empty_list)):
+           ((x-1, y) in empty_list)):
             moves.append(((x, y), (x-1, y)))
         # Check square below
         if ((y+1 in range(self.max_index + 1)) and
-           ((x, y+1) in self.empty_list)):
+           ((x, y+1) in empty_list)):
             moves.append(((x, y), (x, y+1)))
         # Check square above
         if ((y-1 in range(self.max_index + 1)) and
-           ((x, y-1) in self.empty_list)):
+           ((x, y-1) in empty_list)):
             moves.append(((x, y), (x, y-1)))
 
         # Check if piece can jump to right
         if ((x+2 in range(self.max_index + 1)) and
-           (((x+1, y) in self.my_pos) or
-           ((x+1, y) in self.opp_pos)) and ((x+2, y) in self.empty_list)):
+           (((x+1, y) in my_pos) or
+           ((x+1, y) in opp_pos)) and ((x+2, y) in empty_list)):
             moves.append(((x, y), (x+2, y)))
         # Check if piece can jump to left
         if ((x-2 in range(self.max_index + 1)) and
-           (((x-1, y) in self.my_pos) or
-           ((x-1, y) in self.opp_pos)) and ((x-2, y) in self.empty_list)):
+           (((x-1, y) in my_pos) or
+           ((x-1, y) in opp_pos)) and ((x-2, y) in empty_list)):
             moves.append(((x, y), (x-2, y)))
         # Check if piece can jump down
         if ((y+2 in range(self.max_index + 1)) and
-           (((x, y+1) in self.my_pos) or
-           ((x, y+1) in self.opp_pos)) and ((x, y+2) in self.empty_list)):
+           (((x, y+1) in my_pos) or
+           ((x, y+1) in opp_pos)) and ((x, y+2) in empty_list)):
             moves.append(((x, y), (x, y+2)))
         # Check if piece can jump up
         if ((y-2 in range(self.max_index + 1)) and
-           (((x, y-1) in self.my_pos) or
-           ((x, y-1) in self.opp_pos)) and ((x, y-2) in self.empty_list)):
+           (((x, y-1) in my_pos) or
+           ((x, y-1) in opp_pos)) and ((x, y-2) in empty_list)):
             moves.append(((x, y), (x, y-2)))
 
         return moves
 
-    def moves(self, type=0):
+    def moves(self, board, type=0):
         # Initialise moves variables
         my_moves = []
+        my_pos = []
+
+        if type == 0:
+            my_pos = board[1]
+        elif type == 1:
+            opp_pos = board[2]
 
         # For each square on board:
         #       - check if it's a piece
         #       - if so, count available moves
-        if type == 0:
-            for x in range(self.max_index + 1):
-                for y in range(self.max_index + 1):
-                    if (x, y) in self.my_pos:
-                        # Check available spaces
-                        my_moves = my_moves + Player.check_moves(self, x, y)
+        for x in range(self.max_index + 1):
+            for y in range(self.max_index + 1):
+                if (x, y) in my_pos:
+                    # Check available spaces
+                    my_moves = my_moves + Player.check_moves(self, board, x, y)
 
-            return my_moves
-        if type == 1:
-            for x in range(self.max_index + 1):
-                for y in range(self.max_index + 1):
-                    if (x, y) in self.opp_pos:
-                        # Check available spaces
-                        my_moves = my_moves + Player.check_moves(self, x, y)
-
-            return my_moves
+        return my_moves
 
     # Function checks if there is a safe position two away from an opponent
     def check_two_away(self, pos):
@@ -859,7 +860,7 @@ class Player:
 
     def minimax(self, board, dead, depth, type, node, move):
         moves_list = []
-        if (((depth == 0) or (Player.moves(self, type) is None) or 
+        if (((depth == 0) or (Player.moves(self, board, type) is None) or 
              (dead[0] > 11) or (dead[1] > 11))):
             value = Player.eval_move(self, node[1], node[0], board, dead)
             if type == 0:
@@ -873,7 +874,7 @@ class Player:
 
         if type == 0:
             best_value = -1000000
-            moves_list = Player.moves(self, 0)
+            moves_list = Player.moves(self, board, 0)
             for child in moves_list:
                 if node == (-1, -1):
                     move = child
@@ -891,7 +892,7 @@ class Player:
 
         if type == 1:
             best_value = 1000000
-            moves_list = Player.moves(self, 1)
+            moves_list = Player.moves(self, board, 1)
             for child in moves_list:
                 if node == (-1, -1):
                     move = child
@@ -1053,7 +1054,9 @@ class Player:
 
             # Find all possible moves,
             # returns array of nested tuples (current pos, next pos)
-            moves_list = Player.moves(self)
+            moves_list = Player.moves(self, [self.empty_list, 
+                                             self.my_pos, 
+                                             self.opp_pos])
 
             if len(moves_list) < 1:
                 # No avaliable moves, have to forfeit the move
@@ -1199,7 +1202,7 @@ class Player:
                 #   that move
                 Player.update_pos(self, action, [self.empty_list, 
                                                  self.my_pos, 
-                                                 self.opp_pos],0)
+                                                 self.opp_pos], 0)
                 Player.check_confirmed_kill(self, action[1], action[0],
                                             [self.empty_list, self.my_pos,
                                              self.opp_pos],
