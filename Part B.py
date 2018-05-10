@@ -227,12 +227,16 @@ class Player:
                     return [empty_list, opp_pos, my_pos]
 
     # Appends avaliable moves to a list
-    def append_moves(self, x, y, path, board):
+    def append_moves(self, x, y, path, board, player=0):
         moves = []
 
         empty_list = board[0]
-        my_pos = board[1]
-        opp_pos = board[2]
+        if player == 0:
+            my_pos = board[1]
+            opp_pos = board[2]
+        elif player == 1:
+            my_pos = board[2]
+            opp_pos = board[1]
 
         if (x+1, y) in empty_list:
             # Only append if not already a square that has been moved to
@@ -597,14 +601,18 @@ class Player:
 
     # Check if piece already partially surrounded
     #   and mark goal positions for Player
-    def find_goal_pos(self, x, y, board):
+    def find_goal_pos(self, x, y, board, player=0):
 
         goals = []
         flanks = []
 
         empty_list = board[0]
-        my_pos = board[1]
-        opp_pos = board[2]
+        if player == 0:
+            my_pos = board[1]
+            opp_pos = board[2]
+        elif player == 1:
+            my_pos = board[2]
+            opp_pos = board[1]
 
         # If no Player pieces surround Opponent,
         #   all surrounding tiles are valid goals
@@ -914,7 +922,7 @@ class Player:
     # ***
 
     # Searching algorithm function: Depth Limited Search
-    def depth_limited_search(self, start, goals, depth, board):
+    def depth_limited_search(self, start, goals, depth, board, player=0):
         SENTINEL = object()
         path = []
         visited = [start]
@@ -941,7 +949,7 @@ class Player:
                 path.append(current)
                 visited.append(SENTINEL)
                 visited.extend(Player.append_moves(self, current[0],
-                                                   current[1], path, board))
+                                                   current[1], path, board, player))
 
     # ***
     #    END OF MODIFIED CODE
@@ -1000,7 +1008,7 @@ class Player:
                 flanks = []
 
                 for pos in board[2]:
-                    returns = Player.find_goal_pos(self, pos[0], pos[1], new_board)
+                    returns = Player.find_goal_pos(self, pos[0], pos[1], new_board, 0)
                     for goal in returns[0]:
                         if goal not in goals:
                             goals.append(goal)
@@ -1009,7 +1017,7 @@ class Player:
                             flanks.append(flank)
 
                 path = Player.depth_limited_search(self, child[1],
-                                                   goals, 6, new_board)
+                                                   goals, 1, new_board)
                 if path is not None:
                     priority -= len(path)
 
@@ -1084,8 +1092,22 @@ class Player:
                 new_board = result[0]
                 new_dead = result[1]
 
-                # print("new before ", new_board[2])
-                # print("old before ", board[2])
+                goals = []
+                flanks = []
+
+                for pos in board[2]:
+                    returns = Player.find_goal_pos(self, pos[0], pos[1], new_board, 1)
+                    for goal in returns[0]:
+                        if goal not in goals:
+                            goals.append(goal)
+                    for flank in returns[1]:
+                        if flank not in flanks:
+                            flanks.append(flank)
+
+                path = Player.depth_limited_search(self, child[1],
+                                                   goals, 1, new_board, 1)
+                if path is not None:
+                    priority += len(path)
 
                 if node == (-1, -1):
                     move = child
