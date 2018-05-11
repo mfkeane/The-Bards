@@ -152,6 +152,7 @@ class Player:
             else:
                 i += 1
 
+        # Update the next set of boarders for shrinking
         self.next_borders = []
         for i in range(self.min_index+2, self.max_index-1):
             self.next_borders.append((i, self.min_index+1))
@@ -180,7 +181,7 @@ class Player:
                                          self.opp_pos],
                                         [self.my_dead, self.opp_dead],
                                         1)
-
+        # Return the updated corners list
         return [(self.min_index, self.min_index),
                 (self.min_index, self.max_index),
                 (self.max_index, self.max_index),
@@ -195,7 +196,7 @@ class Player:
             my_pos = board[1]
             opp_pos = board[2]
         elif player == 1:
-            # Opponents Turn
+            # Opponents Turn 
             my_pos = board[2]
             opp_pos = board[1]
 
@@ -229,6 +230,7 @@ class Player:
         moves = []
 
         empty_list = board[0]
+        # Check if needed for my player or to check from opp's POV
         if player == 0:
             my_pos = board[1]
             opp_pos = board[2]
@@ -331,6 +333,8 @@ class Player:
             empty_list.append((x, y))
 
         if type == 1:
+            # If it needs to be returned (e.g. not using self. versions, 
+            # arrange the lists in the right order of "board")
             if player == 0:
                 return [[empty_list, my_pos, opp_pos], [my_dead, opp_dead]]
             elif player == 1:
@@ -400,10 +404,12 @@ class Player:
             # Use function to check if piece will die in the next turn
             if ((x+1, y) in opp_pos) or ((x+1, y) in self.corners):
                 if ((x-1, y) in empty_list):
+                    # Check if an opp can move into that space
                     if ((((x-2, y) in opp_pos) or
                         ((x-1, y+1) in opp_pos) or
                        ((x-1, y-1) in opp_pos))):
                         return (x-1, y)
+                    # Check if an opp can jump into that space
                     if ((((x-1, y+1) in my_pos) or ((x-1, y+1) in opp_pos)) and
                        ((x-1, y+2) in opp_pos)):
                         return (x-1, y)
@@ -416,10 +422,12 @@ class Player:
 
             if ((x-1, y) in opp_pos) or ((x-1, y) in self.corners):
                 if ((x+1, y) in empty_list):
+                    # Check if an opp can move into that space
                     if ((((x+2, y) in opp_pos) or
                          ((x+1, y+1) in opp_pos) or
                          ((x+1, y-1) in opp_pos))):
                         return (x+1, y)
+                    # Check if an opp can jump into that space
                     if ((((x+1, y+1) in my_pos) or ((x+1, y+1) in opp_pos)) and
                        ((x+1, y+2) in opp_pos)):
                         return (x+1, y)
@@ -432,10 +440,12 @@ class Player:
 
             if ((x, y+1) in opp_pos) or ((x, y+1) in self.corners):
                 if ((x, y-1) in empty_list):
+                    # Check if an opp can move into that space
                     if ((((x, y-2) in opp_pos) or
                          ((x+1, y-1) in opp_pos) or
                          ((x-1, y-1) in opp_pos))):
                         return (x, y-1)
+                    # Check if an opp can jump into that space
                     if ((((x+1, y-1) in my_pos) or ((x+1, y-1) in opp_pos)) and
                        ((x+2, y-1) in opp_pos)):
                         return (x, y-1)
@@ -448,10 +458,12 @@ class Player:
 
             if ((x, y-1) in opp_pos) or ((x, y-1) in self.corners):
                 if ((x, y+1) in empty_list):
+                    # Check if an opp can move into that space
                     if ((((x, y+2) in opp_pos) or
                          ((x+1, y+1) in opp_pos) or
                          ((x-1, y+1) in opp_pos))):
                         return (x, y+1)
+                    # Check if an opp can jump into that space
                     if ((((x+1, y+1) in my_pos) or ((x+1, y+1) in opp_pos)) and
                        ((x+2, y+1) in opp_pos)):
                         return (x, y+1)
@@ -470,6 +482,7 @@ class Player:
         x = pos[0]
         y = pos[1]
 
+        # Sort out board and lists according to player
         empty_list = board[0]
         my_pos = []
         opp_pos = []
@@ -803,6 +816,7 @@ class Player:
         my_moves = []
         my_pos = []
 
+        # Check if we need my_pos or opp_pos according to type (player)
         if type == 0:
             my_pos = board[1]
         elif type == 1:
@@ -973,6 +987,8 @@ class Player:
 
     def minimax(self, board, dead, kill, depth, type, node, move, alpha, beta):
         moves_list = []
+
+        # If hit a leaf or the max depth, set value and pop up back
         if (((depth == 0) or (Player.moves(self, board, type) is None) or
              (len(board[1]) < 1) or (len(board[2]) < 1))):
             if type == 0:
@@ -989,14 +1005,19 @@ class Player:
                     value = value - 1000
                 return [value, move]
 
+        # Maximising Player
         if type == 0:
+            # Set initial values
             kill_save = [kill[1], []]
             v = [-1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 0)
+            # If no moves avaliable from the first node, return None to forfeit
             if moves_list is None and node == (-1, -1):
                 return None
+            # For each child
             for child in moves_list:
                 priority = 0
+                # Set up a new board so the old one isn't overwritten
                 empty = board[0][:]
                 my = board[1][:]
                 opp = board[2][:]
@@ -1006,6 +1027,7 @@ class Player:
                 for num_dead in dead:
                     new_dead.append(num_dead)
 
+                # Update the new_board based on the move (child)
                 new_board = Player.update_pos(self, child, new_board, 0, 1)
                 result = Player.check_confirmed_kill(self, child[1],
                                                      new_board, new_dead, 0, 1)
@@ -1016,6 +1038,8 @@ class Player:
                 new_board = result[0]
                 new_dead = result[1]
 
+                # Search for goal positions, targets that let us know if
+                #   we are heading in the right direction
                 goals = []
                 flanks = []
 
@@ -1029,6 +1053,8 @@ class Player:
                         if flank not in flanks:
                             flanks.append(flank)
 
+                # Find the shortest distance to the closest goal and 
+                #   record to be added to the value of the move
                 path = Player.depth_limited_search(self, child[1],
                                                    goals, 6, new_board)
                 if path is not None:
@@ -1037,15 +1063,22 @@ class Player:
                 if node == (-1, -1):
                     move = child
                     if move[0] in kill[0]:
+                        # Check if the first move is a kill, especially good
+                        # for smallest board
                         if Player.eval_move(self, move[1], move[0], new_board,
                                             new_dead, 0) < 20:
                             priority += 200
+
+                    # Check if we need to move this piece or it will die
                     priority_move = Player.about_to_die(self, child[0],
                                                         new_board, new_dead,
                                                         [kill[0], []], type)
                     if priority_move is not None:
                         if child is priority_move:
                             priority += 50
+
+                    # Check if piece is on a boarder if the board is 
+                    #   close to shrinking
                     if (((self.turn > (152-(len(self.my_pos))) and
                           self.turn < 152) or
                          (self.turn > (216-(len(self.my_pos))) and
@@ -1056,25 +1089,42 @@ class Player:
                         if Player.on_border(self, move[0]):
                             priority += 50
 
+                    # If piece is flanking, avoid moving
+                    if move[0] in flanks:
+                        priority -= 50
+
+                # Give a lower value to the move if the new position will 
+                #   not kill an opponent
                 if child[1] not in kill[0]:
+                    # More crucial at the smallest board size
                     if self.turn > 216:
                         priority += -100
                     else:
                         priority += -30
+
+                # Recursion: go down to the next child 
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 1,
                                    child, move, alpha, beta)
+
+                # Add the variation to the end value
                 v[0] = v[0] + priority
+                # Save the maximum value and move
                 if v[0] > alpha[0]:
                     alpha = v
-                if beta <= alpha:
+                # Alpha Beta Pruning
+                if beta[0] <= alpha[0]:
                     break
             return alpha
 
+        # Minimizing Opponent
         if type == 1:
+            # Set initial values
             kill_save = [kill[0], []]
             v = [1000000, (-1, -1)]
             moves_list = Player.moves(self, board, 1)
+            # For every child
             for child in moves_list:
+                # Set up a new board so the old one isn't overwritten
                 priority = 0
                 if node == (-1, -1):
                     move = child
@@ -1082,6 +1132,7 @@ class Player:
                 my = board[1][:]
                 opp = board[2][:]
 
+                # Update the new_board based on the move (child)
                 new_board = [empty, my, opp]
                 new_dead = []
                 for num_dead in dead:
@@ -1097,6 +1148,8 @@ class Player:
                 new_board = result[0]
                 new_dead = result[1]
 
+                # Search for goal positions, targets that let us know if
+                #   we are heading in the right direction
                 goals = []
                 flanks = []
 
@@ -1110,6 +1163,8 @@ class Player:
                         if flank not in flanks:
                             flanks.append(flank)
 
+                # Find the shortest distance to the closest goal and 
+                #   record to be added to the value of the move
                 path = Player.depth_limited_search(self, child[1],
                                                    goals, 4, new_board, 1)
                 if path is not None:
@@ -1118,15 +1173,22 @@ class Player:
                 if node == (-1, -1):
                     move = child
                     if move[0] in kill[1]:
+                        # Check if the first move is a kill, especially good
+                        # for smallest board
                         if Player.eval_move(self, move[1], move[0], new_board,
                                             new_dead, 1) < 20:
                             priority += -200
+
+                    # Check if we need to move this piece or it will die
                     priority_move = Player.about_to_die(self, child[0],
                                                         new_board, new_dead,
                                                         [kill[1], []], type)
                     if priority_move is not None:
                         if child is priority_move:
                             priority += -50
+
+                    # Check if piece is on a boarder if the board is 
+                    #   close to shrinking
                     if (((self.turn > (152-(len(self.my_pos))) and
                           self.turn < 152) or
                          (self.turn > (216-(len(self.my_pos))) and
@@ -1137,19 +1199,30 @@ class Player:
                         if Player.on_border(self, move[0]):
                             priority += 50
 
+                    # If piece is flanking, avoid moving
+                    if move[0] in flanks:
+                        priority += 50
+
+                # Give a higher value to the move if the new position will 
+                #   not kill an opponent
                 if child[1] not in kill[1]:
+                    # More crucial at the smallest board size
                     if self.turn > 216:
                         priority += 100
                     else:
                         priority += 30
 
+                # Recursion: go down to the next child 
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0,
                                    child, move, alpha, beta)
 
+                # Add the variation to the end value
                 v[0] = v[0] + priority
+                # Save the minimum value and move
                 if v[0] < beta[0]:
                     beta = v
-                if beta <= alpha:
+                # Alpha Beta Pruning
+                if beta[0] <= alpha[0]:
                     break
             return beta
 
@@ -1194,7 +1267,7 @@ class Player:
                                                        self.save_pos])
 
         if self.turn < 24:
-            # Placing Phase:
+            # PLACING PHASE:
             # Will return a tuple
 
             # If we have the first move, choose a random position
@@ -1280,7 +1353,7 @@ class Player:
                             return pos
 
         else:
-            # Moving Phase
+            # MOVING PHASE:
             # Will return a nested tuple
 
             # Reset kill_pos and save_pos*
@@ -1296,6 +1369,8 @@ class Player:
                                                           [self.kill_pos,
                                                            self.save_pos])
 
+            # Find the shortest distance to the closest goal and 
+            #   record to be added to the value of the move
             self.goals = []
             self.flanks = []
 
@@ -1323,6 +1398,8 @@ class Player:
 
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
+
+            # ----------------Handle Shrinking Strategy---------------
             if self.turn > 120 or len(self.my_pos) < 6:
                 if (((self.turn > (152-(len(self.my_pos))) and
                       self.turn < 152) or
@@ -1367,30 +1444,35 @@ class Player:
                                                      self.opp_dead], 0)
                         return best_on_border[1]
 
+                # ------------MINIMAX--------------
+                # Initialise Lists
                 board = [[], [], []]
                 dead = []
                 empty = []
                 my = []
                 opp = []
-                for pos in self.empty_list:
-                    empty.append(pos)
+
+                # Set board values
+                empty = self.empty_list[:]
+                my = self.my_pos[:]
+                opp = self.opp_pos[:]
                 board[0] = empty
-                for pos in self.my_pos:
-                    my.append(pos)
                 board[1] = my
-                for pos in self.opp_pos:
-                    opp.append(pos)
                 board[2] = opp
 
                 dead.append(self.my_dead)
                 dead.append(self.opp_dead)
 
+                # Run minimax
                 returns = Player.minimax(self, board, dead, [[], []], 3, 0,
                                          (-1, -1), ((-1, -1), (-1, -1)),
                                          [-10000, (-1, -1)], [10000, (-1, -1)])
+
                 if returns is None:
+                    # No moves, have to forfeit move
                     return None
 
+                # Update positions and check for dead
                 Player.update_pos(self, returns[1], [self.empty_list,
                                                      self.my_pos,
                                                      self.opp_pos], 0)
@@ -1401,6 +1483,9 @@ class Player:
                                             0)
                 return returns[1]
 
+            # ----------------NORMAL MOVEMENT---------------
+            # Minimax cannot be run constantly for efficiency
+            
             # For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
             for i in range(len(moves_list)):
