@@ -336,9 +336,13 @@ class Player:
             elif player == 1:
                 return [[empty_list, opp_pos, my_pos], [opp_dead, my_dead]]
 
-    # Check and add positions to kill_pos and save_pos
-    #   kill_pos: positions that will kill an opponent immediately
-    #   save_pos: positions that will save a friendly from imminent death
+    # Function has two states, both find positions that will kill a player
+    # in one turn.
+    # 1. Check and add positions to kill_pos and save_pos
+    #    kill_pos: positions that will kill an opponent immediately
+    #    save_pos: positions that will save a friendly from imminent death
+    # 2. Find if one of the players pieces is vunerable (has a kill_pos
+    #    from an enemy) and check if it will die in one turn
     def check_kill_save_pos(self, pos, board, kill_save, player=0, type=0):
         x = pos[0]
         y = pos[1]
@@ -357,7 +361,7 @@ class Player:
         save_pos = kill_save[1]
 
         if type == 0:
-
+            # Function used to find the positions to kill or save
             if ((x+1, y) in my_pos) or ((x+1, y) in self.corners):
                 if ((x-1, y) in empty_list):
                     if ((x-1, y) not in kill_pos):
@@ -393,6 +397,7 @@ class Player:
             return [kill_pos, save_pos]
 
         if type == 1:
+            # Use function to check if piece will die in the next turn
             if ((x+1, y) in opp_pos) or ((x+1, y) in self.corners):
                 if ((x-1, y) in empty_list):
                     if ((((x-2, y) in opp_pos) or
