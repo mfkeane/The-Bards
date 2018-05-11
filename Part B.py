@@ -196,7 +196,7 @@ class Player:
             my_pos = board[1]
             opp_pos = board[2]
         elif player == 1:
-            # Opponents Turn 
+            # Opponents Turn
             my_pos = board[2]
             opp_pos = board[1]
 
@@ -333,7 +333,7 @@ class Player:
             empty_list.append((x, y))
 
         if type == 1:
-            # If it needs to be returned (e.g. not using self. versions, 
+            # If it needs to be returned (e.g. not using self. versions,
             # arrange the lists in the right order of "board")
             if player == 0:
                 return [[empty_list, my_pos, opp_pos], [my_dead, opp_dead]]
@@ -1053,7 +1053,7 @@ class Player:
                         if flank not in flanks:
                             flanks.append(flank)
 
-                # Find the shortest distance to the closest goal and 
+                # Find the shortest distance to the closest goal and
                 #   record to be added to the value of the move
                 path = Player.depth_limited_search(self, child[1],
                                                    goals, 6, new_board)
@@ -1077,7 +1077,7 @@ class Player:
                         if child is priority_move:
                             priority += 50
 
-                    # Check if piece is on a boarder if the board is 
+                    # Check if piece is on a boarder if the board is
                     #   close to shrinking
                     if (((self.turn > (152-(len(self.my_pos))) and
                           self.turn < 152) or
@@ -1093,7 +1093,7 @@ class Player:
                     if move[0] in flanks:
                         priority -= 50
 
-                # Give a lower value to the move if the new position will 
+                # Give a lower value to the move if the new position will
                 #   not kill an opponent
                 if child[1] not in kill[0]:
                     # More crucial at the smallest board size
@@ -1102,7 +1102,7 @@ class Player:
                     else:
                         priority += -30
 
-                # Recursion: go down to the next child 
+                # Recursion: go down to the next child
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 1,
                                    child, move, alpha, beta)
 
@@ -1163,7 +1163,7 @@ class Player:
                         if flank not in flanks:
                             flanks.append(flank)
 
-                # Find the shortest distance to the closest goal and 
+                # Find the shortest distance to the closest goal and
                 #   record to be added to the value of the move
                 path = Player.depth_limited_search(self, child[1],
                                                    goals, 4, new_board, 1)
@@ -1187,7 +1187,7 @@ class Player:
                         if child is priority_move:
                             priority += -50
 
-                    # Check if piece is on a boarder if the board is 
+                    # Check if piece is on a boarder if the board is
                     #   close to shrinking
                     if (((self.turn > (152-(len(self.my_pos))) and
                           self.turn < 152) or
@@ -1203,7 +1203,7 @@ class Player:
                     if move[0] in flanks:
                         priority += 50
 
-                # Give a higher value to the move if the new position will 
+                # Give a higher value to the move if the new position will
                 #   not kill an opponent
                 if child[1] not in kill[1]:
                     # More crucial at the smallest board size
@@ -1212,7 +1212,7 @@ class Player:
                     else:
                         priority += 30
 
-                # Recursion: go down to the next child 
+                # Recursion: go down to the next child
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0,
                                    child, move, alpha, beta)
 
@@ -1369,7 +1369,7 @@ class Player:
                                                           [self.kill_pos,
                                                            self.save_pos])
 
-            # Find the shortest distance to the closest goal and 
+            # Find the shortest distance to the closest goal and
             #   record to be added to the value of the move
             self.goals = []
             self.flanks = []
