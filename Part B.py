@@ -533,7 +533,7 @@ class Player:
                   ((x, y-1) in opp_pos or (x, y-1) in self.corners))):
                 if curr_pos_removed:
                     my_pos.append(curr_pos)
-                return 30
+                return 100
 
             if (self.turn >= 24):
                 if Player.check_kill_save_pos(self, pos,
@@ -546,7 +546,7 @@ class Player:
                     # Will die after this turn
                     if curr_pos_removed:
                         my_pos.append(curr_pos)
-                    return 30
+                    return 70
 
             if (self.turn < 24):
 
@@ -1079,9 +1079,9 @@ class Player:
 
                     # Check if piece is on a boarder if the board is
                     #   close to shrinking
-                    if (((self.turn > (152-(len(self.my_pos))) and
+                    if (((self.turn > (152-(len(self.my_pos))*2) and
                           self.turn < 152) or
-                         (self.turn > (216-(len(self.my_pos))) and
+                         (self.turn > (216-(len(self.my_pos))*2) and
                           self.turn < 216))):
                         if Player.on_border(self, move[1]):
                             if not Player.on_border(self, move[0]):
@@ -1092,7 +1092,7 @@ class Player:
                                 priority += 50
                                 if Player.eval_move(self, move[1],
                                                     move[0], board, dead)<20:
-                                    priority += 1000
+                                    priority += 200
 
                     # If piece is flanking, avoid moving
                     if move[0] in flanks:
@@ -1194,24 +1194,24 @@ class Player:
 
                     # Check if piece is on a boarder if the board is
                     #   close to shrinking
-                    if (((self.turn > (152-(len(self.my_pos))) and
+                    if (((self.turn > (152-(len(self.my_pos))*2) and
                           self.turn < 152) or
-                         (self.turn > (216-(len(self.my_pos))) and
+                         (self.turn > (216-(len(self.my_pos))*2) and
                           self.turn < 216))):
                         if Player.on_border(self, move[1]):
                             if not Player.on_border(self, move[0]):
-                                priority += +1000
+                                priority += +500
                         if Player.on_border(self, move[0]):
                             priority += -100
                             if not Player.on_border(self, move[1]):
                                 priority += -50
                                 if Player.eval_move(self, move[1],
                                                     move[0], board, dead)<20:
-                                    priority += -1000
+                                    priority += -200
 
                     # If piece is flanking, avoid moving
                     if move[0] in flanks:
-                        priority += 50
+                        priority += 10
 
                 # Give a higher value to the move if the new position will
                 #   not kill an opponent
@@ -1220,7 +1220,7 @@ class Player:
                     if self.turn > 216:
                         priority += 100
                     else:
-                        priority += 30
+                        priority += 10
 
                 # Recursion: go down to the next child
                 v = Player.minimax(self, new_board, new_dead, kill, depth-1, 0,
@@ -1411,7 +1411,7 @@ class Player:
 
             # If these conditions below are met, stop postponing for effiency
             #   and start using Minimax
-            if self.turn > 120 or len(self.my_pos) < 6:
+            if self.turn > 120 or len(self.my_pos) < 8:
                 # ----------------Handle Shrinking Strategy---------------
                 """if (((self.turn > (152-(len(self.my_pos))) and
                       self.turn < 152) or
