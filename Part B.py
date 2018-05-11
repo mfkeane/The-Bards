@@ -1399,8 +1399,10 @@ class Player:
             # Set a dictionary to be used for index keys and distance values
             eval_dict = defaultdict()
 
-            # ----------------Handle Shrinking Strategy---------------
+            # If these conditions below are met, stop postponing for effiency
+            #   and start using Minimax
             if self.turn > 120 or len(self.my_pos) < 6:
+                # ----------------Handle Shrinking Strategy---------------
                 if (((self.turn > (152-(len(self.my_pos))) and
                       self.turn < 152) or
                      (self.turn > (216-(len(self.my_pos))) and
@@ -1485,7 +1487,7 @@ class Player:
 
             # ----------------NORMAL MOVEMENT---------------
             # Minimax cannot be run constantly for efficiency
-            
+
             # For every valid possible move, find the distance to the nearest
             # goal to evaluate the move
             for i in range(len(moves_list)):
