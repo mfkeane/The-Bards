@@ -1085,9 +1085,14 @@ class Player:
                           self.turn < 216))):
                         if Player.on_border(self, move[1]):
                             if not Player.on_border(self, move[0]):
-                                priority += -100
+                                priority += -1000
                         if Player.on_border(self, move[0]):
-                            priority += 50
+                            priority += 100
+                            if not Player.on_border(self, move[1]):
+                                priority += 50
+                                if Player.eval_move(self, move[1],
+                                                    move[0], board, dead)<20:
+                                    priority += 1000
 
                     # If piece is flanking, avoid moving
                     if move[0] in flanks:
@@ -1195,9 +1200,14 @@ class Player:
                           self.turn < 216))):
                         if Player.on_border(self, move[1]):
                             if not Player.on_border(self, move[0]):
-                                priority += -100
+                                priority += +1000
                         if Player.on_border(self, move[0]):
-                            priority += 50
+                            priority += -100
+                            if not Player.on_border(self, move[1]):
+                                priority += -50
+                                if Player.eval_move(self, move[1],
+                                                    move[0], board, dead)<20:
+                                    priority += -1000
 
                     # If piece is flanking, avoid moving
                     if move[0] in flanks:
@@ -1403,7 +1413,7 @@ class Player:
             #   and start using Minimax
             if self.turn > 120 or len(self.my_pos) < 6:
                 # ----------------Handle Shrinking Strategy---------------
-                if (((self.turn > (152-(len(self.my_pos))) and
+                """if (((self.turn > (152-(len(self.my_pos))) and
                       self.turn < 152) or
                      (self.turn > (216-(len(self.my_pos))) and
                       self.turn < 216))):
@@ -1444,7 +1454,7 @@ class Player:
                                                      self.opp_pos],
                                                     [self.my_dead,
                                                      self.opp_dead], 0)
-                        return best_on_border[1]
+                        return best_on_border[1]"""
 
                 # ------------MINIMAX--------------
                 # Initialise Lists
