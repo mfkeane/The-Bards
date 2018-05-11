@@ -26,7 +26,7 @@ This phase is where things get a little reckless. In the Moving Phase, we are no
 the enemy. Of course this doesn't mean our pieces are bent on making stupid moves, but rather we are trying to maximise the 
 efficiency with which our pieces can position themselves in relatively safe positions that bring them closer to ideal positions. 
 
-Due to this, our decision making is based upon the depth limited search algorithm ( Player.depth_limited_search() ), and an 
+Due to this, our decision making is based upon minimax with alpha beta pruning, using the depth limited search algorithm ( Player.depth_limited_search() ), and an 
 evaluation function ( Player.eval_move() ) joined with some other "priority" listed situations where we add or subtract values to
 the evaluations returning value. Our program firstly finds all avaliable moves by using modified versions of the functions made 
 for Part A, and then evaluates each move by checking if it is valid, finding the shortest distance from the new position to a goal
