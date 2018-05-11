@@ -1,4 +1,4 @@
-Strategy:
+The Bards Strategy
 
 Placing Phase:
 After playing the placing phase ourselves, we have decided that the best strategy is simply one where your pieces do not die.
@@ -25,13 +25,15 @@ Moving Phase:
 This phase is where things get a little reckless. In the Moving Phase, we are not concerned with saving pieces, but with killing
 the enemy. Of course this doesn't mean our pieces are bent on making stupid moves, but rather we are trying to maximise the 
 efficiency with which our pieces can position themselves in relatively safe positions that bring them closer to ideal positions. 
+
 Due to this, our decision making is based upon the depth limited search algorithm ( Player.depth_limited_search() ), and an 
-evaluation function ( Player.eval_move() ) Our program firstly finds all avaliable moves by using modified versions of the 
-functions made for Part A, and then evaluates each move by checking if it is valid, finding the shortest distance from the new 
-position to a goal position (by number of moves), and adding a number to that value depending on how smartthe move is. For example,
-if the move is a good one, we add zero, but if it is not ideal, say the player will die, we add a large number like 20.
-We then go through all these moves and their values (distance + evaluation) and choose the move with the 
-lowest value, making it the move that brings us closer to an ideal position at minimal risk. 
+evaluation function ( Player.eval_move() ) joined with some other "priority" listed situations where we add or subtract values to
+the evaluations returning value. Our program firstly finds all avaliable moves by using modified versions of the functions made 
+for Part A, and then evaluates each move by checking if it is valid, finding the shortest distance from the new position to a goal
+position (by number of moves), and adding a number to that value depending on how smartthe move is. For example, if the move is a 
+good one, we add zero, but if it is not ideal, say the player will die, we add a large number like 20 or 30. We then go through all
+these moves and their values (distance + evaluation) and choose the move with the lowest value, making it the move that brings us 
+closer to an ideal position at minimal risk. 
 
 There are a few select cases where our strategy is tweaked, and they are as follows:
           Nearing the Shrinking of the Board:
@@ -48,3 +50,14 @@ There are a few select cases where our strategy is tweaked, and they are as foll
               as white, if we are to place a piece next to the corner, "X O @ X", we will kill the black piece, our
               opponent, while being safe as we are attacking. Therefore, the evaluation value of being next to a
               corner should be tweaked to be very low if the position will result in killing an opponent.
+              
+To implement this decision making strategy, we are using Minimax with Alpha Beta Pruning. Sadly, in order to maximise efficiency,
+we cannot run Minimax throughout the entire game. Therefore, we are using only the decision making sections on their own, through
+trying every possible move but only looking to the immediately next move in the future, for the first section up to a predefined
+number of turns (based upon the time limit), or if we have lost more pieces than we are comfortable with. Then, we switch to using
+Minimax. We also neglect using Minimax during the times where we are nearing the shrinking of the board if there are pieces on 
+the boarders that can be moved to safer positions before the board shrinks. 
+
+We decided on 6 being the number of deaths of our pieces that we would allow as it marks the halfway point of the game. We also
+decided on the turn number being ##### before switching to Minimax, after testing the running time of the program against other
+players. 
