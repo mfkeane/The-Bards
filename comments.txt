@@ -56,7 +56,7 @@ we cannot run Minimax throughout the entire game. Therefore, we are using only t
 trying every possible move but only looking to the immediately next move in the future, for the first section up to a predefined
 number of turns (based upon the time limit), or if we have lost more pieces than we are comfortable with. Then, we switch to using
 Minimax. We also neglect using Minimax during the times where we are nearing the shrinking of the board if there are pieces on 
-the boarders that can be moved to safer positions before the board shrinks. 
+the borders that can be moved to safer positions before the board shrinks. 
 
 We decided on 6 being the number of deaths of our pieces that we would allow as it marks the halfway point of the game. We also
 decided on the turn number being ##### before switching to Minimax, after testing the running time of the program against other
